@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdStick — Car Advertising Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --brand: #FF6B2B;
+      --brand-dark: #e05520;
+      --dark: #0F1117;
+      --dark2: #1A1D27;
+      --dark3: #242838;
+      --card: #1E2130;
+      --border: #2E3347;
+      --text: #E8EAF0;
+      --muted: #8890A8;
+      --green: #22C55E;
+      --yellow: #F59E0B;
+      --red: #EF4444;
+      --blue: #3B82F6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--dark); color: var(--text); overflow-x: hidden; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+      background: rgba(15,17,23,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--brand); letter-spacing: -0.5px; }
+    .logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { display: flex; gap: 0.75rem; align-items: center; }
+    .btn { padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all .2s; border: none; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary:hover { background: var(--brand-dark); transform: translateY(-1px); }
+
+    /* ─── VIEWS ─── */
+    .view { display: none; padding-top: 64px; }
+    .view.active { display: block; }
+
+    /* ─── LANDING ─── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 6rem 2rem 4rem;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,107,43,0.15) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,107,43,0.1); border: 1px solid rgba(255,107,43,0.3);
+      color: var(--brand); padding: 0.35rem 1rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600; margin-bottom: 1.5rem;
+    }
+    .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 1.25rem; }
+    .hero h1 .accent { color: var(--brand); }
+    .hero p { font-size: 1.15rem; color: var(--muted); max-width: 560px; line-height: 1.7; margin-bottom: 2.5rem; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-lg { padding: 0.875rem 2rem; font-size: 1rem; border-radius: 10px; }
+    .hero-stats { display: flex; gap: 3rem; margin-top: 5rem; flex-wrap: wrap; justify-content: center; }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 2rem; font-weight: 800; color: var(--brand); }
+    .hero-stat .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* features */
+    section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .section-label { color: var(--brand); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .section-title { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 1rem; }
+    .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.7; max-width: 560px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 2rem; transition: border-color .2s, transform .2s;
+    }
+    .feature-card:hover { border-color: var(--brand); transform: translateY(-3px); }
+    .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .feature-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .feature-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+    /* how it works */
+    .how-section { background: var(--dark2); padding: 5rem 2rem; }
+    .how-inner { max-width: 1200px; margin: 0 auto; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 3rem; }
+    .step { text-align: center; }
+    .step-num { width: 56px; height: 56px; background: var(--brand); border-radius: 14px; font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .step p { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+
+    /* pricing */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .pricing-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+      position: relative;
+    }
+    .pricing-card.featured { border-color: var(--brand); }
+    .featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--brand); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 1rem; border-radius: 999px; }
+    .price { font-size: 2.5rem; font-weight: 900; margin: 1rem 0 0.25rem; }
+    .price span { font-size: 1rem; color: var(--muted); font-weight: 400; }
+    .pricing-features { list-style: none; margin: 1.5rem 0; }
+    .pricing-features li { color: var(--muted); font-size: 0.875rem; padding: 0.4rem 0; display: flex; align-items: center; gap: 0.5rem; }
+    .pricing-features li::before { content: "✓"; color: var(--green); font-weight: 700; }
+    .full-width { width: 100%; }
+
+    /* cta strip */
+    .cta-strip {
+      background: linear-gradient(135deg, var(--brand) 0%, #ff9f5a 100%);
+      padding: 4rem 2rem; text-align: center;
+    }
+    .cta-strip h2 { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 1rem; }
+    .cta-strip p { color: rgba(255,255,255,0.85); margin-bottom: 2rem; }
+    .btn-white { background: #fff; color: var(--brand); font-weight: 700; }
+    .btn-white:hover { background: #f0f0f0; transform: translateY(-1px); }
+
+    footer { background: var(--dark2); padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
+
+    /* ─── DASHBOARD ─── */
+    .dash-layout { display: flex; min-height: calc(100vh - 64px); }
+    .sidebar {
+      width: 240px; background: var(--dark2); border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.25rem;
+      position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto;
+    }
+    .sidebar-label { font-size: 0.7rem; font-weight: 700; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.75rem 0.75rem 0.25rem; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.65rem 0.75rem; border-radius: 8px; cursor: pointer;
+      color: var(--muted); font-size: 0.875rem; font-weight: 500;
+      transition: all .2s; border: none; background: none; width: 100%; text-align: left;
+    }
+    .sidebar-item:hover { background: var(--dark3); color: var(--text); }
+    .sidebar-item.active { background: rgba(255,107,43,0.12); color: var(--brand); }
+    .sidebar-item .icon { font-size: 1.1rem; width: 20px; text-align: center; }
+
+    .dash-content { flex: 1; padding: 2rem; overflow-y: auto; }
+    .dash-panel { display: none; }
+    .dash-panel.active { display: block; }
+
+    .page-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .page-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+
+    /* stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .stat-delta { font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; }
+    .delta-up { color: var(--green); }
+    .delta-down { color: var(--red); }
+
+    /* map */
+    .map-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+    .card-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 0.95rem; font-weight: 700; }
+    #live-map { height: 420px; }
+
+    /* table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .data-table th { color: var(--muted); font-weight: 600; text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .data-table td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .badge-green { background: rgba(34,197,94,0.12); color: var(--green); }
+    .badge-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+    .badge-red { background: rgba(239,68,68,0.12); color: var(--red); }
+    .badge-blue { background: rgba(59,130,246,0.12); color: var(--blue); }
+
+    /* charts */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .chart-card canvas { max-height: 280px; }
+
+    /* live dot */
+    .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; margin-right: 6px; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* campaigns */
+    .campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .campaign-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .campaign-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .campaign-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+    .campaign-client { color: var(--muted); font-size: 0.8rem; }
+    .progress-bar { height: 6px; background: var(--dark3); border-radius: 999px; overflow: hidden; margin: 1rem 0 0.25rem; }
+    .progress-fill { height: 100%; background: var(--brand); border-radius: 999px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
+    .campaign-meta { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .campaign-meta-item { font-size: 0.8rem; color: var(--muted); }
+    .campaign-meta-item strong { color: var(--text); font-weight: 600; }
+
+    /* cars panel */
+    .search-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 1rem; color: var(--text); font-size: 0.875rem; }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { outline: none; border-color: var(--brand); }
+
+    /* traffic */
+    .traffic-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .nav-links { display: none; }
+    }
+
+    /* leaflet overrides */
+    .leaflet-container { background: #1a1d27 !important; }
+    .leaflet-tile { filter: invert(0.9) hue-rotate(180deg) brightness(0.85) saturate(0.8); }
+  </style>
+</head>
+<body>
+
+<!-- ──────────────────── NAV ──────────────────── -->
+<nav>
+  <div class="logo">Ad<span>Stick</span></div>
+  <div class="nav-links">
+    <a href="#" onclick="showView('landing')">Home</a>
+    <a href="#features">Features</a>
+    <a href="#how">How it Works</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn btn-outline" onclick="showView('dashboard')">Sign In</button>
+    <button class="btn btn-primary" onclick="showView('dashboard')">Go to Dashboard</button>
+  </div>
+</nav>
+
+<!-- ──────────────────── LANDING ──────────────────── -->
+<div class="view active" id="view-landing">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🚗 Real-time car ad tracking platform</div>
+    <h1>Turn Every Car Into a<br><span class="accent">Moving Billboard</span></h1>
+    <p>Place sticker ads on cars across the city, track their real-time locations, measure KM covered, and analyze traffic density — all from one dashboard.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg" onclick="showView('dashboard')">Open Dashboard →</button>
+      <button class="btn btn-outline btn-lg">Watch Demo</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">1,200+</div><div class="lbl">Active Cars</div></div>
+      <div class="hero-stat"><div class="num">3.4M</div><div class="lbl">KM Tracked</div></div>
+      <div class="hero-stat"><div class="num">98</div><div class="lbl">Active Campaigns</div></div>
+      <div class="hero-stat"><div class="num">47</div><div class="lbl">Cities Covered</div></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">Platform Features</div>
+    <div class="section-title">Everything you need to run car ad campaigns</div>
+    <p class="section-sub">A complete toolkit for advertisers, fleet managers, and campaign analysts.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3>Real-time GPS Tracking</h3>
+        <p>See every car with your sticker on a live map. Updates every 30 seconds with precise coordinates.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📏</div>
+        <h3>KM Distance Analytics</h3>
+        <p>Track total kilometers each car has traveled with your sticker on it. Broken down by day, week, or campaign.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Traffic Density Maps</h3>
+        <p>Visualize how much traffic exists in areas where your cars are operating — maximize exposure.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Campaign Dashboard</h3>
+        <p>Manage multiple ad campaigns, assign cars to campaigns, set durations, and track progress.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <h3>Driver Portal</h3>
+        <p>Drivers can log in to see their routes, earnings, and sticker status from a dedicated interface.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Client Reports</h3>
+        <p>Auto-generate PDF reports for your advertising clients with reach estimates and coverage maps.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-section" id="how">
+    <div class="how-inner">
+      <div class="section-label">How it Works</div>
+      <div class="section-title">From sticker to insights in 4 steps</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Add Campaign</h3>
+          <p>Create a campaign with brand, duration, target areas, and KM goals.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Assign Cars</h3>
+          <p>Select cars from the fleet and assign them to the campaign. Stickers are placed physically.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Cars Drive</h3>
+          <p>GPS devices track location, speed, and routes in real time as cars move through the city.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Track & Report</h3>
+          <p>View live map, KM analytics, traffic exposure, and share reports with clients.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="section-label">Pricing</div>
+    <div class="section-title">Simple, transparent plans</div>
+    <p class="section-sub">All plans include a 14-day free trial. No credit card required.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="section-label">Starter</div>
+        <div class="price">$99 <span>/ month</span></div>
+        <ul class="pricing-features">
+          <li>Up to 50 cars tracked</li>
+          <li>2 active campaigns</li>
+          <li>30-second GPS updates</li>
+          <li>Basic KM reports</li>
+          <li>Email support</li>
+        </ul>
+        <button class="btn btn-outline full-width btn-lg" onclick="showView('dashboard')">Get Started</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="featured-badge">Most Popular</div>
+        <div class="section-label">Growth</div>
+        <div class="price">$299 <span>/ month</span></div>
+        <ul class="pricing-features">
+          <li>Up to 300 cars tracked</li>
+          <li>Unlimited campaigns</li>
+          <li>10-second GPS updates</li>
+          <li>Traffic density analytics</li>
+          <li>Client PDF reports</li>
+          <li>Priority support</li>
+        </ul>
+        <button class="btn btn-primary full-width btn-lg" onclick="showView('dashboard')">Get Started</button>
+      </div>
+      <div class="pricing-card">
+        <div class="section-label">Enterprise</div>
+        <div class="price">Custom</div>
+        <ul class="pricing-features">
+          <li>Unlimited cars</li>
+          <li>Dedicated infrastructure</li>
+          <li>Real-time API access</li>
+          <li>White-label dashboard</li>
+          <li>24/7 dedicated support</li>
+          <li>Custom integrations</li>
+        </ul>
+        <button class="btn btn-outline full-width btn-lg">Contact Sales</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA STRIP -->
+  <div class="cta-strip">
+    <h2>Ready to launch your first campaign?</h2>
+    <p>Join 500+ companies already using AdStick to reach millions of commuters daily.</p>
+    <button class="btn btn-white btn-lg" onclick="showView('dashboard')">Open Dashboard →</button>
+  </div>
+
+  <footer>© 2026 AdStick. All rights reserved. &nbsp;·&nbsp; Built for modern mobile advertisers.</footer>
+</div>
+
+
+<!-- ──────────────────── DASHBOARD ──────────────────── -->
+<div class="view" id="view-dashboard">
+  <div class="dash-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Main</div>
+      <button class="sidebar-item active" onclick="showPanel('overview')">
+        <span class="icon">🏠</span> Overview
+      </button>
+      <button class="sidebar-item" onclick="showPanel('map')">
+        <span class="icon">🗺️</span> Live Map
+      </button>
+      <button class="sidebar-item" onclick="showPanel('cars')">
+        <span class="icon">🚗</span> Cars & KM
+      </button>
+      <button class="sidebar-item" onclick="showPanel('traffic')">
+        <span class="icon">📡</span> Traffic Analytics
+      </button>
+      <button class="sidebar-item" onclick="showPanel('campaigns')">
+        <span class="icon">📢</span> Campaigns
+      </button>
+      <div class="sidebar-label">Account</div>
+      <button class="sidebar-item" onclick="showPanel('reports')">
+        <span class="icon">📄</span> Reports
+      </button>
+      <button class="sidebar-item" onclick="showView('landing')">
+        <span class="icon">🌐</span> Landing Page
+      </button>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="dash-content">
+
+      <!-- OVERVIEW -->
+      <div class="dash-panel active" id="panel-overview">
+        <div class="page-title">Overview</div>
+        <div class="page-sub"><span class="live-dot"></span>Live data · Last updated just now</div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Active Cars</div>
+            <div class="stat-value" style="color:var(--green)">847</div>
+            <div class="stat-delta delta-up">▲ 12 since yesterday</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">KM Today</div>
+            <div class="stat-value" style="color:var(--blue)">24,891</div>
+            <div class="stat-delta delta-up">▲ 8.4% vs last week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Campaigns</div>
+            <div class="stat-value" style="color:var(--brand)">23</div>
+            <div class="stat-delta delta-up">▲ 3 new this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg Traffic Score</div>
+            <div class="stat-value" style="color:var(--yellow)">7.4</div>
+            <div class="stat-delta delta-down">▼ 0.3 from morning peak</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="card-header">
+            <div class="card-title"><span class="live-dot"></span>Live Car Locations</div>
+            <button class="btn btn-outline" style="font-size:0.8rem;padding:0.35rem 0.8rem" onclick="showPanel('map')">Full Map →</button>
+          </div>
+          <div id="live-map"></div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="card-title" style="margin-bottom:1rem">KM per Day (Last 7 Days)</div>
+            <canvas id="kmChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title" style="margin-bottom:1rem">Cars by Campaign</div>
+            <canvas id="campaignChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP PANEL -->
+      <div class="dash-panel" id="panel-map">
+        <div class="page-title">Live Map</div>
+        <div class="page-sub"><span class="live-dot"></span>Tracking 847 cars in real time</div>
+        <div class="map-card" style="margin-bottom:1rem">
+          <div id="full-map" style="height:600px"></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Downtown</div><div class="stat-value" style="color:var(--red);font-size:1.5rem">213 cars</div><div class="stat-delta" style="color:var(--red)">● High traffic</div></div>
+          <div class="stat-card"><div class="stat-label">North District</div><div class="stat-value" style="color:var(--yellow);font-size:1.5rem">148 cars</div><div class="stat-delta" style="color:var(--yellow)">● Medium traffic</div></div>
+          <div class="stat-card"><div class="stat-label">East Side</div><div class="stat-value" style="color:var(--green);font-size:1.5rem">94 cars</div><div class="stat-delta" style="color:var(--green)">● Low traffic</div></div>
+          <div class="stat-card"><div class="stat-label">West End</div><div class="stat-value" style="color:var(--yellow);font-size:1.5rem">112 cars</div><div class="stat-delta" style="color:var(--yellow)">● Medium traffic</div></div>
+        </div>
+      </div>
+
+      <!-- CARS & KM -->
+      <div class="dash-panel" id="panel-cars">
+        <div class="page-title">Cars & KM Tracking</div>
+        <div class="page-sub">Distance traveled per car with active sticker</div>
+        <div class="search-bar">
+          <input class="search-input" placeholder="Search by plate, driver, or campaign…" />
+          <button class="btn btn-outline">Filter</button>
+          <button class="btn btn-primary">Export CSV</button>
+        </div>
+        <div class="map-card">
+          <div class="card-header"><div class="card-title">All Cars</div><div style="color:var(--muted);font-size:0.8rem">Showing 847 of 847</div></div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Plate</th>
+                <th>Driver</th>
+                <th>Campaign</th>
+                <th>Today KM</th>
+                <th>Total KM</th>
+                <th>Last Seen</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="cars-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRAFFIC ANALYTICS -->
+      <div class="dash-panel" id="panel-traffic">
+        <div class="page-title">Traffic Analytics</div>
+        <div class="page-sub">Footfall and traffic density in areas where your cars are active</div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Peak Area</div><div class="stat-value" style="color:var(--red);font-size:1.4rem">Downtown</div><div class="stat-delta">Score 9.2 / 10</div></div>
+          <div class="stat-card"><div class="stat-label">Total Impressions Est.</div><div class="stat-value" style="color:var(--brand)">2.1M</div><div class="stat-delta delta-up">▲ Today</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Dwell Time</div><div class="stat-value" style="color:var(--blue)">4.2s</div><div class="stat-delta">per passerby</div></div>
+          <div class="stat-card"><div class="stat-label">Hottest Hour</div><div class="stat-value" style="color:var(--yellow)">8–9 AM</div><div class="stat-delta">Rush hour peak</div></div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="card-title" style="margin-bottom:1rem">Traffic Score by Area</div>
+            <canvas id="trafficAreaChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="card-title" style="margin-bottom:1rem">Hourly Traffic (Today)</div>
+            <canvas id="trafficHourChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-top:1.5rem">
+          <div class="card-title" style="margin-bottom:1rem">Weekly Traffic Trend by Zone</div>
+          <canvas id="trafficWeekChart" style="max-height:220px"></canvas>
+        </div>
+      </div>
+
+      <!-- CAMPAIGNS -->
+      <div class="dash-panel" id="panel-campaigns">
+        <div class="page-title">Campaigns</div>
+        <div class="page-sub">Manage and track all advertising campaigns</div>
+        <div style="display:flex;gap:1rem;margin-bottom:1.5rem">
+          <button class="btn btn-primary">+ New Campaign</button>
+          <button class="btn btn-outline">Filter</button>
+        </div>
+        <div class="campaign-grid" id="campaign-grid"></div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="dash-panel" id="panel-reports">
+        <div class="page-title">Reports</div>
+        <div class="page-sub">Generate and download reports for clients</div>
+        <div class="map-card">
+          <div class="card-header"><div class="card-title">Available Reports</div></div>
+          <table class="data-table">
+            <thead><tr><th>Report</th><th>Campaign</th><th>Period</th><th>KM Covered</th><th>Est. Reach</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>Coca-Cola May Summary</td><td>Coca-Cola Refresh</td><td>May 2026</td><td>89,240 km</td><td>1.2M</td><td><button class="btn btn-outline" style="font-size:0.8rem;padding:0.3rem 0.75rem">Download PDF</button></td></tr>
+              <tr><td>Nike Q1 Overview</td><td>Nike Air Max</td><td>Q1 2026</td><td>220,780 km</td><td>3.8M</td><td><button class="btn btn-outline" style="font-size:0.8rem;padding:0.3rem 0.75rem">Download PDF</button></td></tr>
+              <tr><td>Apple Weekly #22</td><td>Apple Vision</td><td>Week 22</td><td>14,300 km</td><td>340K</td><td><button class="btn btn-outline" style="font-size:0.8rem;padding:0.3rem 0.75rem">Download PDF</button></td></tr>
+              <tr><td>McDonald's Rush Hour</td><td>McD Morning</td><td>Jun 1–3</td><td>8,120 km</td><td>190K</td><td><button class="btn btn-outline" style="font-size:0.8rem;padding:0.3rem 0.75rem">Download PDF</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ── View switching ──
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  if (v === 'dashboard') initDashboard();
+}
+
+// ── Panel switching ──
+function showPanel(p) {
+  document.querySelectorAll('.dash-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('panel-' + p).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (p === 'map' && !fullMapInit) initFullMap();
+  if (p === 'traffic' && !trafficInit) initTrafficCharts();
+}
+
+// ── Sample data ──
+const plates = ['ABC 1234','XYZ 5678','DEF 9012','GHI 3456','JKL 7890','MNO 2345','PQR 6789','STU 0123','VWX 4567','YZA 8901'];
+const drivers = ['Ahmed K.','Sara M.','Omar H.','Fatima R.','Yusuf A.','Layla N.','Khaled S.','Nour E.','Tarek B.','Dina F.'];
+const campaigns = ['Coca-Cola Refresh','Nike Air Max','Apple Vision','McD Morning','Samsung Galaxy','Pepsi Summer','Zara Collection','Amazon Prime'];
+const statuses = ['active','active','active','active','idle','active','active','maintenance'];
+const colors = {active:'badge-green',idle:'badge-yellow',maintenance:'badge-red'};
+const carData = Array.from({length:40}, (_,i) => ({
+  plate: plates[i%10] + (i>9 ? ` (${Math.floor(i/10)})` : ''),
+  driver: drivers[i%10],
+  campaign: campaigns[i%8],
+  todayKm: (Math.random()*120+10).toFixed(1),
+  totalKm: (Math.random()*8000+500).toFixed(0),
+  lastSeen: `${Math.floor(Math.random()*30)+1}m ago`,
+  status: statuses[i%8]
+}));
+
+const campaignData = [
+  {name:'Coca-Cola Refresh', client:'Coca-Cola Co.', cars:120, target:150, kmDone:89240, kmTarget:120000, start:'Apr 1', end:'Jun 30', status:'active'},
+  {name:'Nike Air Max', client:'Nike Inc.', cars:85, target:100, kmDone:220780, kmTarget:300000, start:'Jan 1', end:'Mar 31', status:'active'},
+  {name:'Apple Vision', client:'Apple Inc.', cars:60, target:60, kmDone:45200, kmTarget:80000, start:'May 15', end:'Jul 15', status:'active'},
+  {name:'McD Morning Rush', client:"McDonald's", cars:200, target:250, kmDone:8120, kmTarget:50000, start:'Jun 1', end:'Jun 30', status:'active'},
+  {name:'Samsung Galaxy', client:'Samsung', cars:40, target:80, kmDone:12400, kmTarget:60000, start:'Jun 3', end:'Aug 3', status:'active'},
+  {name:'Pepsi Summer', client:'PepsiCo', cars:0, target:100, kmDone:0, kmTarget:100000, start:'Jul 1', end:'Sep 30', status:'upcoming'},
+];
+
+// GPS demo locations (around Riyadh area)
+const baseLat = 24.7136, baseLng = 46.6753;
+function rndCars(n) {
+  return Array.from({length:n}, () => ({
+    lat: baseLat + (Math.random()-0.5)*0.4,
+    lng: baseLng + (Math.random()-0.5)*0.4,
+    plate: plates[Math.floor(Math.random()*10)],
+    campaign: campaigns[Math.floor(Math.random()*8)],
+    km: (Math.random()*80+5).toFixed(1)
+  }));
+}
+
+let dashInited = false, fullMapInit = false, trafficInit = false;
+let miniMap, fullMap;
+
+function initDashboard() {
+  if (dashInited) return;
+  dashInited = true;
+  populateCarsTable();
+  populateCampaigns();
+  setTimeout(() => { initMiniMap(); initKmChart(); initCampaignChart(); }, 100);
+}
+
+// ── Mini map ──
+function initMiniMap() {
+  miniMap = L.map('live-map', {zoomControl:true, scrollWheelZoom:false}).setView([baseLat, baseLng], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+  const carIcon = L.divIcon({html:'🚗',iconSize:[24,24],className:'',iconAnchor:[12,12]});
+  rndCars(60).forEach(c => {
+    L.marker([c.lat, c.lng], {icon: carIcon})
+      .addTo(miniMap)
+      .bindPopup(`<b>${c.plate}</b><br>Campaign: ${c.campaign}<br>Today: ${c.km} km`);
+  });
+}
+
+// ── Full map ──
+function initFullMap() {
+  fullMapInit = true;
+  setTimeout(() => {
+    fullMap = L.map('full-map').setView([baseLat, baseLng], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(fullMap);
+    const carIcon = L.divIcon({html:'🚗',iconSize:[24,24],className:'',iconAnchor:[12,12]});
+    rndCars(120).forEach(c => {
+      L.marker([c.lat, c.lng], {icon: carIcon})
+        .addTo(fullMap)
+        .bindPopup(`<b>${c.plate}</b><br>${c.campaign}<br>${c.km} km today`);
+    });
+    // Traffic circles
+    [[baseLat+0.05, baseLng+0.02, 0.08, '#ef4444'],
+     [baseLat-0.08, baseLng-0.05, 0.06, '#f59e0b'],
+     [baseLat+0.1, baseLng-0.1, 0.05, '#22c55e']].forEach(([la,ln,r,c]) => {
+      L.circle([la,ln], {radius:r*10000, color:c, fillColor:c, fillOpacity:0.12, weight:1}).addTo(fullMap);
+    });
+  }, 150);
+}
+
+// ── KM Chart ──
+function initKmChart() {
+  new Chart(document.getElementById('kmChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        label: 'KM',
+        data: [18400,21200,19800,23400,24891,22100,20300],
+        backgroundColor: 'rgba(255,107,43,0.7)',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, plugins: {legend:{display:false}},
+      scales: { x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8890A8'}}, y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8890A8'}} }
+    }
+  });
+}
+
+// ── Campaign donut ──
+function initCampaignChart() {
+  new Chart(document.getElementById('campaignChart'), {
+    type: 'doughnut',
+    data: {
+      labels: campaignData.map(c=>c.name),
+      datasets: [{
+        data: campaignData.map(c=>c.cars||10),
+        backgroundColor: ['#FF6B2B','#3B82F6','#22C55E','#F59E0B','#A855F7','#EC4899','#14B8A6','#F97316'],
+        borderWidth: 2, borderColor: '#1E2130'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: {position:'right', labels:{color:'#8890A8',font:{size:11}}} }
+    }
+  });
+}
+
+// ── Traffic charts ──
+function initTrafficCharts() {
+  trafficInit = true;
+  setTimeout(() => {
+    // Area bar
+    new Chart(document.getElementById('trafficAreaChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Downtown','North','East','West','Airport Rd','Industrial'],
+        datasets: [{label:'Traffic Score', data:[9.2,7.1,5.4,6.8,8.1,4.2], backgroundColor:'rgba(239,68,68,0.7)', borderRadius:6}]
+      },
+      options: { responsive:true, indexAxis:'y', plugins:{legend:{display:false}},
+        scales:{x:{min:0,max:10,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8890A8'}}, y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8890A8'}}} }
+    });
+    // Hourly line
+    const hours = Array.from({length:24},(_,i)=>`${i}:00`);
+    new Chart(document.getElementById('trafficHourChart'), {
+      type: 'line',
+      data: {
+        labels: hours,
+        datasets: [{label:'Traffic Index', data:[1,0.8,0.6,0.5,0.7,2.1,5.8,9.2,8.4,6.1,5.2,5.8,6.4,5.9,5.4,6.2,7.8,9.0,8.1,6.5,4.9,3.8,2.4,1.5],
+          borderColor:'#F59E0B', backgroundColor:'rgba(245,158,11,0.1)', fill:true, tension:0.4, pointRadius:0}]
+      },
+      options: { responsive:true, plugins:{legend:{display:false}},
+        scales:{x:{ticks:{color:'#8890A8',maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}}, y:{ticks:{color:'#8890A8'},grid:{color:'rgba(255,255,255,0.05)'}}} }
+    });
+    // Weekly multi-line
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    new Chart(document.getElementById('trafficWeekChart'), {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [
+          {label:'Downtown', data:[8.1,9.2,8.8,9.0,8.5,5.2,4.1], borderColor:'#EF4444', tension:0.4, fill:false},
+          {label:'North', data:[6.2,7.1,6.9,7.3,6.8,6.0,5.5], borderColor:'#3B82F6', tension:0.4, fill:false},
+          {label:'East', data:[4.1,5.4,5.0,5.6,5.2,4.8,4.2], borderColor:'#22C55E', tension:0.4, fill:false},
+          {label:'West', data:[5.8,6.8,6.5,7.0,6.5,5.4,4.8], borderColor:'#F59E0B', tension:0.4, fill:false},
+        ]
+      },
+      options: { responsive:true,
+        plugins:{legend:{labels:{color:'#8890A8'}}},
+        scales:{x:{ticks:{color:'#8890A8'},grid:{color:'rgba(255,255,255,0.05)'}}, y:{ticks:{color:'#8890A8'},grid:{color:'rgba(255,255,255,0.05)'}}} }
+    });
+  }, 100);
+}
+
+// ── Cars table ──
+function populateCarsTable() {
+  const tbody = document.getElementById('cars-table-body');
+  tbody.innerHTML = carData.map(c => `
+    <tr>
+      <td><strong>${c.plate}</strong></td>
+      <td>${c.driver}</td>
+      <td><span class="badge badge-blue">${c.campaign}</span></td>
+      <td><strong>${c.todayKm}</strong> km</td>
+      <td>${Number(c.totalKm).toLocaleString()} km</td>
+      <td style="color:var(--muted)">${c.lastSeen}</td>
+      <td><span class="badge ${colors[c.status]}">${c.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ── Campaigns ──
+function populateCampaigns() {
+  const grid = document.getElementById('campaign-grid');
+  grid.innerHTML = campaignData.map(c => {
+    const pct = Math.round((c.kmDone/c.kmTarget)*100);
+    const carPct = Math.round((c.cars/c.target)*100);
+    const statusBadge = c.status === 'active' ? 'badge-green' : 'badge-yellow';
+    return `
+    <div class="campaign-card">
+      <div class="campaign-header">
+        <div>
+          <div class="campaign-name">${c.name}</div>
+          <div class="campaign-client">${c.client}</div>
+        </div>
+        <span class="badge ${statusBadge}">${c.status}</span>
+      </div>
+      <div style="font-size:0.8rem;color:var(--muted)">KM Progress</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-label"><span>${c.kmDone.toLocaleString()} km</span><span>${c.kmTarget.toLocaleString()} km target</span></div>
+      <div class="progress-bar" style="margin-top:0.75rem"><div class="progress-fill" style="width:${carPct}%;background:var(--blue)"></div></div>
+      <div class="progress-label"><span>${c.cars} cars assigned</span><span>${c.target} target</span></div>
+      <div class="campaign-meta">
+        <div class="campaign-meta-item">📅 <strong>${c.start}</strong> → <strong>${c.end}</strong></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Simulate live car movement
+setInterval(() => {
+  if (!miniMap) return;
+  miniMap.eachLayer(layer => {
+    if (layer instanceof L.Marker) {
+      const ll = layer.getLatLng();
+      layer.setLatLng([ll.lat + (Math.random()-0.5)*0.001, ll.lng + (Math.random()-0.5)*0.001]);
+    }
+  });
+}, 3000);
+</script>
+</body>
+</html>
