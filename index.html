@@ -124,6 +124,90 @@
     .btn-white:hover { background: #f0f0f0; transform: translateY(-1px); }
     footer { background: var(--dark2); padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
 
+    /* ── PHASE 6 LANDING SECTIONS ── */
+    .lp-section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .lp-section-full { padding: 5rem 2rem; background: var(--dark2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .lp-section-full .lp-inner { max-width: 1200px; margin: 0 auto; }
+
+    /* Step 16 – Testimonials */
+    .trust-counter { text-align:center; margin-bottom: 3rem; }
+    .trust-counter .big-num { font-size: clamp(3rem,8vw,5rem); font-weight: 900; color: var(--brand); line-height: 1; }
+    .case-study-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+    .case-study-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem; transition: border-color .2s, transform .2s;
+    }
+    .case-study-card:hover { border-color: var(--brand); transform: translateY(-3px); }
+    .cs-brand-row { display: flex; align-items: center; gap: 0.75rem; }
+    .cs-brand-logo { font-size: 2rem; }
+    .cs-brand-name { font-size: 1rem; font-weight: 800; }
+    .cs-brand-tag  { font-size: 0.72rem; color: var(--muted); }
+    .cs-results-row { display: flex; gap: 1rem; }
+    .cs-result { flex: 1; text-align: center; background: var(--dark3); border-radius: 10px; padding: 0.75rem 0.5rem; }
+    .cs-result-val { font-size: 1.2rem; font-weight: 900; color: var(--green); }
+    .cs-result-lbl { font-size: 0.65rem; color: var(--muted); margin-top: 0.15rem; }
+    .cs-quote { font-size: 0.83rem; color: var(--muted); line-height: 1.7; font-style: italic; border-left: 3px solid var(--brand); padding-left: 0.85rem; }
+    .cs-person { display: flex; align-items: center; gap: 0.6rem; }
+    .cs-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,107,43,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .cs-name { font-size: 0.8rem; font-weight: 700; }
+    .cs-role { font-size: 0.7rem; color: var(--muted); }
+    .video-testimonial-row { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 1rem; }
+    .video-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; transition: border-color .2s; }
+    .video-card:hover { border-color: var(--brand); }
+    .video-thumb { height: 140px; background: var(--dark3); display: flex; align-items: center; justify-content: center; position: relative; }
+    .video-play { width: 50px; height: 50px; border-radius: 50%; background: rgba(255,107,43,0.85); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .video-card-body { padding: 1rem; }
+
+    /* Step 17 – Comparison Table */
+    .compare-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+    .compare-table { width: 100%; border-collapse: collapse; min-width: 680px; }
+    .compare-table th { padding: 1rem 1.25rem; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); text-align: center; }
+    .compare-table th:first-child { text-align: left; }
+    .compare-table th.adstick-col { background: rgba(255,107,43,0.08); color: var(--brand); }
+    .compare-table td { padding: 0.9rem 1.25rem; font-size: 0.875rem; border-bottom: 1px solid rgba(255,255,255,0.04); text-align: center; }
+    .compare-table td:first-child { text-align: left; font-weight: 600; color: var(--muted); }
+    .compare-table td.adstick-col { background: rgba(255,107,43,0.05); font-weight: 700; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .cmp-check { color: #22C55E; font-weight: 700; }
+    .cmp-cross { color: #EF4444; }
+    .cmp-partial { color: #F59E0B; }
+
+    /* Step 18 – Mobile App */
+    .app-section { display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; }
+    .app-mockup { flex-shrink: 0; width: 200px; height: 380px; background: var(--dark3); border: 2px solid var(--border); border-radius: 32px; display: flex; align-items: center; justify-content: center; font-size: 5rem; position: relative; overflow: hidden; }
+    .app-mockup::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:80px; height:20px; background:var(--dark2); border-radius:0 0 12px 12px; }
+    .app-content { flex: 1; min-width: 260px; }
+    .app-badges { display: flex; gap: 0.75rem; margin: 1.25rem 0; flex-wrap: wrap; }
+    .store-badge { display: flex; align-items: center; gap: 0.6rem; background: var(--dark3); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 1.25rem; cursor: pointer; transition: border-color .2s; text-decoration: none; color: var(--text); }
+    .store-badge:hover { border-color: var(--brand); }
+    .store-badge-icon { font-size: 1.5rem; }
+    .store-badge-text .store-sub { font-size: 0.65rem; color: var(--muted); }
+    .store-badge-text .store-name { font-size: 0.9rem; font-weight: 800; }
+    .app-features-list { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.25rem; }
+    .app-feature { display: flex; align-items: center; gap: 0.65rem; font-size: 0.875rem; }
+    .app-feature-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); flex-shrink: 0; }
+    .qr-placeholder { width: 96px; height: 96px; background: var(--dark3); border: 2px dashed var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+
+    /* Step 19 – Onboarding Wizard */
+    .wizard-steps { display: flex; flex-direction: column; gap: 0; position: relative; margin-bottom: 2rem; }
+    .wizard-steps::before { content:''; position:absolute; left:27px; top:0; bottom:0; width:2px; background: linear-gradient(180deg, var(--brand), rgba(255,107,43,0.1)); }
+    .wizard-step { display: flex; align-items: flex-start; gap: 1.25rem; padding: 1.25rem 0; }
+    .wizard-num { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,107,43,0.12); border: 2px solid var(--brand); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; color: var(--brand); flex-shrink: 0; position: relative; z-index: 1; }
+    .wizard-body { flex: 1; padding-top: 0.65rem; }
+    .wizard-title { font-size: 1rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .wizard-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .wizard-time-badge { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(34,197,94,0.12); color: #22C55E; border: 1px solid rgba(34,197,94,0.3); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; margin-top: 0.4rem; }
+
+    /* Step 20 – Traffic Intelligence */
+    .intel-report-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .intel-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; transition: border-color .2s; }
+    .intel-card:hover { border-color: var(--brand); }
+    .intel-icon { font-size: 2.5rem; }
+    .intel-title { font-size: 1rem; font-weight: 800; }
+    .intel-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+    .intel-sample { font-size: 0.75rem; background: var(--dark3); border-radius: 8px; padding: 0.6rem 0.75rem; color: var(--muted); font-family: monospace; }
+    .intel-pricing-row { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 1rem; }
+
     /* ─── DASHBOARD ─── */
     .dash-layout { display: flex; min-height: calc(100vh - 64px); }
     .sidebar { width: 240px; background: var(--dark2); border-right: 1px solid var(--border); padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
@@ -1717,6 +1801,352 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           X
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STEP 16: TESTIMONIALS & LIVE CASE STUDIES ── -->
+  <section id="section-testimonials" style="background:var(--dark2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:5rem 2rem;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div class="trust-counter">
+        <div class="big-num" id="trust-counter-num">0</div>
+        <div style="font-size:1rem;color:var(--muted);margin-top:0.5rem;" data-i18n="testi.sub">brands trust AdStick for city-wide reach</div>
+      </div>
+      <div style="text-align:center;margin-bottom:3rem;">
+        <h2 style="font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;margin-bottom:0.75rem;" data-i18n="testi.h">Real Campaigns. Real Results.</h2>
+        <p style="color:var(--muted);max-width:560px;margin:0 auto;" data-i18n="testi.p">See how leading brands achieved measurable outcomes with AdStick's GPS-verified car advertising network.</p>
+      </div>
+      <div class="case-study-grid">
+        <!-- Card 1 -->
+        <div class="case-study-card">
+          <div class="cs-brand-row">
+            <div class="cs-brand-logo">🍕</div>
+            <div><div class="cs-brand-name">PizzaHut KSA</div><div class="cs-brand-tag">QSR / Food & Beverage</div></div>
+          </div>
+          <div class="cs-results-row">
+            <div class="cs-result"><div class="cs-result-val">3.2M</div><div class="cs-result-lbl">Impressions</div></div>
+            <div class="cs-result"><div class="cs-result-val">+41%</div><div class="cs-result-lbl">Store Visits</div></div>
+            <div class="cs-result"><div class="cs-result-val">SAR 0.04</div><div class="cs-result-lbl">Cost/View</div></div>
+          </div>
+          <div class="cs-quote">"We replaced two static billboards with AdStick and tripled our lunch-hour walk-ins in Riyadh in the first 30 days."</div>
+          <div class="cs-person">
+            <div class="cs-avatar">👩</div>
+            <div><div class="cs-name">Sara Al-Rashidi</div><div class="cs-role">Marketing Director, PizzaHut KSA</div></div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="case-study-card">
+          <div class="cs-brand-row">
+            <div class="cs-brand-logo">🏦</div>
+            <div><div class="cs-brand-name">Riyad Bank</div><div class="cs-brand-tag">Finance & Banking</div></div>
+          </div>
+          <div class="cs-results-row">
+            <div class="cs-result"><div class="cs-result-val">5.7M</div><div class="cs-result-lbl">Impressions</div></div>
+            <div class="cs-result"><div class="cs-result-val">+28%</div><div class="cs-result-lbl">App Installs</div></div>
+            <div class="cs-result"><div class="cs-result-val">4.1×</div><div class="cs-result-lbl">ROI</div></div>
+          </div>
+          <div class="cs-quote">"Targeting the financial district during morning peak hours drove our best app-download week ever. Full attribution in the dashboard."</div>
+          <div class="cs-person">
+            <div class="cs-avatar">👨</div>
+            <div><div class="cs-name">Khalid M. Al-Harbi</div><div class="cs-role">Head of Digital, Riyad Bank</div></div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="case-study-card">
+          <div class="cs-brand-row">
+            <div class="cs-brand-logo">👟</div>
+            <div><div class="cs-brand-name">Extra Stores</div><div class="cs-brand-tag">Retail / Electronics</div></div>
+          </div>
+          <div class="cs-results-row">
+            <div class="cs-result"><div class="cs-result-val">8.1M</div><div class="cs-result-lbl">Impressions</div></div>
+            <div class="cs-result"><div class="cs-result-val">+67%</div><div class="cs-result-lbl">Black Fri. Sales</div></div>
+            <div class="cs-result"><div class="cs-result-val">180</div><div class="cs-result-lbl">Cars Deployed</div></div>
+          </div>
+          <div class="cs-quote">"We geo-fenced every Extra Store branch with a 5 km radius. The campaign paid for itself in the first weekend alone."</div>
+          <div class="cs-person">
+            <div class="cs-avatar">👨</div>
+            <div><div class="cs-name">Ahmed Saleh</div><div class="cs-role">Campaigns Manager, Extra Stores</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Video testimonials -->
+      <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:1rem;" data-i18n="testi.video">Video Testimonials</h3>
+      <div class="video-testimonial-row">
+        <div class="video-card" onclick="showToast('Video coming soon!')">
+          <div class="video-thumb"><div class="video-play">▶</div></div>
+          <div class="video-card-body">
+            <div style="font-size:0.85rem;font-weight:700;">How Riyad Bank ran a 5M-impression campaign in 14 days</div>
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">2:34 · Riyad Bank Marketing Team</div>
+          </div>
+        </div>
+        <div class="video-card" onclick="showToast('Video coming soon!')">
+          <div class="video-thumb" style="background:linear-gradient(135deg,#1a1a2e,#16213e);"><div class="video-play">▶</div></div>
+          <div class="video-card-body">
+            <div style="font-size:0.85rem;font-weight:700;">PizzaHut KSA: Geo-Targeting the Lunch Rush</div>
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">1:58 · AdStick Case Study</div>
+          </div>
+        </div>
+        <div class="video-card" onclick="showToast('Video coming soon!')">
+          <div class="video-thumb" style="background:linear-gradient(135deg,#0f3460,#533483);"><div class="video-play">▶</div></div>
+          <div class="video-card-body">
+            <div style="font-size:0.85rem;font-weight:700;">From signup to launch in 10 minutes — Extra Stores story</div>
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem;">3:10 · Extra Stores Digital Team</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STEP 17: vs. DIGITAL ADS COMPARISON ── -->
+  <section id="section-compare" style="padding:5rem 2rem;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:3rem;">
+        <div style="display:inline-block;background:rgba(255,107,43,0.1);color:var(--brand);padding:0.35rem 1rem;border-radius:999px;font-size:0.8rem;font-weight:700;margin-bottom:1rem;" data-i18n="cmp.badge">How We Stack Up</div>
+        <h2 style="font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;margin-bottom:0.75rem;" data-i18n="cmp.h">AdStick vs. Other Advertising Channels</h2>
+        <p style="color:var(--muted);max-width:560px;margin:0 auto;" data-i18n="cmp.p">An honest, side-by-side breakdown of performance, cost, and targeting across every major ad channel.</p>
+      </div>
+      <div class="compare-table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th style="background:var(--dark2);" data-i18n="cmp.metric">Metric</th>
+              <th class="adstick-col">🚗 AdStick</th>
+              <th style="background:var(--dark2);">📘 Facebook Ads</th>
+              <th style="background:var(--dark2);">📸 Instagram Ads</th>
+              <th style="background:var(--dark2);">🪧 Billboards</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-i18n="cmp.cpm">CPM (Cost per 1,000 views)</td>
+              <td class="adstick-col" style="color:var(--green);">SAR 12–18</td>
+              <td>SAR 22–45</td>
+              <td>SAR 28–55</td>
+              <td>SAR 80–200</td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.reach">Daily Reach (mid budget)</td>
+              <td class="adstick-col" style="color:var(--green);">250K–1M+</td>
+              <td>50K–300K</td>
+              <td>40K–250K</td>
+              <td>10K–80K</td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.geo">Geo-targeting</td>
+              <td class="adstick-col"><span class="cmp-check">✓ Real-time GPS</span></td>
+              <td><span class="cmp-check">✓ City/radius</span></td>
+              <td><span class="cmp-check">✓ City/radius</span></td>
+              <td><span class="cmp-cross">✗ Fixed location</span></td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.audience">Audience targeting</td>
+              <td class="adstick-col"><span class="cmp-partial">⚡ Route-based</span></td>
+              <td><span class="cmp-check">✓ Behavioral</span></td>
+              <td><span class="cmp-check">✓ Behavioral</span></td>
+              <td><span class="cmp-cross">✗ None</span></td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.fraud">Ad fraud / bots</td>
+              <td class="adstick-col"><span class="cmp-check">✓ Zero (physical)</span></td>
+              <td><span class="cmp-cross">✗ 20–40%</span></td>
+              <td><span class="cmp-cross">✗ 15–35%</span></td>
+              <td><span class="cmp-check">✓ Zero</span></td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.measure">Verified measurement</td>
+              <td class="adstick-col"><span class="cmp-check">✓ GPS + KM proof</span></td>
+              <td><span class="cmp-partial">⚡ Self-reported</span></td>
+              <td><span class="cmp-partial">⚡ Self-reported</span></td>
+              <td><span class="cmp-cross">✗ Estimated only</span></td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.speed">Launch speed</td>
+              <td class="adstick-col"><span class="cmp-check">✓ &lt; 10 minutes</span></td>
+              <td><span class="cmp-check">✓ Same day</span></td>
+              <td><span class="cmp-check">✓ Same day</span></td>
+              <td><span class="cmp-cross">✗ 2–6 weeks</span></td>
+            </tr>
+            <tr>
+              <td data-i18n="cmp.roi">Average ROI</td>
+              <td class="adstick-col" style="color:var(--green);">3.8× – 6.2×</td>
+              <td>1.8× – 3.1×</td>
+              <td>1.6× – 2.8×</td>
+              <td>0.5× – 1.8×</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:0.72rem;color:var(--muted);margin-top:1rem;text-align:center;" data-i18n="cmp.disclaimer">Data based on 2025 industry benchmarks and AdStick internal campaign analytics. CPMs in SAR.</p>
+    </div>
+  </section>
+
+  <!-- ── STEP 18: MOBILE APP DOWNLOAD ── -->
+  <section id="section-app" style="background:var(--dark2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:5rem 2rem;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:3.5rem;">
+        <div style="display:inline-block;background:rgba(255,107,43,0.1);color:var(--brand);padding:0.35rem 1rem;border-radius:999px;font-size:0.8rem;font-weight:700;margin-bottom:1rem;" data-i18n="app.badge">AdStick Mobile</div>
+        <h2 style="font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;margin-bottom:0.75rem;" data-i18n="app.h">Manage Campaigns from Anywhere</h2>
+        <p style="color:var(--muted);max-width:520px;margin:0 auto;" data-i18n="app.p">Launch, monitor, and optimize your campaigns on the go. Get notified in real-time when your ads hit milestones.</p>
+      </div>
+      <div class="app-section" style="justify-content:center;">
+        <!-- Phone mockup -->
+        <div class="app-mockup">📱</div>
+        <!-- Content -->
+        <div class="app-content">
+          <h3 style="font-size:1.4rem;font-weight:900;margin-bottom:0.5rem;" data-i18n="app.sub">Everything in your pocket</h3>
+          <p style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem;" data-i18n="app.sub2">Real-time GPS tracking, live impression counters, and one-tap campaign controls — all without opening a laptop.</p>
+          <div class="app-features-list">
+            <div class="app-feature"><div class="app-feature-dot"></div><span data-i18n="app.f1">Live car tracking on interactive map</span></div>
+            <div class="app-feature"><div class="app-feature-dot"></div><span data-i18n="app.f2">Push alerts for impression milestones</span></div>
+            <div class="app-feature"><div class="app-feature-dot"></div><span data-i18n="app.f3">One-tap campaign pause / resume</span></div>
+            <div class="app-feature"><div class="app-feature-dot"></div><span data-i18n="app.f4">Invoice and payment history</span></div>
+            <div class="app-feature"><div class="app-feature-dot"></div><span data-i18n="app.f5">Driver chat and support</span></div>
+          </div>
+          <div class="app-badges">
+            <a class="store-badge" href="#" onclick="showToast('App Store coming soon!');return false;">
+              <div class="store-badge-icon">🍎</div>
+              <div class="store-badge-text"><div class="store-sub" data-i18n="app.ios_sub">Download on the</div><div class="store-name">App Store</div></div>
+            </a>
+            <a class="store-badge" href="#" onclick="showToast('Google Play coming soon!');return false;">
+              <div class="store-badge-icon">▶️</div>
+              <div class="store-badge-text"><div class="store-sub" data-i18n="app.and_sub">Get it on</div><div class="store-name">Google Play</div></div>
+            </a>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div class="qr-placeholder">📲</div>
+            <div style="font-size:0.78rem;color:var(--muted);" data-i18n="app.qr">Scan QR to download · Available for iOS 16+ and Android 10+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STEP 19: SELF-SERVE ONBOARDING FLOW ── -->
+  <section id="section-onboarding" style="padding:5rem 2rem;">
+    <div style="max-width:900px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:3rem;">
+        <div style="display:inline-block;background:rgba(34,197,94,0.1);color:var(--green);padding:0.35rem 1rem;border-radius:999px;font-size:0.8rem;font-weight:700;margin-bottom:1rem;" data-i18n="onb.badge">⚡ 10-Minute Launch</div>
+        <h2 style="font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;margin-bottom:0.75rem;" data-i18n="onb.h">From Signup to Live Campaign in 10 Minutes</h2>
+        <p style="color:var(--muted);max-width:520px;margin:0 auto;" data-i18n="onb.p">Our guided wizard handles everything. No sales calls, no waiting, no setup fees.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start;">
+        <div class="wizard-steps">
+          <div class="wizard-step">
+            <div class="wizard-num">1</div>
+            <div class="wizard-body">
+              <div class="wizard-title" data-i18n="onb.s1">Create your account</div>
+              <div class="wizard-desc" data-i18n="onb.s1d">Email or Google signup. No credit card required to explore.</div>
+              <div class="wizard-time-badge">⏱ ~1 min</div>
+            </div>
+          </div>
+          <div class="wizard-step">
+            <div class="wizard-num">2</div>
+            <div class="wizard-body">
+              <div class="wizard-title" data-i18n="onb.s2">Define your target zone</div>
+              <div class="wizard-desc" data-i18n="onb.s2d">Pick neighborhoods, districts, or draw a custom geo-fence on the live map.</div>
+              <div class="wizard-time-badge">⏱ ~2 min</div>
+            </div>
+          </div>
+          <div class="wizard-step">
+            <div class="wizard-num">3</div>
+            <div class="wizard-body">
+              <div class="wizard-title" data-i18n="onb.s3">Upload your creative</div>
+              <div class="wizard-desc" data-i18n="onb.s3d">Drag-and-drop your design. Our AI checks dimensions, contrast, and compliance automatically.</div>
+              <div class="wizard-time-badge">⏱ ~2 min</div>
+            </div>
+          </div>
+          <div class="wizard-step">
+            <div class="wizard-num">4</div>
+            <div class="wizard-body">
+              <div class="wizard-title" data-i18n="onb.s4">Set budget and schedule</div>
+              <div class="wizard-desc" data-i18n="onb.s4d">Choose daily spend, total budget, and campaign dates. See live impression forecasts update as you type.</div>
+              <div class="wizard-time-badge">⏱ ~2 min</div>
+            </div>
+          </div>
+          <div class="wizard-step">
+            <div class="wizard-num">5</div>
+            <div class="wizard-body">
+              <div class="wizard-title" data-i18n="onb.s5">Pay & go live</div>
+              <div class="wizard-desc" data-i18n="onb.s5d">Mada, Visa, Apple Pay, or IBAN transfer. Cars are auto-assigned and begin routing to your zone within minutes.</div>
+              <div class="wizard-time-badge">⏱ ~3 min</div>
+            </div>
+          </div>
+        </div>
+        <!-- CTA card -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center;position:sticky;top:2rem;">
+          <div style="font-size:3rem;margin-bottom:1rem;">🚀</div>
+          <h3 style="font-size:1.3rem;font-weight:900;margin-bottom:0.75rem;" data-i18n="onb.card_h">Ready to launch?</h3>
+          <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem;" data-i18n="onb.card_p">Join 500+ brands already running GPS-verified campaigns. No contracts, cancel any time.</p>
+          <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;"><span style="color:var(--green);">✓</span><span data-i18n="onb.p1">No setup fees</span></div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;"><span style="color:var(--green);">✓</span><span data-i18n="onb.p2">Start from SAR 500</span></div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;"><span style="color:var(--green);">✓</span><span data-i18n="onb.p3">Full dashboard access from day 1</span></div>
+            <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;"><span style="color:var(--green);">✓</span><span data-i18n="onb.p4">24/7 support in Arabic & English</span></div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;padding:0.9rem;" onclick="showView('auth')" data-i18n="onb.btn">Start Your Campaign →</button>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:0.85rem;" data-i18n="onb.note">Free to explore · First campaign discount 20% off</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STEP 20: TRAFFIC INTELLIGENCE REPORTS ── -->
+  <section id="section-intel" style="background:var(--dark2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:5rem 2rem;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:3.5rem;">
+        <div style="display:inline-block;background:rgba(59,130,246,0.1);color:#60a5fa;padding:0.35rem 1rem;border-radius:999px;font-size:0.8rem;font-weight:700;margin-bottom:1rem;" data-i18n="intel.badge">📊 Data Products</div>
+        <h2 style="font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;margin-bottom:0.75rem;" data-i18n="intel.h">Traffic Intelligence &amp; City Mobility Reports</h2>
+        <p style="color:var(--muted);max-width:580px;margin:0 auto;" data-i18n="intel.p">AdStick's fleet generates rich, anonymized mobility data across 6 Saudi cities. We package this insight for urban planners, retailers, and researchers.</p>
+      </div>
+      <!-- Report types -->
+      <div class="intel-report-grid">
+        <div class="intel-card">
+          <div class="intel-icon">🗺️</div>
+          <div class="intel-title" data-i18n="intel.r1">City Mobility Report</div>
+          <div class="intel-desc" data-i18n="intel.r1d">Weekly heatmaps of traffic density, peak hours, congestion corridors, and road usage patterns across all 6 cities. Fully anonymized.</div>
+          <div class="intel-sample">→ Peak: King Fahd Rd 07:30–09:00<br>→ Congestion index: 8.4 / 10<br>→ Avg speed: 28 km/h</div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-icon">🛍️</div>
+          <div class="intel-title" data-i18n="intel.r2">Retail Location Intelligence</div>
+          <div class="intel-desc" data-i18n="intel.r2d">Footfall heatmaps near shopping malls, retail zones, and commercial districts. Identify which locations see the most commuter exposure.</div>
+          <div class="intel-sample">→ Riyadh Park exposure: 84K/day<br>→ Best arrival window: 17:00–20:00<br>→ Repeat pass-by rate: 34%</div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-icon">🏙️</div>
+          <div class="intel-title" data-i18n="intel.r3">Urban Planning Insights</div>
+          <div class="intel-desc" data-i18n="intel.r3d">Corridor usage data for municipal planning — ideal for understanding road load distribution, new development impact zones, and transit gaps.</div>
+          <div class="intel-sample">→ New district bypass: +22% load<br>→ Recommended signal timing<br>→ Pedestrian crossover hotspots</div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-icon">📈</div>
+          <div class="intel-title" data-i18n="intel.r4">Event Impact Reports</div>
+          <div class="intel-desc" data-i18n="intel.r4d">Before/during/after traffic analysis for major events (sports, concerts, Ramadan, National Day). Measure real crowd movement at scale.</div>
+          <div class="intel-sample">→ Riyadh Season +340% traffic<br>→ Radius affected: 8 km<br>→ Duration spike: 3 hrs</div>
+        </div>
+      </div>
+      <!-- Subscription tiers -->
+      <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:1.5rem;text-align:center;" data-i18n="intel.tiers_h">Data Subscription Tiers</h3>
+      <div class="intel-pricing-row">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;">
+          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.5rem;" data-i18n="intel.t1">Researcher</div>
+          <div style="font-size:1.8rem;font-weight:900;margin-bottom:0.5rem;">SAR 999<span style="font-size:0.8rem;font-weight:400;color:var(--muted);">/mo</span></div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;" data-i18n="intel.t1d">1 city · monthly snapshot · CSV export</div>
+          <button class="btn btn-outline" style="width:100%;" onclick="showToast('Contact sales for data access')" data-i18n="intel.t_btn">Request Access</button>
+        </div>
+        <div style="background:var(--card);border:2px solid var(--brand);border-radius:14px;padding:1.5rem;position:relative;">
+          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:0.7rem;font-weight:800;padding:0.2rem 0.75rem;border-radius:999px;" data-i18n="intel.popular">Most Popular</div>
+          <div style="font-size:0.72rem;color:var(--brand);text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.5rem;" data-i18n="intel.t2">Business</div>
+          <div style="font-size:1.8rem;font-weight:900;margin-bottom:0.5rem;">SAR 3,499<span style="font-size:0.8rem;font-weight:400;color:var(--muted);">/mo</span></div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;" data-i18n="intel.t2d">3 cities · weekly reports · API access · retail intel</div>
+          <button class="btn btn-primary" style="width:100%;" onclick="showToast('Contact sales for data access')" data-i18n="intel.t_btn2">Get Started</button>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;">
+          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.5rem;" data-i18n="intel.t3">Enterprise</div>
+          <div style="font-size:1.8rem;font-weight:900;margin-bottom:0.5rem;" data-i18n="intel.t3_price">Custom</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;" data-i18n="intel.t3d">All 6 cities · real-time stream · white-label · SLA</div>
+          <button class="btn btn-outline" style="width:100%;" onclick="showToast('Contact sales for enterprise pricing')" data-i18n="intel.t3_btn">Talk to Sales</button>
+        </div>
       </div>
     </div>
   </section>
@@ -4244,6 +4674,11 @@ const i18n = {
     "p1.name":"Starter","p1.f1":"Up to 50 cars tracked","p1.f2":"2 active campaigns","p1.f3":"30-second GPS updates","p1.f4":"Basic KM reports","p1.f5":"Email support",
     "p2.name":"Growth","p2.f1":"Up to 300 cars tracked","p2.f2":"Unlimited campaigns","p2.f3":"10-second GPS updates","p2.f4":"Traffic density analytics","p2.f5":"Client PDF reports","p2.f6":"Priority support",
     "p3.name":"Enterprise","p3.price":"Custom","p3.f1":"Unlimited cars","p3.f2":"Dedicated infrastructure","p3.f3":"Real-time API access","p3.f4":"White-label dashboard","p3.f5":"24/7 dedicated support","p3.f6":"Custom integrations",
+    "testi.sub":"brands trust AdStick for city-wide reach","testi.h":"Real Campaigns. Real Results.","testi.p":"See how leading brands achieved measurable outcomes with AdStick's GPS-verified car advertising network.","testi.video":"Video Testimonials",
+    "cmp.badge":"How We Stack Up","cmp.h":"AdStick vs. Other Advertising Channels","cmp.p":"An honest, side-by-side breakdown of performance, cost, and targeting across every major ad channel.","cmp.metric":"Metric","cmp.cpm":"CPM (Cost per 1,000 views)","cmp.reach":"Daily Reach (mid budget)","cmp.geo":"Geo-targeting","cmp.audience":"Audience targeting","cmp.fraud":"Ad fraud / bots","cmp.measure":"Verified measurement","cmp.speed":"Launch speed","cmp.roi":"Average ROI","cmp.disclaimer":"Data based on 2025 industry benchmarks and AdStick internal campaign analytics. CPMs in SAR.",
+    "app.badge":"AdStick Mobile","app.h":"Manage Campaigns from Anywhere","app.p":"Launch, monitor, and optimize your campaigns on the go. Get notified in real-time when your ads hit milestones.","app.sub":"Everything in your pocket","app.sub2":"Real-time GPS tracking, live impression counters, and one-tap campaign controls — all without opening a laptop.","app.f1":"Live car tracking on interactive map","app.f2":"Push alerts for impression milestones","app.f3":"One-tap campaign pause / resume","app.f4":"Invoice and payment history","app.f5":"Driver chat and support","app.ios_sub":"Download on the","app.and_sub":"Get it on","app.qr":"Scan QR to download · Available for iOS 16+ and Android 10+",
+    "onb.badge":"⚡ 10-Minute Launch","onb.h":"From Signup to Live Campaign in 10 Minutes","onb.p":"Our guided wizard handles everything. No sales calls, no waiting, no setup fees.","onb.s1":"Create your account","onb.s1d":"Email or Google signup. No credit card required to explore.","onb.s2":"Define your target zone","onb.s2d":"Pick neighborhoods, districts, or draw a custom geo-fence on the live map.","onb.s3":"Upload your creative","onb.s3d":"Drag-and-drop your design. Our AI checks dimensions, contrast, and compliance automatically.","onb.s4":"Set budget and schedule","onb.s4d":"Choose daily spend, total budget, and campaign dates. See live impression forecasts update as you type.","onb.s5":"Pay & go live","onb.s5d":"Mada, Visa, Apple Pay, or IBAN transfer. Cars are auto-assigned and begin routing to your zone within minutes.","onb.card_h":"Ready to launch?","onb.card_p":"Join 500+ brands already running GPS-verified campaigns. No contracts, cancel any time.","onb.p1":"No setup fees","onb.p2":"Start from SAR 500","onb.p3":"Full dashboard access from day 1","onb.p4":"24/7 support in Arabic & English","onb.btn":"Start Your Campaign →","onb.note":"Free to explore · First campaign discount 20% off",
+    "intel.badge":"📊 Data Products","intel.h":"Traffic Intelligence & City Mobility Reports","intel.p":"AdStick's fleet generates rich, anonymized mobility data across 6 Saudi cities. We package this insight for urban planners, retailers, and researchers.","intel.r1":"City Mobility Report","intel.r1d":"Weekly heatmaps of traffic density, peak hours, congestion corridors, and road usage patterns across all 6 cities. Fully anonymized.","intel.r2":"Retail Location Intelligence","intel.r2d":"Footfall heatmaps near shopping malls, retail zones, and commercial districts. Identify which locations see the most commuter exposure.","intel.r3":"Urban Planning Insights","intel.r3d":"Corridor usage data for municipal planning — ideal for understanding road load distribution, new development impact zones, and transit gaps.","intel.r4":"Event Impact Reports","intel.r4d":"Before/during/after traffic analysis for major events (sports, concerts, Ramadan, National Day). Measure real crowd movement at scale.","intel.tiers_h":"Data Subscription Tiers","intel.t1":"Researcher","intel.t1d":"1 city · monthly snapshot · CSV export","intel.t2":"Business","intel.t2d":"3 cities · weekly reports · API access · retail intel","intel.t3":"Enterprise","intel.t3_price":"Custom","intel.t3d":"All 6 cities · real-time stream · white-label · SLA","intel.t_btn":"Request Access","intel.t_btn2":"Get Started","intel.t3_btn":"Talk to Sales","intel.popular":"Most Popular",
     "cta.h":"Ready to launch your first campaign?","cta.p":"Join 500+ companies already using AdStick to reach millions of commuters daily.","cta.btn":"Open Dashboard →",
     "footer":"© 2026 AdStick. All rights reserved. · Built for modern mobile advertisers.",
     "sb.main":"Main","sb.overview":"Overview","sb.map":"Live Map","sb.cars":"Cars & KM","sb.traffic":"Traffic Analytics",
@@ -4602,6 +5037,11 @@ const i18n = {
     "p1.name":"المبتدئ","p1.f1":"تتبع حتى 50 سيارة","p1.f2":"حملتان نشطتان","p1.f3":"تحديثات GPS كل 30 ثانية","p1.f4":"تقارير كيلومتر أساسية","p1.f5":"دعم عبر البريد الإلكتروني",
     "p2.name":"النمو","p2.f1":"تتبع حتى 300 سيارة","p2.f2":"حملات غير محدودة","p2.f3":"تحديثات GPS كل 10 ثوانٍ","p2.f4":"تحليلات كثافة المرور","p2.f5":"تقارير PDF للعملاء","p2.f6":"دعم ذو أولوية",
     "p3.name":"المؤسسات","p3.price":"مخصص","p3.f1":"سيارات غير محدودة","p3.f2":"بنية تحتية مخصصة","p3.f3":"وصول API في الوقت الفعلي","p3.f4":"لوحة تحكم بعلامتك التجارية","p3.f5":"دعم مخصص 24/7","p3.f6":"تكاملات مخصصة",
+    "testi.sub":"علامة تجارية تثق في AdStick للوصول على مستوى المدينة","testi.h":"حملات حقيقية. نتائج حقيقية.","testi.p":"اكتشف كيف حققت العلامات التجارية الرائدة نتائج قابلة للقياس مع شبكة إعلانات السيارات المعتمدة بـ GPS من AdStick.","testi.video":"شهادات مرئية",
+    "cmp.badge":"مقارنة الأداء","cmp.h":"AdStick مقابل قنوات الإعلان الأخرى","cmp.p":"مقارنة صادقة وجانبية للأداء والتكلفة والاستهداف عبر جميع قنوات الإعلان الرئيسية.","cmp.metric":"المقياس","cmp.cpm":"التكلفة لكل 1000 مشاهدة","cmp.reach":"الوصول اليومي (ميزانية متوسطة)","cmp.geo":"الاستهداف الجغرافي","cmp.audience":"استهداف الجمهور","cmp.fraud":"الاحتيال الإعلاني / الروبوتات","cmp.measure":"القياس المعتمد","cmp.speed":"سرعة الإطلاق","cmp.roi":"متوسط العائد على الاستثمار","cmp.disclaimer":"البيانات مبنية على معايير الصناعة لعام 2025 وتحليلات حملات AdStick الداخلية. التكاليف بالريال السعودي.",
+    "app.badge":"تطبيق AdStick","app.h":"إدارة حملاتك من أي مكان","app.p":"أطلق ورصد وحسّن حملاتك أثناء التنقل. احصل على إشعارات فورية عند وصول إعلاناتك لمعالم هامة.","app.sub":"كل شيء في جيبك","app.sub2":"تتبع GPS مباشر، وعدادات انطباعات حية، وتحكم بنقرة واحدة — كل ذلك بدون فتح حاسوب.","app.f1":"تتبع السيارات على خريطة تفاعلية","app.f2":"إشعارات فورية عند معالم الانطباع","app.f3":"إيقاف/تشغيل الحملة بنقرة واحدة","app.f4":"سجل الفواتير والمدفوعات","app.f5":"محادثة مع السائق والدعم","app.ios_sub":"تنزيل من","app.and_sub":"متاح على","app.qr":"امسح رمز QR للتنزيل · متوفر لـ iOS 16+ وAndroid 10+",
+    "onb.badge":"⚡ إطلاق خلال 10 دقائق","onb.h":"من التسجيل إلى حملة مباشرة في 10 دقائق","onb.p":"معالجنا الموجّه يتكفل بكل شيء. لا مكالمات مبيعات، لا انتظار، لا رسوم إعداد.","onb.s1":"إنشاء حسابك","onb.s1d":"التسجيل بالبريد الإلكتروني أو Google. لا بطاقة ائتمانية مطلوبة للاستكشاف.","onb.s2":"تحديد منطقة الاستهداف","onb.s2d":"اختر الأحياء أو الأحياء السكنية أو ارسم سياجاً جغرافياً مخصصاً على الخريطة المباشرة.","onb.s3":"تحميل التصميم الإبداعي","onb.s3d":"اسحب وأفلت تصميمك. يتحقق الذكاء الاصطناعي لدينا من الأبعاد والتباين والامتثال تلقائياً.","onb.s4":"تحديد الميزانية والجدول الزمني","onb.s4d":"اختر الإنفاق اليومي والميزانية الإجمالية ومواعيد الحملة. شاهد توقعات الانطباع الحية تتحدث أثناء الكتابة.","onb.s5":"الدفع والانطلاق","onb.s5d":"مدى أو فيزا أو Apple Pay أو تحويل IBAN. تُعيَّن السيارات تلقائياً وتبدأ بالتوجه نحو منطقتك في غضون دقائق.","onb.card_h":"مستعد للإطلاق؟","onb.card_p":"انضم إلى 500+ علامة تجارية تدير حملات معتمدة بـ GPS. بدون عقود، إلغاء في أي وقت.","onb.p1":"بدون رسوم إعداد","onb.p2":"ابدأ من 500 ريال سعودي","onb.p3":"وصول كامل للوحة التحكم من اليوم الأول","onb.p4":"دعم 24/7 بالعربية والإنجليزية","onb.btn":"ابدأ حملتك ←","onb.note":"استكشاف مجاني · خصم 20% على الحملة الأولى",
+    "intel.badge":"📊 منتجات البيانات","intel.h":"تقارير ذكاء المرور وتنقل المدن","intel.p":"تولّد أسطول AdStick بيانات تنقل غنية ومجهولة الهوية عبر 6 مدن سعودية. نقوم بتحزيم هذه المعلومات للمخططين العمرانيين وتجار التجزئة والباحثين.","intel.r1":"تقرير تنقل المدينة","intel.r1d":"خرائط حرارية أسبوعية لكثافة المرور وساعات الذروة وممرات الازدحام وأنماط استخدام الطرق عبر جميع المدن الـ6. مجهولة الهوية تماماً.","intel.r2":"ذكاء المواقع التجارية","intel.r2d":"خرائط حرارية لحجم الزوار بالقرب من المجمعات التجارية والمناطق التجارية والمناطق التجارية. حدد المواقع التي تشهد أعلى تعرض للمتنقلين.","intel.r3":"رؤى التخطيط العمراني","intel.r3d":"بيانات استخدام الممرات للتخطيط البلدي — مثالية لفهم توزيع حمل الطرق ومناطق تأثير التطوير الجديد وثغرات النقل العام.","intel.r4":"تقارير تأثير الفعاليات","intel.r4d":"تحليل المرور قبل/خلال/بعد الفعاليات الكبرى (الرياضة، الحفلات، رمضان، اليوم الوطني). قياس حركة الحشود الحقيقية على نطاق واسع.","intel.tiers_h":"باقات اشتراك البيانات","intel.t1":"باحث","intel.t1d":"مدينة واحدة · لقطة شهرية · تصدير CSV","intel.t2":"أعمال","intel.t2d":"3 مدن · تقارير أسبوعية · وصول API · ذكاء التجزئة","intel.t3":"مؤسسات","intel.t3_price":"مخصص","intel.t3d":"جميع المدن الـ6 · بث في الوقت الفعلي · علامة تجارية خاصة · SLA","intel.t_btn":"طلب الوصول","intel.t_btn2":"ابدأ الآن","intel.t3_btn":"تحدث مع المبيعات","intel.popular":"الأكثر شيوعاً",
     "cta.h":"هل أنت مستعد لإطلاق حملتك الأولى؟","cta.p":"انضم إلى 500+ شركة تستخدم AdStick للوصول إلى ملايين المتنقلين يومياً.","cta.btn":"افتح لوحة التحكم ←",
     "footer":"© 2026 AdStick. جميع الحقوق محفوظة. · مبنية لمعلني الجوّال العصريين.",
     "sb.main":"القائمة الرئيسية","sb.overview":"نظرة عامة","sb.map":"الخريطة المباشرة","sb.cars":"السيارات والكيلومترات","sb.traffic":"تحليلات المرور",
@@ -5616,6 +6056,33 @@ function applyLang() {
   populateCampaigns();
 }
 
+// ── Trust counter animation (Step 16) ──
+let trustCounterStarted = false;
+function startTrustCounter() {
+  const el = document.getElementById('trust-counter-num');
+  if (!el || trustCounterStarted) return;
+  trustCounterStarted = true;
+  const target = 523;
+  let current = 0;
+  const step = Math.ceil(target / 60);
+  const ticker = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current + '+';
+    if (current >= target) clearInterval(ticker);
+  }, 24);
+}
+
+// Intersection observer to fire counter when testimonials section scrolls into view
+(function() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) startTrustCounter(); });
+  }, { threshold: 0.2 });
+  document.addEventListener('DOMContentLoaded', () => {
+    const sec = document.getElementById('section-testimonials');
+    if (sec) obs.observe(sec);
+  });
+})();
+
 // ── View switching ──
 function showView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
@@ -5623,6 +6090,7 @@ function showView(v) {
   if (v === 'dashboard')   initDashboard();
   if (v === 'driver')      setTimeout(initDriverPortal, 100);
   if (v === 'advertiser')  setTimeout(initAdvertiserPortal, 100);
+  if (v === 'landing')     { trustCounterStarted = false; setTimeout(startTrustCounter, 400); }
   window.scrollTo(0,0);
 }
 
