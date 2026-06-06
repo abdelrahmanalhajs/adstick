@@ -9,6 +9,7 @@ import 'screens/live_map_screen.dart';
 import 'screens/reports_screen.dart';
 import 'screens/km_analytics_screen.dart';
 import 'screens/profile_screen.dart';
+import 'widgets/float_cluster.dart';
 
 void main() => runApp(const AdStickAdvertiserApp());
 
@@ -67,7 +68,10 @@ class AdvShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
+      body: FloatCluster(
+        accentColor: AppTheme.brand,
+        child: child,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _bottomIndex(),
         onDestinationSelected: (i) => context.go(_bottomTabs[i].path),

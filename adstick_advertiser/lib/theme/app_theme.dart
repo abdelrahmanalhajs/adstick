@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static const brand      = Color(0xFFFF6B2B);
   static const dark       = Color(0xFF0A0A0F);
-  static const dark2      = Color(0xFF13131A);
+  static const dark2     = Color(0xFF13131A);
+  static const dark3     = Color(0xFF242838);
   static const card       = Color(0xFF1C1C28);
   static const border     = Color(0xFF2A2A3A);
   static const textMuted  = Color(0xFF8B8BA0);

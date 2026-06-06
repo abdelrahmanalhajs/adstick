@@ -12,6 +12,7 @@ import 'screens/referral_screen.dart';
 import 'screens/benefits_screen.dart';
 import 'screens/profile_screen.dart';
 import 'theme/app_theme.dart';
+import 'widgets/float_cluster.dart';
 
 void main() => runApp(const AdStickDriverApp());
 
@@ -74,7 +75,10 @@ class DriverShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
+      body: FloatCluster(
+        accentColor: AppTheme.driverGreen,
+        child: child,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _bottomIndex(),
         onDestinationSelected: (i) => context.go(_bottomTabs[i].path),

@@ -19,6 +19,7 @@ import 'screens/cities_screen.dart';
 import 'screens/quality_screen.dart';
 import 'screens/audit_screen.dart';
 import 'screens/carbon_screen.dart';
+import 'widgets/float_cluster.dart';
 
 void main() => runApp(const AdStickAdminApp());
 
@@ -80,7 +81,10 @@ class AdminShell extends StatelessWidget {
           onPressed: () => Scaffold.of(ctx).openDrawer(),
         )),
       ),
-      body: child,
+      body: FloatCluster(
+        accentColor: AppTheme.brand,
+        child: child,
+      ),
       drawer: _AdminDrawer(currentPath: location),
     );
   }
