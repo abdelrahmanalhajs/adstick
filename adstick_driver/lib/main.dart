@@ -85,6 +85,16 @@ class DriverShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppL10n.of(context);
     return Scaffold(
+      appBar: AppBar(
+        title: Text(l.t('app_name')),
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        ),
+        actions: [_LangToggle(accentColor: AppTheme.driverGreen)],
+      ),
       body: FloatCluster(accentColor: AppTheme.driverGreen, child: child),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _bottomIndex(),
