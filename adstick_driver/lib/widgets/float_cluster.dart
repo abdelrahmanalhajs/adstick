@@ -70,6 +70,85 @@ class _FloatClusterState extends State<FloatCluster>
     return Stack(
       children: [
         widget.child,
+
+        // ── LEFT cluster: hamburger + language toggle ──────────
+        Positioned(
+          bottom: 24,
+          left: 20,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Language toggle pill
+              ValueListenableBuilder<String>(
+                valueListenable: localeNotifier,
+                builder: (_, locale, __) => GestureDetector(
+                  onTap: () =>
+                      localeNotifier.value = locale == 'en' ? 'ar' : 'en',
+                  child: Container(
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: widget.accentColor,
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: [
+                        BoxShadow(
+                          color: widget.accentColor.withValues(alpha: 0.45),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(locale == 'en' ? '🇺🇸' : '🇸🇦',
+                          style: const TextStyle(fontSize: 16)),
+                      const SizedBox(width: 5),
+                      Text(
+                        locale == 'en' ? 'EN' : 'AR',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.swap_horiz_rounded,
+                          color: Colors.white, size: 15),
+                    ]),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // Hamburger menu button
+              GestureDetector(
+                onTap: () => Scaffold.of(context).openDrawer(),
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppTheme.dark2,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: widget.accentColor.withValues(alpha: 0.6),
+                        width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.menu_rounded,
+                      color: widget.accentColor, size: 26),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── RIGHT cluster: social + AI chat ───────────────────
         Positioned(
           bottom: 24,
           right: 20,
