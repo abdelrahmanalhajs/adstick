@@ -1085,6 +1085,56 @@
     .franchise-avatar { width:48px;height:48px;border-radius:50%;background:rgba(255,107,43,0.15);border:2px solid var(--brand);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0; }
     .franchise-rev { font-size:1.1rem;font-weight:900;color:var(--green); }
 
+    /* ── STEP 13: STICKER QUALITY SCORE ── */
+    .quality-score-ring { position:relative;width:100px;height:100px;flex-shrink:0; }
+    .quality-score-ring svg { transform:rotate(-90deg); }
+    .quality-score-ring .ring-val { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.5rem;font-weight:900; }
+    .quality-badge { display:inline-flex;align-items:center;gap:0.35rem;padding:0.22rem 0.65rem;border-radius:999px;font-size:0.7rem;font-weight:800; }
+    .quality-badge.excellent { background:rgba(34,197,94,0.15);color:#22C55E; }
+    .quality-badge.good      { background:rgba(59,130,246,0.15);color:#3B82F6; }
+    .quality-badge.fair      { background:rgba(245,158,11,0.15);color:#F59E0B; }
+    .quality-badge.poor      { background:rgba(239,68,68,0.15);color:#EF4444; }
+    .quality-car-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem; }
+    .quality-car-card { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;display:flex;flex-direction:column;gap:0.65rem;transition:border-color .2s; }
+    .quality-car-card.excellent-card { border-color:rgba(34,197,94,0.3); }
+    .quality-car-card.poor-card      { border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.03); }
+    .quality-upload-zone { border:2px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:1rem; }
+    .quality-upload-zone:hover { border-color:var(--brand); }
+    .quality-scan-result { background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:1.25rem;display:none; }
+    .quality-criteria-row { display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.04); }
+    .quality-criteria-row:last-child { border:none; }
+
+    /* ── STEP 14: AUDIT BADGE ── */
+    .audit-verified-banner {
+      background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(59,130,246,0.08));
+      border:1.5px solid rgba(34,197,94,0.35);border-radius:16px;padding:1.5rem;
+      display:flex;align-items:center;gap:1.25rem;margin-bottom:1.5rem;
+    }
+    .audit-shield { font-size:3.5rem;flex-shrink:0; }
+    .audit-badge-pill { display:inline-flex;align-items:center;gap:0.4rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:#22C55E;padding:0.3rem 0.85rem;border-radius:999px;font-size:0.78rem;font-weight:700; }
+    .audit-partner-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.75rem;margin-bottom:1.5rem; }
+    .audit-partner-card { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;display:flex;align-items:center;gap:0.85rem; }
+    .audit-partner-logo { font-size:2rem;flex-shrink:0; }
+    .audit-trail-entry { display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.04); }
+    .audit-trail-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+
+    /* ── STEP 15: CARBON IMPACT ── */
+    .carbon-zero-banner {
+      background:linear-gradient(135deg,rgba(16,185,129,0.14),rgba(16,185,129,0.04));
+      border:1.5px solid rgba(16,185,129,0.4);border-radius:16px;padding:1.5rem;
+      display:flex;align-items:center;gap:1.25rem;margin-bottom:1.5rem;
+    }
+    .carbon-badge { display:inline-flex;align-items:center;gap:0.4rem;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#10B981;padding:0.3rem 0.85rem;border-radius:999px;font-size:0.78rem;font-weight:700; }
+    .carbon-compare-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin-bottom:1.5rem; }
+    .carbon-compare-card { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;text-align:center; }
+    .carbon-compare-icon { font-size:2rem;margin-bottom:0.4rem; }
+    .carbon-compare-val { font-size:1.4rem;font-weight:900; }
+    .carbon-compare-lbl { font-size:0.72rem;color:var(--muted);margin-top:0.2rem; }
+    .eco-campaign-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem; }
+    .eco-campaign-card { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem; }
+    .eco-score-bar { height:8px;background:rgba(255,255,255,0.07);border-radius:999px;overflow:hidden;margin:0.5rem 0; }
+    .eco-score-fill { height:100%;border-radius:999px;background:linear-gradient(90deg,#10B981,#34D399); }
+
     /* ── STEP 4: GAMIFICATION ── */
     .tier-banner {
       display: flex; align-items: center; gap: 1.25rem;
@@ -1693,6 +1743,10 @@
       <button class="sidebar-item" onclick="showPanel('campaigns',event)"><span class="icon">📢</span><span data-i18n="sb.campaigns">Campaigns</span></button>
       <button class="sidebar-item" onclick="showPanel('drivers',event)"><span class="icon">👤</span><span data-i18n="sb.drivers">Drivers</span></button>
       <button class="sidebar-item" onclick="showPanel('roi',event)"><span class="icon">📈</span><span data-i18n="sb.roi">ROI Score</span></button>
+      <div class="sidebar-label" data-i18n="sb.trust">Trust & Credibility</div>
+      <button class="sidebar-item" onclick="showPanel('quality',event)"><span class="icon">🔍</span><span data-i18n="sb.quality">Sticker Quality</span></button>
+      <button class="sidebar-item" onclick="showPanel('audit',event)"><span class="icon">✅</span><span data-i18n="sb.audit">Audit Badge</span></button>
+      <button class="sidebar-item" onclick="showPanel('carbon',event)"><span class="icon">🌿</span><span data-i18n="sb.carbon">Carbon Impact</span></button>
       <div class="sidebar-label" data-i18n="sb.expansion">Expansion</div>
       <button class="sidebar-item" onclick="showPanel('fleet',event)"><span class="icon">🚛</span><span data-i18n="sb.fleet">Fleet Partners</span></button>
       <button class="sidebar-item" onclick="showPanel('marketplace',event)"><span class="icon">🏛️</span><span data-i18n="sb.marketplace">Marketplace</span></button>
@@ -2486,6 +2540,157 @@
           <div id="city-roadmap"></div>
         </div>
       </div><!-- /panel-cities -->
+
+      <!-- ══ STEP 13: STICKER QUALITY SCORE ══ -->
+      <div class="dash-panel" id="panel-quality">
+        <div class="page-title" data-i18n="qual.title">🔍 Sticker Quality Score</div>
+        <div class="page-sub" data-i18n="qual.sub">AI-powered photo scan rates each sticker 1–10 · Low scores auto-flagged for review</div>
+
+        <!-- Fleet quality stats -->
+        <div class="stats-row" style="margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-label" data-i18n="qual.s.avg">Fleet Avg Score</div><div class="stat-value" style="color:var(--green);">8.6</div><div class="stat-delta delta-up">▲ 0.3 this month</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="qual.s.excellent">Excellent (9–10)</div><div class="stat-value" style="color:var(--green);">412</div><div class="stat-delta delta-up">▲ 49% of fleet</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="qual.s.flagged">Flagged for Review</div><div class="stat-value" style="color:var(--yellow);">38</div><div class="stat-delta" style="color:var(--yellow);">⚠ Needs attention</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="qual.s.rejected">Auto-Rejected</div><div class="stat-value" style="color:var(--red);">12</div><div class="stat-delta" style="color:var(--red);">● Below threshold</div></div>
+        </div>
+
+        <!-- AI scan tool -->
+        <div class="map-card" style="padding:1.5rem;margin-bottom:1.5rem;">
+          <div class="card-title" style="margin-bottom:1rem;" data-i18n="qual.scan.title">🤖 AI Sticker Scanner</div>
+          <div class="quality-upload-zone" onclick="simulateQualityScan()">
+            <div style="font-size:2.5rem;margin-bottom:0.5rem;">📸</div>
+            <div style="font-weight:700;margin-bottom:0.25rem;" data-i18n="qual.scan.click">Click to upload car photo</div>
+            <div style="font-size:0.78rem;color:var(--muted);" data-i18n="qual.scan.sub">JPG, PNG · AI analyzes sticker visibility, clarity, and placement</div>
+          </div>
+          <div class="quality-scan-result" id="quality-scan-result">
+            <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1rem;">
+              <div class="quality-score-ring">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="9"/>
+                  <circle id="quality-ring-arc" cx="50" cy="50" r="42" fill="none" stroke="#22C55E" stroke-width="9"
+                    stroke-dasharray="263.9" stroke-dashoffset="42" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-val" id="quality-ring-val" style="color:#22C55E;">8.4</div>
+              </div>
+              <div>
+                <div style="font-size:1.1rem;font-weight:800;margin-bottom:0.3rem;" data-i18n="qual.scan.result">AI Scan Result</div>
+                <span class="quality-badge excellent" id="quality-grade-badge">✓ Excellent</span>
+                <div style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;" id="quality-scan-msg">Sticker is clearly visible, well-applied, and undamaged. Approved for all campaigns.</div>
+              </div>
+            </div>
+            <div id="quality-criteria-list"></div>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+              <button class="btn btn-primary" onclick="showToast('Sticker approved ✓')" data-i18n="qual.approve">Approve</button>
+              <button class="btn btn-outline" onclick="showToast('Flagged for manual review')" data-i18n="qual.flag">Flag for Review</button>
+              <button class="btn btn-outline" style="color:var(--red);border-color:var(--red);" onclick="showToast('Sticker rejected ✗')" data-i18n="qual.reject">Reject</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fleet quality grid -->
+        <div class="card-header" style="margin-bottom:1rem;">
+          <div class="card-title" data-i18n="qual.fleet.title">Fleet Quality Overview</div>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn btn-outline btn-sm" onclick="filterQuality('all',this)" style="border-color:var(--brand);color:var(--brand);" data-i18n="camp.f.all">All</button>
+            <button class="btn btn-outline btn-sm" onclick="filterQuality('poor',this)" data-i18n="qual.f.poor">Poor Only</button>
+          </div>
+        </div>
+        <div class="quality-car-grid" id="quality-car-grid"></div>
+      </div><!-- /panel-quality -->
+
+      <!-- ══ STEP 14: THIRD-PARTY AUDIT BADGE ══ -->
+      <div class="dash-panel" id="panel-audit">
+        <div class="page-title" data-i18n="audit.title">✅ Third-Party Audit Badge</div>
+        <div class="page-sub" data-i18n="audit.sub">Independently verified campaign data — build advertiser trust with certified proof</div>
+
+        <!-- Verified banner -->
+        <div class="audit-verified-banner">
+          <div class="audit-shield">🛡️</div>
+          <div style="flex:1;">
+            <div style="font-size:1.1rem;font-weight:800;margin-bottom:0.4rem;" data-i18n="audit.banner.title">AdStick Platform — Independently Verified</div>
+            <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;" data-i18n="audit.banner.sub">All campaign KM data, impression estimates, and GPS tracking methodology are certified by independent auditors. Last full audit: May 2026.</div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <span class="audit-badge-pill">✓ GPS Data Verified</span>
+              <span class="audit-badge-pill">✓ KM Methodology Certified</span>
+              <span class="audit-badge-pill">✓ Impression Formula Audited</span>
+            </div>
+          </div>
+          <button class="btn btn-outline" onclick="showToast('Downloading audit certificate…')" data-i18n="audit.download">⬇ Download Certificate</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" style="margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-label" data-i18n="audit.s.campaigns">Audited Campaigns</div><div class="stat-value" style="color:var(--green);">98</div><div class="stat-delta delta-up">▲ 100% verified</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="audit.s.last">Last Audit</div><div class="stat-value" style="color:var(--blue);font-size:1.3rem;">May 2026</div><div class="stat-delta" style="color:var(--muted);">Next: Aug 2026</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="audit.s.accuracy">Data Accuracy</div><div class="stat-value" style="color:var(--green);">99.4%</div><div class="stat-delta delta-up">▲ Industry leading</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="audit.s.partners">Audit Partners</div><div class="stat-value" style="color:var(--brand);">3</div><div class="stat-delta" style="color:var(--muted);">Certified firms</div></div>
+        </div>
+
+        <!-- Verification partners -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="audit.partners.title">Verification Partners</div>
+        <div class="audit-partner-grid" id="audit-partner-grid"></div>
+
+        <!-- Per-campaign audit badges -->
+        <div class="map-card" style="margin-bottom:1.5rem;">
+          <div class="card-header" style="margin-bottom:1rem;">
+            <div class="card-title" data-i18n="audit.campaigns.title">Campaign Audit Status</div>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Full audit report exported')" data-i18n="audit.export">⬇ Export All Reports</button>
+          </div>
+          <div style="overflow-x:auto;"><table class="data-table">
+            <thead><tr><th data-i18n="th.campaign">Campaign</th><th data-i18n="audit.th.auditor">Auditor</th><th data-i18n="audit.th.date">Audit Date</th><th data-i18n="audit.th.accuracy">Accuracy</th><th data-i18n="audit.th.badge">Badge</th><th data-i18n="audit.th.report">Report</th></tr></thead>
+            <tbody id="audit-campaign-table"></tbody>
+          </table></div>
+        </div>
+
+        <!-- Audit trail -->
+        <div class="map-card" style="padding:1.5rem;">
+          <div class="card-title" style="margin-bottom:1rem;" data-i18n="audit.trail.title">📋 Audit Trail</div>
+          <div id="audit-trail-list"></div>
+        </div>
+      </div><!-- /panel-audit -->
+
+      <!-- ══ STEP 15: CARBON IMPACT DASHBOARD ══ -->
+      <div class="dash-panel" id="panel-carbon">
+        <div class="page-title" data-i18n="carbon.title">🌿 Carbon Impact Dashboard</div>
+        <div class="page-sub" data-i18n="carbon.sub">Car ads produce zero additional emissions — compare your footprint vs digital and billboard alternatives</div>
+
+        <!-- Zero-emission banner -->
+        <div class="carbon-zero-banner">
+          <div style="font-size:3rem;flex-shrink:0;">🌱</div>
+          <div style="flex:1;">
+            <div style="font-size:1.1rem;font-weight:800;margin-bottom:0.3rem;" data-i18n="carbon.banner.title">0 Additional Emissions from Car Advertising</div>
+            <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;" data-i18n="carbon.banner.sub">AdStick uses cars that are already on the road. No extra fuel, no extra journeys, no new infrastructure. Your ad goes along for the ride — emission-free.</div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <span class="carbon-badge">🌿 0kg CO₂ Added</span>
+              <span class="carbon-badge">♻️ No New Journeys</span>
+              <span class="carbon-badge">⚡ No Server Farms</span>
+            </div>
+          </div>
+          <button class="btn btn-outline" onclick="showToast('Eco-certificate downloaded ✓')" data-i18n="carbon.cert">⬇ Eco Certificate</button>
+        </div>
+
+        <!-- Carbon stats -->
+        <div class="stats-row" style="margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-label" data-i18n="carbon.s.saved">CO₂ Saved vs Digital</div><div class="stat-value" style="color:#10B981;">4.2T</div><div class="stat-delta delta-up">▲ This year</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="carbon.s.equiv">Equivalent Trees</div><div class="stat-value" style="color:#10B981;">192</div><div class="stat-delta" style="color:var(--muted);">Trees planted worth</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="carbon.s.campaigns">Green Campaigns</div><div class="stat-value" style="color:var(--brand);">98</div><div class="stat-delta delta-up">▲ 100% of fleet</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="carbon.s.eco">Platform Eco-Score</div><div class="stat-value" style="color:#10B981;">9.6 <span style="font-size:1rem;">/10</span></div><div class="stat-delta delta-up">▲ Top 1% globally</div></div>
+        </div>
+
+        <!-- Comparison cards -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="carbon.compare.title">Carbon Footprint Comparison — per 1M Impressions</div>
+        <div class="carbon-compare-grid" id="carbon-compare-grid"></div>
+
+        <!-- Eco score per campaign -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="carbon.eco.title">🌿 Eco-Score per Campaign</div>
+        <div class="eco-campaign-grid" id="eco-campaign-grid"></div>
+
+        <!-- Carbon chart -->
+        <div class="chart-card">
+          <div class="card-title" style="margin-bottom:1rem;" data-i18n="carbon.chart">CO₂ Impact Trend — AdStick vs Digital Ads (tonnes/month)</div>
+          <canvas id="carbonChart"></canvas>
+        </div>
+      </div><!-- /panel-carbon -->
 
     </main>
   </div>
@@ -4272,6 +4477,32 @@ const i18n = {
     "role.advertiser":"Advertiser","role.advertiser.desc":"Manage campaigns & analytics",
     "role.driver":"Driver","role.driver.desc":"Track my routes & earnings",
     "vtype.sedan":"Sedan","vtype.suv":"SUV","vtype.pickup":"Pickup","vtype.van":"Van",
+    // Step 13 – Sticker Quality
+    "sb.trust":"Trust & Credibility","sb.quality":"Sticker Quality","sb.audit":"Audit Badge","sb.carbon":"Carbon Impact",
+    "qual.title":"🔍 Sticker Quality Score","qual.sub":"AI-powered photo scan rates each sticker 1–10 · Low scores auto-flagged for review",
+    "qual.s.avg":"Fleet Avg Score","qual.s.excellent":"Excellent (9–10)","qual.s.flagged":"Flagged for Review","qual.s.rejected":"Auto-Rejected",
+    "qual.scan.title":"🤖 AI Sticker Scanner","qual.scan.click":"Click to upload car photo",
+    "qual.scan.sub":"JPG, PNG · AI analyzes sticker visibility, clarity, and placement",
+    "qual.scan.result":"AI Scan Result","qual.approve":"Approve","qual.flag":"Flag for Review","qual.reject":"Reject",
+    "qual.fleet.title":"Fleet Quality Overview","qual.f.poor":"Poor Only",
+    // Step 14 – Audit Badge
+    "audit.title":"✅ Third-Party Audit Badge","audit.sub":"Independently verified campaign data — build advertiser trust with certified proof",
+    "audit.banner.title":"AdStick Platform — Independently Verified",
+    "audit.banner.sub":"All campaign KM data, impression estimates, and GPS tracking methodology are certified by independent auditors.",
+    "audit.download":"⬇ Download Certificate",
+    "audit.s.campaigns":"Audited Campaigns","audit.s.last":"Last Audit","audit.s.accuracy":"Data Accuracy","audit.s.partners":"Audit Partners",
+    "audit.partners.title":"Verification Partners",
+    "audit.campaigns.title":"Campaign Audit Status","audit.export":"⬇ Export All Reports",
+    "audit.th.auditor":"Auditor","audit.th.date":"Audit Date","audit.th.accuracy":"Accuracy","audit.th.badge":"Badge","audit.th.report":"Report",
+    "audit.trail.title":"📋 Audit Trail",
+    // Step 15 – Carbon Impact
+    "carbon.title":"🌿 Carbon Impact Dashboard","carbon.sub":"Car ads produce zero additional emissions — compare your footprint vs digital and billboard alternatives",
+    "carbon.banner.title":"0 Additional Emissions from Car Advertising",
+    "carbon.banner.sub":"AdStick uses cars already on the road. No extra fuel, no extra journeys, no new infrastructure.",
+    "carbon.cert":"⬇ Eco Certificate",
+    "carbon.s.saved":"CO₂ Saved vs Digital","carbon.s.equiv":"Equivalent Trees","carbon.s.campaigns":"Green Campaigns","carbon.s.eco":"Platform Eco-Score",
+    "carbon.compare.title":"Carbon Footprint Comparison — per 1M Impressions",
+    "carbon.eco.title":"🌿 Eco-Score per Campaign","carbon.chart":"CO₂ Impact Trend — AdStick vs Digital Ads (tonnes/month)",
     // Step 10 – Fleet Partnerships
     "sb.expansion":"Expansion","sb.fleet":"Fleet Partners","sb.marketplace":"Marketplace","sb.cities":"Multi-City",
     "fleet.title":"🚛 Fleet Partnerships","fleet.sub":"Onboard corporate fleets, manage revenue sharing, and bulk-assign campaigns",
@@ -4535,6 +4766,32 @@ const i18n = {
     "drv.profile.sub":"معلوماتك الشخصية وبيانات المركبة والمستندات",
     "drv.doc.upload":"رفع مستند",
     "drv.paid":"مدفوع","drv.pending":"معلّق",
+    // Step 13 AR – Sticker Quality
+    "sb.trust":"الثقة والمصداقية","sb.quality":"جودة الملصق","sb.audit":"شارة التدقيق","sb.carbon":"أثر الكربون",
+    "qual.title":"🔍 نقاط جودة الملصق","qual.sub":"تصوير AI يقيّم كل ملصق من 1 إلى 10 · الدرجات المنخفضة تُعلَّم تلقائياً للمراجعة",
+    "qual.s.avg":"متوسط الأسطول","qual.s.excellent":"ممتاز (9–10)","qual.s.flagged":"مُعلَّم للمراجعة","qual.s.rejected":"مرفوض تلقائياً",
+    "qual.scan.title":"🤖 ماسح الملصقات بالذكاء الاصطناعي","qual.scan.click":"انقر لرفع صورة السيارة",
+    "qual.scan.sub":"JPG، PNG · يحلل الذكاء الاصطناعي وضوح الملصق وجودة التطبيق والموضع",
+    "qual.scan.result":"نتيجة الفحص بالذكاء الاصطناعي","qual.approve":"قبول","qual.flag":"تعليم للمراجعة","qual.reject":"رفض",
+    "qual.fleet.title":"نظرة عامة على جودة الأسطول","qual.f.poor":"الضعيف فقط",
+    // Step 14 AR – Audit Badge
+    "audit.title":"✅ شارة التدقيق من جهة خارجية","audit.sub":"بيانات حملة موثقة باستقلالية — ابنِ ثقة المعلنين بإثبات معتمد",
+    "audit.banner.title":"منصة AdStick — تم التحقق باستقلالية",
+    "audit.banner.sub":"جميع بيانات الكيلومتر وتقديرات الانطباعات ومنهجية GPS مصادق عليها من مراجعين مستقلين.",
+    "audit.download":"⬇ تحميل الشهادة",
+    "audit.s.campaigns":"الحملات المدققة","audit.s.last":"آخر تدقيق","audit.s.accuracy":"دقة البيانات","audit.s.partners":"شركاء التدقيق",
+    "audit.partners.title":"شركاء التحقق",
+    "audit.campaigns.title":"حالة تدقيق الحملات","audit.export":"⬇ تصدير جميع التقارير",
+    "audit.th.auditor":"المدقق","audit.th.date":"تاريخ التدقيق","audit.th.accuracy":"الدقة","audit.th.badge":"الشارة","audit.th.report":"التقرير",
+    "audit.trail.title":"📋 سجل التدقيق",
+    // Step 15 AR – Carbon Impact
+    "carbon.title":"🌿 لوحة أثر الكربون","carbon.sub":"إعلانات السيارات لا تُضيف انبعاثات — قارن بصمتك الكربونية مع الرقمي واللوحات الإعلانية",
+    "carbon.banner.title":"0 انبعاثات إضافية من الإعلانات على السيارات",
+    "carbon.banner.sub":"AdStick تستخدم سيارات موجودة بالفعل على الطريق. لا وقود إضافي، لا رحلات جديدة، لا بنية تحتية.",
+    "carbon.cert":"⬇ شهادة بيئية",
+    "carbon.s.saved":"CO₂ موفر مقابل الرقمي","carbon.s.equiv":"أشجار معادلة","carbon.s.campaigns":"حملات خضراء","carbon.s.eco":"النقاط البيئية للمنصة",
+    "carbon.compare.title":"مقارنة البصمة الكربونية — لكل مليون انطباع",
+    "carbon.eco.title":"🌿 النقاط البيئية لكل حملة","carbon.chart":"اتجاه CO₂ — AdStick مقابل الإعلانات الرقمية (طن/شهر)",
     // Step 10 AR – Fleet Partnerships
     "sb.expansion":"التوسع","sb.fleet":"شركاء الأسطول","sb.marketplace":"السوق","sb.cities":"متعدد المدن",
     "fleet.title":"🚛 شراكات الأسطول","fleet.sub":"إدخال أساطيل الشركات وإدارة تقاسم الإيرادات والتعيين الجماعي",
@@ -5385,6 +5642,9 @@ function showPanel(p, e) {
   if (p === 'fleet')                       setTimeout(()=>{ renderFleetPartners(); renderFleetRevTable(); }, 50);
   if (p === 'marketplace')                 setTimeout(()=>{ renderAuctionGrid(); renderMarketIndex(); renderBidHistory(); }, 50);
   if (p === 'cities')                      setTimeout(()=>{ renderCities(); renderFranchise(); renderRoadmap(); }, 50);
+  if (p === 'quality')                     setTimeout(()=>renderQualityCars(), 50);
+  if (p === 'audit')                       setTimeout(()=>{ renderAuditPartners(); renderAuditCampaigns(); renderAuditTrail(); }, 50);
+  if (p === 'carbon')                      setTimeout(()=>{ renderCarbonCompare(); renderEcoCampaigns(); initCarbonChart(); }, 80);
 }
 
 // ── Data ──
@@ -6910,6 +7170,235 @@ function populateCarsTable() {
     </tr>`).join('');
 }
 
+
+// ═══════════════════════════════════════════════════
+// STEP 13 — STICKER QUALITY SCORE
+// ═══════════════════════════════════════════════════
+const qualityCriteria = [
+  {label:'Sticker Visibility',   score:9.2, weight:'30%'},
+  {label:'Surface Adhesion',     score:8.8, weight:'25%'},
+  {label:'Color Accuracy',       score:8.5, weight:'20%'},
+  {label:'Edge Alignment',       score:7.9, weight:'15%'},
+  {label:'Damage / Peeling',     score:9.1, weight:'10%'},
+];
+
+const qualityCarsData = [
+  {plate:'ABC 1234', driver:'Ahmed K.',  score:9.4, grade:'excellent'},
+  {plate:'XYZ 5678', driver:'Sara M.',   score:8.7, grade:'excellent'},
+  {plate:'DEF 9012', driver:'Omar H.',   score:8.1, grade:'good'},
+  {plate:'GHI 3456', driver:'Fatima R.', score:7.6, grade:'good'},
+  {plate:'JKL 7890', driver:'Yusuf A.',  score:6.2, grade:'fair'},
+  {plate:'MNO 2345', driver:'Layla N.',  score:9.1, grade:'excellent'},
+  {plate:'PQR 6789', driver:'Khaled S.', score:3.8, grade:'poor'},
+  {plate:'STU 0123', driver:'Nour E.',   score:8.9, grade:'excellent'},
+  {plate:'VWX 4567', driver:'Tarek B.',  score:5.1, grade:'fair'},
+  {plate:'YZA 8901', driver:'Dina F.',   score:2.9, grade:'poor'},
+  {plate:'BCD 1111', driver:'Rami T.',   score:9.7, grade:'excellent'},
+  {plate:'EFG 2222', driver:'Lina K.',   score:7.3, grade:'good'},
+];
+
+function gradeColor(g) { return {excellent:'#22C55E',good:'#3B82F6',fair:'#F59E0B',poor:'#EF4444'}[g]; }
+
+function renderQualityCars(filter='all') {
+  const grid = document.getElementById('quality-car-grid');
+  if (!grid) return;
+  const data = filter==='poor' ? qualityCarsData.filter(c=>c.grade==='poor'||c.grade==='fair') : qualityCarsData;
+  const scoreToOffset = s => 263.9 - (s/10)*263.9;
+  grid.innerHTML = data.map(c => `
+    <div class="quality-car-card ${c.grade==='poor'?'poor-card':c.grade==='excellent'?'excellent-card':''}">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <div class="quality-score-ring" style="width:72px;height:72px;">
+          <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg)">
+            <circle cx="36" cy="36" r="28" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
+            <circle cx="36" cy="36" r="28" fill="none" stroke="${gradeColor(c.grade)}" stroke-width="7"
+              stroke-dasharray="175.9" stroke-dashoffset="${175.9 - (c.score/10)*175.9}" stroke-linecap="round"/>
+          </svg>
+          <div class="ring-val" style="color:${gradeColor(c.grade)};font-size:1.1rem;">${c.score}</div>
+        </div>
+        <div>
+          <div style="font-weight:800;">${c.plate}</div>
+          <div style="font-size:0.78rem;color:var(--muted);">${c.driver}</div>
+          <span class="quality-badge ${c.grade}" style="margin-top:0.3rem;">${c.grade.charAt(0).toUpperCase()+c.grade.slice(1)}</span>
+        </div>
+      </div>
+      <button class="btn btn-outline full-width" style="font-size:0.78rem;" onclick="showToast('Viewing ${c.plate} quality report')">View Report →</button>
+    </div>`).join('');
+}
+
+function filterQuality(f, btn) {
+  document.querySelectorAll('#panel-quality .btn-outline.btn-sm').forEach(b=>{ b.style.borderColor=''; b.style.color=''; });
+  btn.style.borderColor='var(--brand)'; btn.style.color='var(--brand)';
+  renderQualityCars(f);
+}
+
+let scanRunning = false;
+function simulateQualityScan() {
+  if (scanRunning) return;
+  scanRunning = true;
+  const zone = document.querySelector('.quality-upload-zone');
+  zone.innerHTML = '<div style="font-size:2rem;">⏳</div><div style="font-weight:700;margin-top:0.5rem;">AI scanning sticker…</div>';
+  setTimeout(() => {
+    zone.innerHTML = '<div style="font-size:2rem;color:#22C55E;">✓</div><div style="font-weight:700;margin-top:0.5rem;color:#22C55E;">Scan complete — click to rescan</div>';
+    const result = document.getElementById('quality-scan-result');
+    result.style.display = 'block';
+    const critEl = document.getElementById('quality-criteria-list');
+    critEl.innerHTML = qualityCriteria.map(c => `
+      <div class="quality-criteria-row">
+        <span style="font-size:0.82rem;">${c.label} <span style="color:var(--muted);font-size:0.72rem;">(${c.weight})</span></span>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div style="width:80px;height:5px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+            <div style="width:${c.score*10}%;height:100%;background:#22C55E;border-radius:999px;"></div>
+          </div>
+          <span style="font-size:0.82rem;font-weight:700;color:#22C55E;">${c.score}</span>
+        </div>
+      </div>`).join('');
+    scanRunning = false;
+  }, 1800);
+}
+
+// ═══════════════════════════════════════════════════
+// STEP 14 — AUDIT BADGE
+// ═══════════════════════════════════════════════════
+const auditPartners = [
+  {logo:'🏛️', name:'Bureau Veritas',   specialty:'GPS & KM Methodology',    certified:'May 2026'},
+  {logo:'🔬', name:'SGS Group',         specialty:'Impression Formula Audit', certified:'Apr 2026'},
+  {logo:'📊', name:'Nielsen Media Lab', specialty:'Reach & Audience Metrics', certified:'Mar 2026'},
+];
+const auditCampaigns = [
+  {name:'Coca-Cola Refresh', auditor:'Bureau Veritas',   date:'May 14',  accuracy:'99.7%', badge:'Verified'},
+  {name:'Nike Air Max',      auditor:'SGS Group',        date:'May 8',   accuracy:'99.2%', badge:'Verified'},
+  {name:'Apple Vision',      auditor:'Nielsen Media Lab',date:'Apr 29',  accuracy:'99.8%', badge:'Verified'},
+  {name:'McD Morning',       auditor:'Bureau Veritas',   date:'Apr 22',  accuracy:'98.9%', badge:'Verified'},
+  {name:'Samsung Galaxy',    auditor:'SGS Group',        date:'Apr 15',  accuracy:'99.4%', badge:'Verified'},
+];
+const auditTrail = [
+  {dot:'#22C55E', action:'Full platform audit completed',            who:'Bureau Veritas',   time:'May 14, 2026 · 10:32 AM'},
+  {dot:'#3B82F6', action:'GPS tracking methodology re-certified',    who:'SGS Group',        time:'Apr 29, 2026 · 2:15 PM'},
+  {dot:'#A855F7', action:'Impression formula independently reviewed', who:'Nielsen Media Lab',time:'Mar 18, 2026 · 9:00 AM'},
+  {dot:'#F59E0B', action:'Q1 2026 quarterly audit report issued',     who:'Bureau Veritas',   time:'Mar 1, 2026 · 11:45 AM'},
+  {dot:'#22C55E', action:'KM calculation method certified accurate',  who:'SGS Group',        time:'Feb 10, 2026 · 3:30 PM'},
+];
+
+function renderAuditPartners() {
+  const grid = document.getElementById('audit-partner-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = auditPartners.map(p => `
+    <div class="audit-partner-card">
+      <div class="audit-partner-logo">${p.logo}</div>
+      <div>
+        <div style="font-weight:800;font-size:0.9rem;">${p.name}</div>
+        <div style="font-size:0.72rem;color:var(--muted);">${p.specialty}</div>
+        <div style="font-size:0.7rem;color:#22C55E;margin-top:0.2rem;">✓ Certified ${p.certified}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAuditCampaigns() {
+  const tb = document.getElementById('audit-campaign-table');
+  if (!tb || tb.dataset.rendered) return;
+  tb.dataset.rendered = '1';
+  tb.innerHTML = auditCampaigns.map(c => `
+    <tr>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.auditor}</td>
+      <td style="color:var(--muted);">${c.date}</td>
+      <td style="color:#22C55E;font-weight:700;">${c.accuracy}</td>
+      <td><span class="audit-badge-pill" style="font-size:0.65rem;">✓ ${c.badge}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="showToast('Downloading audit report…')">⬇ PDF</button></td>
+    </tr>`).join('');
+}
+
+function renderAuditTrail() {
+  const el = document.getElementById('audit-trail-list');
+  if (!el || el.dataset.rendered) return;
+  el.dataset.rendered = '1';
+  el.innerHTML = auditTrail.map(e => `
+    <div class="audit-trail-entry">
+      <div class="audit-trail-dot" style="background:${e.dot};"></div>
+      <div style="flex:1;">
+        <div style="font-size:0.85rem;font-weight:700;">${e.action}</div>
+        <div style="font-size:0.72rem;color:var(--muted);">by ${e.who}</div>
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted);white-space:nowrap;">${e.time}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// STEP 15 — CARBON IMPACT
+// ═══════════════════════════════════════════════════
+const carbonComparisons = [
+  {icon:'🌿', label:'AdStick Car Ads',    co2:'0 kg',    color:'#10B981', note:'Uses existing journeys'},
+  {icon:'📱', label:'Social Media Ads',   co2:'~0.9 kg',  color:'#EF4444', note:'Data center energy'},
+  {icon:'🖥️', label:'Display / Banner',  co2:'~0.7 kg',  color:'#F59E0B', note:'Server & CDN load'},
+  {icon:'🪟', label:'Digital Billboards', co2:'~3.2 kg',  color:'#EF4444', note:'LED screens 24/7'},
+  {icon:'🗺️', label:'Print Billboards',  co2:'~5.8 kg',  color:'#EF4444', note:'Production & install'},
+  {icon:'📺', label:'TV Advertising',     co2:'~2.1 kg',  color:'#EF4444', note:'Broadcast infrastructure'},
+];
+const ecoCampaigns = [
+  {name:'Coca-Cola Refresh', score:9.8, saved:'1.24T CO₂', badge:true},
+  {name:'Nike Air Max',      score:9.6, saved:'0.96T CO₂', badge:true},
+  {name:'Apple Vision',      score:9.9, saved:'2.10T CO₂', badge:true},
+  {name:'McD Morning',       score:9.4, saved:'0.62T CO₂', badge:true},
+  {name:'Samsung Galaxy',    score:9.7, saved:'1.80T CO₂', badge:true},
+  {name:'Pepsi Summer',      score:9.5, saved:'1.10T CO₂', badge:true},
+];
+
+function renderCarbonCompare() {
+  const grid = document.getElementById('carbon-compare-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = carbonComparisons.map(c => `
+    <div class="carbon-compare-card">
+      <div class="carbon-compare-icon">${c.icon}</div>
+      <div class="carbon-compare-val" style="color:${c.color};">${c.co2}</div>
+      <div style="font-size:0.82rem;font-weight:700;margin:0.25rem 0;">${c.label}</div>
+      <div class="carbon-compare-lbl">${c.note}</div>
+    </div>`).join('');
+}
+
+function renderEcoCampaigns() {
+  const grid = document.getElementById('eco-campaign-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = ecoCampaigns.map(c => `
+    <div class="eco-campaign-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-weight:800;">${c.name}</div>
+        ${c.badge?'<span class="carbon-badge" style="font-size:0.65rem;">0 kg CO₂</span>':''}
+      </div>
+      <div class="eco-score-bar"><div class="eco-score-fill" style="width:${c.score*10}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.78rem;">
+        <span style="color:#10B981;font-weight:700;">Eco-Score: ${c.score}/10</span>
+        <span style="color:var(--muted);">Saved: ${c.saved}</span>
+      </div>
+    </div>`).join('');
+}
+
+let carbonChartInst = null;
+function initCarbonChart() {
+  const ctx = document.getElementById('carbonChart');
+  if (!ctx || carbonChartInst) return;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul'];
+  const adstick = [0,0,0,0,0,0,0];
+  const digital = [3.2,3.4,3.1,3.6,3.8,4.0,4.2];
+  carbonChartInst = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:months,
+      datasets:[
+        {label:'AdStick (tonnes CO₂)',  data:adstick, backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6},
+        {label:'Digital Ads Equivalent',data:digital, backgroundColor:'rgba(239,68,68,0.5)', borderRadius:6},
+      ]
+    },
+    options:{responsive:true, plugins:{legend:{labels:{color:'#8890A8'}}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8890A8'}},
+        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#8890A8',callback:v=>v+'T'}}
+      }
+    }
+  });
+}
 
 // ═══════════════════════════════════════════════════
 // STEP 10 — FLEET PARTNERSHIPS
