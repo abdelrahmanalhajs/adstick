@@ -124,6 +124,38 @@
     .btn-white:hover { background: #f0f0f0; transform: translateY(-1px); }
     footer { background: var(--dark2); padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
 
+    /* ── APP DOWNLOAD PANELS (driver & advertiser) ── */
+    .app-download-hero { display:flex; gap:2.5rem; align-items:flex-start; flex-wrap:wrap; margin-top:1.75rem; }
+    .app-dl-mockup { flex-shrink:0; display:flex; justify-content:center; }
+    .app-mockup-shell {
+      width:180px; height:360px; background:var(--dark3);
+      border:3px solid var(--border); border-radius:30px;
+      position:relative; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    }
+    .app-mockup-notch { position:absolute;top:0;left:50%;transform:translateX(-50%);width:70px;height:18px;background:var(--dark2);border-radius:0 0 12px 12px;z-index:1; }
+    .app-mockup-screen { width:154px;height:316px;border-radius:20px;overflow:hidden; }
+    .app-dl-content { flex:1; min-width:260px; }
+    .app-feat-row { display:flex; align-items:flex-start; gap:0.85rem; }
+    .app-feat-icon { width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0; }
+    .app-feat-title { font-size:0.875rem;font-weight:700;margin-bottom:0.1rem; }
+    .app-feat-desc { font-size:0.75rem;color:var(--muted);line-height:1.5; }
+    .app-store-row { display:flex;gap:0.75rem;flex-wrap:wrap; }
+    .app-store-badge {
+      display:flex;align-items:center;gap:0.65rem;
+      padding:0.7rem 1.25rem;border-radius:12px;border:1px solid var(--border);
+      background:var(--dark3);text-decoration:none;color:var(--text);
+      transition:border-color .2s,transform .2s;cursor:pointer;
+    }
+    .app-store-badge:hover { transform:translateY(-2px); }
+    .app-store-badge.driver-badge:hover { border-color:#10B981; }
+    .app-store-badge.adv-badge:hover { border-color:var(--brand); }
+    .store-label { font-size:0.62rem;color:var(--muted); }
+    .store-name-lg { font-size:0.95rem;font-weight:800; }
+    .qr-box { width:72px;height:72px;border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0; }
+    .app-screens-row { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem; }
+    .app-screen-card { border-radius:14px;border:1px solid var(--border);padding:1.25rem;min-height:110px;display:flex;flex-direction:column;justify-content:center; }
+
     /* ── PHASE 6 LANDING SECTIONS ── */
     .lp-section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
     .lp-section-full { padding: 5rem 2rem; background: var(--dark2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
@@ -3842,6 +3874,7 @@
       <button class="d-sidebar-item" onclick="showDriverPanel('d-benefits',event)"><span class="icon">🎁</span><span data-i18n="drv.p.benefits">My Benefits</span></button>
       <div class="sidebar-label" data-i18n="sb.account">Account</div>
       <button class="d-sidebar-item" onclick="showDriverPanel('d-profile',event)"><span class="icon">👤</span><span data-i18n="drv.p.profile">Profile</span></button>
+      <button class="d-sidebar-item" onclick="showDriverPanel('d-app',event)"><span class="icon">📱</span><span data-i18n="drv.p.app">Get the App</span></button>
     </aside>
 
     <main class="d-content">
@@ -4315,6 +4348,109 @@
         </div>
       </div><!-- /panel-d-benefits -->
 
+      <!-- DRIVER – GET THE APP -->
+      <div class="d-panel" id="panel-d-app">
+        <div class="page-title" data-i18n="drv.p.app">📱 Get the AdStick Driver App</div>
+        <div class="page-sub" data-i18n="dapp.sub">Track your trips, earnings, and campaigns — all from your phone.</div>
+
+        <div class="app-download-hero">
+          <!-- Left: mockup -->
+          <div class="app-dl-mockup">
+            <div class="app-mockup-shell">
+              <div class="app-mockup-notch"></div>
+              <div class="app-mockup-screen">
+                <div style="background:linear-gradient(160deg,#0f2027,#203a43,#2c5364);height:100%;border-radius:18px;padding:1rem;display:flex;flex-direction:column;gap:0.6rem;">
+                  <div style="font-size:0.65rem;font-weight:800;color:#10B981;text-align:center;">● LIVE · AdStick Driver</div>
+                  <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:0.6rem;text-align:center;">
+                    <div style="font-size:1.4rem;font-weight:900;color:#10B981;">SAR 87.40</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.5);">Today's Earnings</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:0.5rem;">
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;">KM Today</div>
+                    <div style="font-size:0.85rem;font-weight:800;color:#fff;">87.4 km</div>
+                    <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:0.3rem;"><div style="height:4px;background:#10B981;border-radius:2px;width:73%;"></div></div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:0.5rem;">
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.5);margin-bottom:0.2rem;">Active Campaign</div>
+                    <div style="font-size:0.75rem;font-weight:700;color:#fff;">🥤 Coca-Cola Ramadan</div>
+                    <div style="font-size:0.55rem;color:#10B981;">● Sticker verified</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: content -->
+          <div class="app-dl-content">
+            <div class="app-dl-badge-row" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:999px;display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.85rem;margin-bottom:1rem;">
+              <span style="color:#10B981;font-size:0.75rem;font-weight:700;" data-i18n="dapp.badge">🚗 AdStick Driver App</span>
+            </div>
+            <h2 style="font-size:1.6rem;font-weight:900;line-height:1.2;margin-bottom:0.75rem;" data-i18n="dapp.h">Your Earnings.<br>Your Route.<br>Always with you.</h2>
+            <p style="color:var(--muted);font-size:0.875rem;line-height:1.7;margin-bottom:1.5rem;" data-i18n="dapp.p">Manage every aspect of your AdStick journey from one app — GPS route, live earnings, sticker status, leaderboard, and more.</p>
+
+            <div style="display:flex;flex-direction:column;gap:0.65rem;margin-bottom:1.75rem;">
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(16,185,129,0.12);color:#10B981;">📍</div><div><div class="app-feat-title" data-i18n="dapp.f1">Live GPS route tracker</div><div class="app-feat-desc" data-i18n="dapp.f1d">See your path and coverage zone in real-time</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(16,185,129,0.12);color:#10B981;">💰</div><div><div class="app-feat-title" data-i18n="dapp.f2">Instant earnings dashboard</div><div class="app-feat-desc" data-i18n="dapp.f2d">Daily, weekly, and monthly SAR totals with per-km breakdown</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(16,185,129,0.12);color:#10B981;">🏷️</div><div><div class="app-feat-title" data-i18n="dapp.f3">Campaign sticker status</div><div class="app-feat-desc" data-i18n="dapp.f3d">Photo upload, verification status, and campaign brief</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(16,185,129,0.12);color:#10B981;">🏆</div><div><div class="app-feat-title" data-i18n="dapp.f4">Leaderboard & rewards</div><div class="app-feat-desc" data-i18n="dapp.f4d">Compete, earn badges, and redeem fuel card points</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(16,185,129,0.12);color:#10B981;">🤖</div><div><div class="app-feat-title" data-i18n="dapp.f5">AI route suggestions</div><div class="app-feat-desc" data-i18n="dapp.f5d">Smart recommendations to maximize your daily impressions</div></div></div>
+            </div>
+
+            <!-- Store badges -->
+            <div class="app-store-row">
+              <a class="app-store-badge driver-badge" href="https://apps.apple.com" target="_blank" rel="noopener">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <div><div class="store-label" data-i18n="app.ios_sub">Download on the</div><div class="store-name-lg">App Store</div></div>
+              </a>
+              <a class="app-store-badge driver-badge" href="https://play.google.com" target="_blank" rel="noopener">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l15 8.5c.6.34.6 1.26 0 1.6l-15 8.5c-.66.5-1.6.03-1.6-.8z"/></svg>
+                <div><div class="store-label" data-i18n="app.and_sub">Get it on</div><div class="store-name-lg">Google Play</div></div>
+              </a>
+            </div>
+
+            <!-- QR + rating -->
+            <div style="display:flex;align-items:center;gap:1.25rem;margin-top:1.25rem;">
+              <div class="qr-box">
+                <div style="font-size:2rem;">📲</div>
+                <div style="font-size:0.6rem;color:var(--muted);margin-top:0.25rem;text-align:center;" data-i18n="dapp.qr">Scan to<br>download</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem;font-weight:900;color:#F59E0B;">4.8 ⭐</div>
+                <div style="font-size:0.75rem;color:var(--muted);" data-i18n="dapp.rating">Rated 4.8/5 · 12K+ reviews</div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;" data-i18n="dapp.compat">iOS 16+ · Android 10+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- App screenshots strip -->
+        <div style="margin-top:2.5rem;">
+          <div class="card-title" style="margin-bottom:1rem;" data-i18n="dapp.screens">App Screenshots</div>
+          <div class="app-screens-row">
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#0f2027,#2c5364);">
+              <div style="font-size:0.65rem;color:#10B981;font-weight:700;margin-bottom:0.5rem;">Today's Earnings</div>
+              <div style="font-size:1.6rem;font-weight:900;color:#fff;">SAR 87.40</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">87.4 km · Rate: 1.00/km</div>
+            </div>
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#1a1a2e,#16213e);">
+              <div style="font-size:0.65rem;color:#60a5fa;font-weight:700;margin-bottom:0.5rem;">Live Route</div>
+              <div style="font-size:2rem;">🗺️</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">Riyadh · Al-Olaya District</div>
+            </div>
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#2d1b69,#11998e);">
+              <div style="font-size:0.65rem;color:#F59E0B;font-weight:700;margin-bottom:0.5rem;">Leaderboard</div>
+              <div style="font-size:1.4rem;font-weight:900;color:#F59E0B;">#3 🏆</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">Top 5% this month</div>
+            </div>
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#0a3d62,#1e3799);">
+              <div style="font-size:0.65rem;color:#a29bfe;font-weight:700;margin-bottom:0.5rem;">My Campaign</div>
+              <div style="font-size:1.2rem;font-weight:800;color:#fff;">🥤 Coca-Cola</div>
+              <div style="font-size:0.6rem;color:#10B981;margin-top:0.25rem;">● Sticker verified</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /panel-d-app -->
+
     </main>
   </div>
 </div>
@@ -4343,6 +4479,7 @@
       <button class="adv-sidebar-item" onclick="showAdvPanel('adv-reports',event)"><span class="icon">📄</span><span data-i18n="sb.reports">My Reports</span></button>
       <div class="sidebar-label" data-i18n="sb.account">Account</div>
       <button class="adv-sidebar-item" onclick="showAdvPanel('adv-profile',event)"><span class="icon">👤</span><span data-i18n="drv.p.profile">Profile</span></button>
+      <button class="adv-sidebar-item" onclick="showAdvPanel('adv-app',event)"><span class="icon">📱</span><span data-i18n="drv.p.app">Get the App</span></button>
     </aside>
 
     <main class="adv-content">
@@ -4461,6 +4598,108 @@
           <button class="btn btn-primary" style="margin-top:1.25rem;" onclick="showToast('Profile saved ✓')" data-i18n="modal.save">Save Changes</button>
         </div>
       </div>
+
+      <!-- ADVERTISER – GET THE APP -->
+      <div class="adv-panel" id="panel-adv-app">
+        <div class="page-title" data-i18n="advapp.title">📱 Get the AdStick Advertiser App</div>
+        <div class="page-sub" data-i18n="advapp.sub">Launch campaigns, track your cars live, and view reports — from anywhere.</div>
+
+        <div class="app-download-hero">
+          <!-- Left: mockup -->
+          <div class="app-dl-mockup">
+            <div class="app-mockup-shell">
+              <div class="app-mockup-notch"></div>
+              <div class="app-mockup-screen">
+                <div style="background:linear-gradient(160deg,#1a0533,#2d1b69,#11998e);height:100%;border-radius:18px;padding:1rem;display:flex;flex-direction:column;gap:0.6rem;">
+                  <div style="font-size:0.65rem;font-weight:800;color:var(--brand);text-align:center;">● LIVE · AdStick Campaigns</div>
+                  <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:0.6rem;text-align:center;">
+                    <div style="font-size:1.3rem;font-weight:900;color:var(--brand);">1.2M</div>
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.5);">Impressions Today</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:0.5rem;">
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;">Active Cars</div>
+                    <div style="font-size:0.85rem;font-weight:800;color:#fff;">120 🚗</div>
+                    <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:0.3rem;"><div style="height:4px;background:var(--brand);border-radius:2px;width:89%;"></div></div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07);border-radius:10px;padding:0.5rem;">
+                    <div style="font-size:0.55rem;color:rgba(255,255,255,0.5);margin-bottom:0.2rem;">Campaign ROI</div>
+                    <div style="font-size:0.75rem;font-weight:700;color:#22C55E;">4.2× this month</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: content -->
+          <div class="app-dl-content">
+            <div style="background:rgba(255,107,43,0.08);border:1px solid rgba(255,107,43,0.25);border-radius:999px;display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.85rem;margin-bottom:1rem;">
+              <span style="color:var(--brand);font-size:0.75rem;font-weight:700;" data-i18n="advapp.badge">📊 AdStick Advertiser App</span>
+            </div>
+            <h2 style="font-size:1.6rem;font-weight:900;line-height:1.2;margin-bottom:0.75rem;" data-i18n="advapp.h">Your Campaigns.<br>Your Data.<br>On the go.</h2>
+            <p style="color:var(--muted);font-size:0.875rem;line-height:1.7;margin-bottom:1.5rem;" data-i18n="advapp.p">Monitor your car ads in real-time, pause or boost campaigns, get instant notifications when milestones are hit — all from your phone.</p>
+
+            <div style="display:flex;flex-direction:column;gap:0.65rem;margin-bottom:1.75rem;">
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(255,107,43,0.12);color:var(--brand);">📍</div><div><div class="app-feat-title" data-i18n="advapp.f1">Live car map</div><div class="app-feat-desc" data-i18n="advapp.f1d">See every car with your ad moving across the city in real-time</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(255,107,43,0.12);color:var(--brand);">📊</div><div><div class="app-feat-title" data-i18n="advapp.f2">Live impression counter</div><div class="app-feat-desc" data-i18n="advapp.f2d">Real-time impressions, KM covered, and traffic zone heatmap</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(255,107,43,0.12);color:var(--brand);">⚡</div><div><div class="app-feat-title" data-i18n="advapp.f3">One-tap campaign control</div><div class="app-feat-desc" data-i18n="advapp.f3d">Pause, resume, or boost budget with a single tap</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(255,107,43,0.12);color:var(--brand);">🔔</div><div><div class="app-feat-title" data-i18n="advapp.f4">Milestone notifications</div><div class="app-feat-desc" data-i18n="advapp.f4d">Get alerted when your campaign hits 100K, 500K, or 1M impressions</div></div></div>
+              <div class="app-feat-row"><div class="app-feat-icon" style="background:rgba(255,107,43,0.12);color:var(--brand);">📄</div><div><div class="app-feat-title" data-i18n="advapp.f5">Instant PDF reports</div><div class="app-feat-desc" data-i18n="advapp.f5d">Download and share campaign reports directly from your phone</div></div></div>
+            </div>
+
+            <!-- Store badges -->
+            <div class="app-store-row">
+              <a class="app-store-badge adv-badge" href="https://apps.apple.com" target="_blank" rel="noopener">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <div><div class="store-label" data-i18n="app.ios_sub">Download on the</div><div class="store-name-lg">App Store</div></div>
+              </a>
+              <a class="app-store-badge adv-badge" href="https://play.google.com" target="_blank" rel="noopener">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l15 8.5c.6.34.6 1.26 0 1.6l-15 8.5c-.66.5-1.6.03-1.6-.8z"/></svg>
+                <div><div class="store-label" data-i18n="app.and_sub">Get it on</div><div class="store-name-lg">Google Play</div></div>
+              </a>
+            </div>
+
+            <!-- QR + rating -->
+            <div style="display:flex;align-items:center;gap:1.25rem;margin-top:1.25rem;">
+              <div class="qr-box">
+                <div style="font-size:2rem;">📲</div>
+                <div style="font-size:0.6rem;color:var(--muted);margin-top:0.25rem;text-align:center;" data-i18n="dapp.qr">Scan to<br>download</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem;font-weight:900;color:#F59E0B;">4.9 ⭐</div>
+                <div style="font-size:0.75rem;color:var(--muted);" data-i18n="advapp.rating">Rated 4.9/5 · 8K+ reviews</div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;" data-i18n="dapp.compat">iOS 16+ · Android 10+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- App screenshots strip -->
+        <div style="margin-top:2.5rem;">
+          <div class="card-title" style="margin-bottom:1rem;" data-i18n="dapp.screens">App Screenshots</div>
+          <div class="app-screens-row">
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#1a0533,#2d1b69);">
+              <div style="font-size:0.65rem;color:var(--brand);font-weight:700;margin-bottom:0.5rem;">Impressions</div>
+              <div style="font-size:1.6rem;font-weight:900;color:#fff;">1.2M</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">Today · +18%</div>
+            </div>
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#0a3d62,#1e3799);">
+              <div style="font-size:0.65rem;color:#60a5fa;font-weight:700;margin-bottom:0.5rem;">Live Cars</div>
+              <div style="font-size:2rem;">🚗</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">120 active · Riyadh</div>
+            </div>
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#134e4a,#064e3b);">
+              <div style="font-size:0.65rem;color:#22C55E;font-weight:700;margin-bottom:0.5rem;">ROI</div>
+              <div style="font-size:1.4rem;font-weight:900;color:#22C55E;">4.2×</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">This month</div>
+            </div>
+            <div class="app-screen-card" style="background:linear-gradient(160deg,#431407,#7c2d12);">
+              <div style="font-size:0.65rem;color:#fb923c;font-weight:700;margin-bottom:0.5rem;">KM Covered</div>
+              <div style="font-size:1.4rem;font-weight:900;color:#fff;">89.2K</div>
+              <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:0.25rem;">This month · ▲8.4%</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /panel-adv-app -->
 
     </main>
   </div>
@@ -4851,7 +5090,9 @@ const i18n = {
     "rep.generating":"Generating PDF report…",
     // Step 8 – Driver Portal
     "drv.signout":"Sign Out",
-    "drv.p.overview":"My Overview","drv.p.route":"My Route","drv.p.earnings":"Earnings","drv.p.sticker":"My Campaign","drv.p.profile":"Profile",
+    "drv.p.overview":"My Overview","drv.p.route":"My Route","drv.p.earnings":"Earnings","drv.p.sticker":"My Campaign","drv.p.profile":"Profile","drv.p.app":"Get the App",
+    "dapp.sub":"Track your trips, earnings, and campaigns — all from your phone.","dapp.badge":"🚗 AdStick Driver App","dapp.h":"Your Earnings. Your Route. Always with you.","dapp.p":"Manage every aspect of your AdStick journey from one app — GPS route, live earnings, sticker status, leaderboard, and more.","dapp.f1":"Live GPS route tracker","dapp.f1d":"See your path and coverage zone in real-time","dapp.f2":"Instant earnings dashboard","dapp.f2d":"Daily, weekly, and monthly SAR totals with per-km breakdown","dapp.f3":"Campaign sticker status","dapp.f3d":"Photo upload, verification status, and campaign brief","dapp.f4":"Leaderboard & rewards","dapp.f4d":"Compete, earn badges, and redeem fuel card points","dapp.f5":"AI route suggestions","dapp.f5d":"Smart recommendations to maximize your daily impressions","dapp.qr":"Scan to download","dapp.rating":"Rated 4.8/5 · 12K+ reviews","dapp.compat":"iOS 16+ · Android 10+","dapp.screens":"App Screenshots",
+    "advapp.title":"📱 Get the AdStick Advertiser App","advapp.sub":"Launch campaigns, track your cars live, and view reports — from anywhere.","advapp.badge":"📊 AdStick Advertiser App","advapp.h":"Your Campaigns. Your Data. On the go.","advapp.p":"Monitor your car ads in real-time, pause or boost campaigns, get instant notifications when milestones are hit — all from your phone.","advapp.f1":"Live car map","advapp.f1d":"See every car with your ad moving across the city in real-time","advapp.f2":"Live impression counter","advapp.f2d":"Real-time impressions, KM covered, and traffic zone heatmap","advapp.f3":"One-tap campaign control","advapp.f3d":"Pause, resume, or boost budget with a single tap","advapp.f4":"Milestone notifications","advapp.f4d":"Get alerted when your campaign hits 100K, 500K, or 1M impressions","advapp.f5":"Instant PDF reports","advapp.f5d":"Download and share campaign reports directly from your phone","advapp.rating":"Rated 4.9/5 · 8K+ reviews",
     "drv.curr.loc":"Current Location",
     "drv.week.km":"This Week — KM per Day",
     "drv.route.sub":"Today's GPS trail — updates every 5 seconds",
@@ -5205,7 +5446,9 @@ const i18n = {
     "rep.generating":"جارٍ إنشاء تقرير PDF…",
     // Step 8 AR – Driver Portal
     "drv.signout":"تسجيل الخروج",
-    "drv.p.overview":"نظرتي العامة","drv.p.route":"مساري","drv.p.earnings":"أرباحي","drv.p.sticker":"حملتي","drv.p.profile":"ملفي الشخصي",
+    "drv.p.overview":"نظرتي العامة","drv.p.route":"مساري","drv.p.earnings":"أرباحي","drv.p.sticker":"حملتي","drv.p.profile":"ملفي الشخصي","drv.p.app":"حمّل التطبيق",
+    "dapp.sub":"تتبع رحلاتك وأرباحك وحملاتك — من هاتفك.","dapp.badge":"🚗 تطبيق AdStick للسائق","dapp.h":"أرباحك. مسارك. معك دائماً.","dapp.p":"أدر كل جوانب رحلتك في AdStick من تطبيق واحد — GPS والأرباح ووضع الملصق ولوحة المتصدرين والمزيد.","dapp.f1":"تتبع مسار GPS المباشر","dapp.f1d":"شاهد مسارك ومنطقة التغطية في الوقت الفعلي","dapp.f2":"لوحة الأرباح الفورية","dapp.f2d":"إجمالي ريال سعودي يومياً وأسبوعياً وشهرياً مع تفاصيل لكل كيلومتر","dapp.f3":"حالة ملصق الحملة","dapp.f3d":"رفع الصور وحالة التحقق وملخص الحملة","dapp.f4":"لوحة المتصدرين والمكافآت","dapp.f4d":"تنافس واكسب شارات واسترد نقاط بطاقة الوقود","dapp.f5":"اقتراحات المسار بالذكاء الاصطناعي","dapp.f5d":"توصيات ذكية لزيادة انطباعاتك اليومية","dapp.qr":"امسح للتنزيل","dapp.rating":"تقييم 4.8/5 · أكثر من 12 ألف مراجعة","dapp.compat":"iOS 16+ · Android 10+","dapp.screens":"لقطات التطبيق",
+    "advapp.title":"📱 حمّل تطبيق AdStick للمعلن","advapp.sub":"أطلق الحملات وتتبع سياراتك وشاهد التقارير — من أي مكان.","advapp.badge":"📊 تطبيق AdStick للمعلن","advapp.h":"حملاتك. بياناتك. في أي مكان.","advapp.p":"راقب إعلانات سياراتك في الوقت الفعلي، وأوقف الحملات أو عززها، واحصل على إشعارات فورية عند الوصول للأهداف — كل ذلك من هاتفك.","advapp.f1":"خريطة السيارات المباشرة","advapp.f1d":"شاهد كل سيارة تحمل إعلانك تتحرك عبر المدينة في الوقت الفعلي","advapp.f2":"عداد الانطباعات المباشر","advapp.f2d":"انطباعات فورية وكيلومترات مقطوعة وخريطة حرارية لمنطقة المرور","advapp.f3":"التحكم بالحملة بنقرة واحدة","advapp.f3d":"أوقف أو استأنف أو عزز الميزانية بنقرة واحدة","advapp.f4":"إشعارات الأهداف","advapp.f4d":"تنبيه عند وصول حملتك إلى 100K أو 500K أو مليون انطباع","advapp.f5":"تقارير PDF فورية","advapp.f5d":"تنزيل تقارير الحملة ومشاركتها مباشرة من هاتفك","advapp.rating":"تقييم 4.9/5 · أكثر من 8 آلاف مراجعة",
     "drv.curr.loc":"موقعي الحالي",
     "drv.week.km":"هذا الأسبوع — كم في اليوم",
     "drv.route.sub":"مسار GPS اليوم — يتحدث كل 5 ثوانٍ",
