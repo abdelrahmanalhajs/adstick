@@ -1016,6 +1016,75 @@
     .adv-welcome h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.2rem; }
     .adv-welcome p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
 
+    /* ── STEP 10: FLEET PARTNERSHIPS ── */
+    .fleet-partner-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem; }
+    .fleet-partner-card {
+      background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;
+      display:flex;flex-direction:column;gap:0.75rem;transition:border-color .2s;
+    }
+    .fleet-partner-card:hover { border-color:var(--brand); }
+    .fleet-partner-card.active { border-color:rgba(34,197,94,0.35);background:rgba(34,197,94,0.04); }
+    .fleet-partner-header { display:flex;align-items:center;gap:0.85rem; }
+    .fleet-logo { width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0; }
+    .fleet-partner-name { font-size:1rem;font-weight:800; }
+    .fleet-partner-type { font-size:0.72rem;color:var(--muted); }
+    .fleet-rev-row { display:flex;justify-content:space-between;align-items:center; }
+    .fleet-rev-val { font-size:1.2rem;font-weight:900;color:var(--green); }
+    .fleet-rev-lbl { font-size:0.72rem;color:var(--muted); }
+    .fleet-onboard-step { display:flex;align-items:center;gap:0.6rem;font-size:0.78rem;padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.04); }
+    .fleet-onboard-step:last-child { border:none; }
+    .fleet-step-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+
+    /* ── STEP 11: MARKETPLACE / AUCTION ── */
+    .auction-live-badge { display:inline-flex;align-items:center;gap:0.4rem;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#EF4444;padding:0.25rem 0.75rem;border-radius:999px;font-size:0.72rem;font-weight:700; }
+    .auction-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:1.5rem; }
+    .auction-card {
+      background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:1.25rem;
+      display:flex;flex-direction:column;gap:0.75rem;transition:border-color .2s;
+    }
+    .auction-card.live { border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.04); }
+    .auction-card.ending { border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.04); }
+    .auction-card-header { display:flex;justify-content:space-between;align-items:flex-start; }
+    .auction-route-name { font-size:0.95rem;font-weight:800;margin-bottom:0.15rem; }
+    .auction-timer { font-size:0.75rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:8px; }
+    .auction-timer.live   { background:rgba(239,68,68,0.15);color:#EF4444; }
+    .auction-timer.ending { background:rgba(245,158,11,0.15);color:#F59E0B; }
+    .auction-timer.open   { background:rgba(34,197,94,0.15);color:#22C55E; }
+    .auction-price-row { display:flex;justify-content:space-between;align-items:center; }
+    .auction-current-bid { font-size:1.4rem;font-weight:900;color:var(--brand); }
+    .auction-bids-count  { font-size:0.75rem;color:var(--muted); }
+    .auction-bid-input { display:flex;gap:0.5rem;margin-top:0.25rem; }
+    .auction-bid-input input { flex:1;background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:0.45rem 0.75rem;color:var(--text);font-size:0.85rem;outline:none; }
+    .auction-bid-input input:focus { border-color:var(--brand); }
+    .market-index-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin-bottom:1.5rem; }
+    .market-index-card { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem; }
+    .market-index-zone  { font-size:0.78rem;color:var(--muted);margin-bottom:0.3rem; }
+    .market-index-price { font-size:1.3rem;font-weight:900; }
+    .market-index-delta { font-size:0.72rem;font-weight:700;margin-top:0.2rem; }
+
+    /* ── STEP 12: MULTI-CITY ── */
+    .city-selector-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-bottom:1.5rem; }
+    .city-card {
+      background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;
+      cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+    }
+    .city-card.active-city  { border-color:rgba(34,197,94,0.45);background:rgba(34,197,94,0.05); }
+    .city-card.coming-soon  { opacity:0.55; }
+    .city-card:hover:not(.coming-soon) { border-color:var(--brand); }
+    .city-flag { font-size:2rem;margin-bottom:0.5rem; }
+    .city-name { font-size:1rem;font-weight:800;margin-bottom:0.15rem; }
+    .city-country { font-size:0.72rem;color:var(--muted);margin-bottom:0.75rem; }
+    .city-stats-row { display:flex;gap:0.75rem; }
+    .city-stat { flex:1;text-align:center; }
+    .city-stat-val { font-size:1rem;font-weight:800; }
+    .city-stat-lbl { font-size:0.65rem;color:var(--muted); }
+    .city-status-pill { position:absolute;top:0.85rem;right:0.85rem;font-size:0.65rem;font-weight:700;padding:0.2rem 0.55rem;border-radius:999px; }
+    .city-status-pill.live   { background:rgba(34,197,94,0.15);color:#22C55E; }
+    .city-status-pill.soon   { background:rgba(245,158,11,0.15);color:#F59E0B; }
+    .franchise-card { background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:1.25rem; }
+    .franchise-avatar { width:48px;height:48px;border-radius:50%;background:rgba(255,107,43,0.15);border:2px solid var(--brand);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0; }
+    .franchise-rev { font-size:1.1rem;font-weight:900;color:var(--green); }
+
     /* ── STEP 4: GAMIFICATION ── */
     .tier-banner {
       display: flex; align-items: center; gap: 1.25rem;
@@ -1624,6 +1693,10 @@
       <button class="sidebar-item" onclick="showPanel('campaigns',event)"><span class="icon">📢</span><span data-i18n="sb.campaigns">Campaigns</span></button>
       <button class="sidebar-item" onclick="showPanel('drivers',event)"><span class="icon">👤</span><span data-i18n="sb.drivers">Drivers</span></button>
       <button class="sidebar-item" onclick="showPanel('roi',event)"><span class="icon">📈</span><span data-i18n="sb.roi">ROI Score</span></button>
+      <div class="sidebar-label" data-i18n="sb.expansion">Expansion</div>
+      <button class="sidebar-item" onclick="showPanel('fleet',event)"><span class="icon">🚛</span><span data-i18n="sb.fleet">Fleet Partners</span></button>
+      <button class="sidebar-item" onclick="showPanel('marketplace',event)"><span class="icon">🏛️</span><span data-i18n="sb.marketplace">Marketplace</span></button>
+      <button class="sidebar-item" onclick="showPanel('cities',event)"><span class="icon">🌍</span><span data-i18n="sb.cities">Multi-City</span></button>
       <div class="sidebar-label" data-i18n="sb.ai">AI Tools</div>
       <button class="sidebar-item" onclick="showPanel('events',event)"><span class="icon">⚡</span><span data-i18n="sb.events">Event Surge</span></button>
       <button class="sidebar-item" onclick="showPanel('predictions',event)"><span class="icon">🔮</span><span data-i18n="sb.predictions">Predictions</span></button>
@@ -2291,6 +2364,128 @@
           <canvas id="predForecastChart"></canvas>
         </div>
       </div><!-- /panel-predictions -->
+
+      <!-- ══ STEP 10: FLEET PARTNERSHIPS ══ -->
+      <div class="dash-panel" id="panel-fleet">
+        <div class="page-title" data-i18n="fleet.title">🚛 Fleet Partnerships</div>
+        <div class="page-sub" data-i18n="fleet.sub">Onboard corporate fleets, manage revenue sharing, and bulk-assign campaigns</div>
+
+        <!-- Stats row -->
+        <div class="stats-row" style="margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-label" data-i18n="fleet.s.partners">Fleet Partners</div><div class="stat-value" style="color:var(--brand);">7</div><div class="stat-delta delta-up">▲ 2 this month</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="fleet.s.cars">Fleet Cars</div><div class="stat-value" style="color:var(--green);">432</div><div class="stat-delta delta-up">▲ Active with stickers</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="fleet.s.revenue">Monthly Revenue Share</div><div class="stat-value" style="color:var(--yellow);">$18.4K</div><div class="stat-delta delta-up">▲ 12% vs last month</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="fleet.s.pending">Pending Onboarding</div><div class="stat-value" style="color:var(--muted);">3</div><div class="stat-delta" style="color:var(--yellow);">⏳ Awaiting contract</div></div>
+        </div>
+
+        <!-- Onboarding pipeline -->
+        <div class="map-card" style="padding:1.5rem;margin-bottom:1.5rem;">
+          <div class="card-header" style="margin-bottom:1rem;">
+            <div class="card-title" data-i18n="fleet.pipeline">Onboarding Pipeline</div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Onboarding form opened ✓')" data-i18n="fleet.add">+ Add Fleet Partner</button>
+          </div>
+          <div style="display:flex;gap:0;overflow-x:auto;padding-bottom:0.5rem;">
+            <div style="min-width:160px;flex:1;padding:0.75rem;border-right:1px solid var(--border);">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:.5px;" data-i18n="fleet.stage.lead">Lead</div>
+              <div style="font-size:1.5rem;font-weight:900;color:var(--muted);">5</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;" data-i18n="fleet.stage.lead.sub">Initial contact</div>
+            </div>
+            <div style="min-width:160px;flex:1;padding:0.75rem;border-right:1px solid var(--border);">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:.5px;" data-i18n="fleet.stage.negotiation">Negotiation</div>
+              <div style="font-size:1.5rem;font-weight:900;color:var(--yellow);">3</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;" data-i18n="fleet.stage.neg.sub">Contract review</div>
+            </div>
+            <div style="min-width:160px;flex:1;padding:0.75rem;border-right:1px solid var(--border);">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:.5px;" data-i18n="fleet.stage.setup">Setup</div>
+              <div style="font-size:1.5rem;font-weight:900;color:var(--blue);">2</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;" data-i18n="fleet.stage.setup.sub">GPS & sticker install</div>
+            </div>
+            <div style="min-width:160px;flex:1;padding:0.75rem;">
+              <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:.5px;" data-i18n="fleet.stage.live">Live</div>
+              <div style="font-size:1.5rem;font-weight:900;color:var(--green);">7</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;" data-i18n="fleet.stage.live.sub">Earning revenue</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fleet partner cards -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="fleet.active.partners">Active Fleet Partners</div>
+        <div class="fleet-partner-grid" id="fleet-partner-grid"></div>
+
+        <!-- Revenue share table -->
+        <div class="map-card">
+          <div class="card-header"><div class="card-title" data-i18n="fleet.rev.table">Revenue Share — This Month</div><button class="btn btn-outline btn-sm" onclick="showToast('Exporting CSV…')" data-i18n="fleet.export">Export CSV</button></div>
+          <div style="overflow-x:auto;"><table class="data-table">
+            <thead><tr><th data-i18n="fleet.th.partner">Partner</th><th data-i18n="fleet.th.cars">Cars</th><th data-i18n="fleet.th.km">Total KM</th><th data-i18n="fleet.th.gross">Gross Revenue</th><th data-i18n="fleet.th.share">Their Share (25%)</th><th data-i18n="fleet.th.net">Net to AdStick</th><th data-i18n="th.status">Status</th></tr></thead>
+            <tbody id="fleet-rev-table"></tbody>
+          </table></div>
+        </div>
+      </div><!-- /panel-fleet -->
+
+      <!-- ══ STEP 11: MARKETPLACE / AUCTION ══ -->
+      <div class="dash-panel" id="panel-marketplace">
+        <div class="page-title" data-i18n="mkt.title">🏛️ Advertiser Marketplace</div>
+        <div class="page-sub" data-i18n="mkt.sub">Bid on premium routes, zones, and time slots — live auction for high-demand inventory</div>
+        <div class="auction-live-badge" style="margin-bottom:1.25rem;"><span class="live-dot"></span> Live Auctions Active</div>
+
+        <!-- Stats -->
+        <div class="stats-row" style="margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-label" data-i18n="mkt.s.live">Live Auctions</div><div class="stat-value" style="color:#EF4444;">4</div><div class="stat-delta" style="color:#EF4444;">● Bidding open</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="mkt.s.bids">Total Bids Today</div><div class="stat-value" style="color:var(--brand);">38</div><div class="stat-delta delta-up">▲ 12 this hour</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="mkt.s.highest">Highest Bid</div><div class="stat-value" style="color:var(--green);">$4,200</div><div class="stat-delta" style="color:var(--muted);">Downtown Premium</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="mkt.s.gmv">GMV This Week</div><div class="stat-value" style="color:var(--yellow);">$31.8K</div><div class="stat-delta delta-up">▲ 22% vs last week</div></div>
+        </div>
+
+        <!-- Live auction cards -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="mkt.live.auctions">🔴 Live Auctions</div>
+        <div class="auction-grid" id="auction-grid"></div>
+
+        <!-- Route price index -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="mkt.price.index">Route Price Index</div>
+        <div class="market-index-grid" id="market-index-grid"></div>
+
+        <!-- Bid history -->
+        <div class="map-card">
+          <div class="card-header"><div class="card-title" data-i18n="mkt.bid.history">Bid History</div></div>
+          <div style="overflow-x:auto;"><table class="data-table">
+            <thead><tr><th data-i18n="mkt.th.route">Route / Zone</th><th data-i18n="mkt.th.bidder">Advertiser</th><th data-i18n="mkt.th.amount">Amount</th><th data-i18n="mkt.th.time">Time</th><th data-i18n="th.status">Status</th></tr></thead>
+            <tbody id="bid-history-table"></tbody>
+          </table></div>
+        </div>
+      </div><!-- /panel-marketplace -->
+
+      <!-- ══ STEP 12: MULTI-CITY / MULTI-COUNTRY ══ -->
+      <div class="dash-panel" id="panel-cities">
+        <div class="page-title" data-i18n="city.title">🌍 Multi-City Framework</div>
+        <div class="page-sub" data-i18n="city.sub">Manage operations across cities and countries — franchise operator model</div>
+
+        <!-- Global stats -->
+        <div class="stats-row" style="margin-bottom:1.5rem;">
+          <div class="stat-card"><div class="stat-label" data-i18n="city.s.cities">Active Cities</div><div class="stat-value" style="color:var(--brand);">4</div><div class="stat-delta delta-up">▲ Expanding to 3 more</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="city.s.countries">Countries</div><div class="stat-value" style="color:var(--blue);">2</div><div class="stat-delta delta-up">▲ UAE launching soon</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="city.s.cars">Total Fleet</div><div class="stat-value" style="color:var(--green);">2,840</div><div class="stat-delta delta-up">▲ Across all cities</div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="city.s.revenue">Global Revenue</div><div class="stat-value" style="color:var(--yellow);">$142K</div><div class="stat-delta delta-up">▲ This month</div></div>
+        </div>
+
+        <!-- City selector grid -->
+        <div class="card-title" style="margin-bottom:1rem;" data-i18n="city.select">Select City</div>
+        <div class="city-selector-grid" id="city-selector-grid"></div>
+
+        <!-- Franchise operator model -->
+        <div class="map-card" style="margin-bottom:1.5rem;">
+          <div class="card-header" style="margin-bottom:1rem;">
+            <div class="card-title" data-i18n="city.franchise.title">🤝 Franchise Operators</div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Franchise application opened ✓')" data-i18n="city.franchise.add">Apply to Operate</button>
+          </div>
+          <div id="franchise-list"></div>
+        </div>
+
+        <!-- Expansion roadmap -->
+        <div class="map-card" style="padding:1.5rem;">
+          <div class="card-title" style="margin-bottom:1rem;" data-i18n="city.roadmap">📅 Expansion Roadmap</div>
+          <div id="city-roadmap"></div>
+        </div>
+      </div><!-- /panel-cities -->
 
     </main>
   </div>
@@ -4077,6 +4272,28 @@ const i18n = {
     "role.advertiser":"Advertiser","role.advertiser.desc":"Manage campaigns & analytics",
     "role.driver":"Driver","role.driver.desc":"Track my routes & earnings",
     "vtype.sedan":"Sedan","vtype.suv":"SUV","vtype.pickup":"Pickup","vtype.van":"Van",
+    // Step 10 – Fleet Partnerships
+    "sb.expansion":"Expansion","sb.fleet":"Fleet Partners","sb.marketplace":"Marketplace","sb.cities":"Multi-City",
+    "fleet.title":"🚛 Fleet Partnerships","fleet.sub":"Onboard corporate fleets, manage revenue sharing, and bulk-assign campaigns",
+    "fleet.s.partners":"Fleet Partners","fleet.s.cars":"Fleet Cars","fleet.s.revenue":"Monthly Revenue Share","fleet.s.pending":"Pending Onboarding",
+    "fleet.pipeline":"Onboarding Pipeline","fleet.add":"+ Add Fleet Partner",
+    "fleet.stage.lead":"Lead","fleet.stage.lead.sub":"Initial contact",
+    "fleet.stage.negotiation":"Negotiation","fleet.stage.neg.sub":"Contract review",
+    "fleet.stage.setup":"Setup","fleet.stage.setup.sub":"GPS & sticker install",
+    "fleet.stage.live":"Live","fleet.stage.live.sub":"Earning revenue",
+    "fleet.active.partners":"Active Fleet Partners","fleet.rev.table":"Revenue Share — This Month","fleet.export":"Export CSV",
+    "fleet.th.partner":"Partner","fleet.th.cars":"Cars","fleet.th.km":"Total KM","fleet.th.gross":"Gross Revenue","fleet.th.share":"Their Share (25%)","fleet.th.net":"Net to AdStick",
+    // Step 11 – Marketplace
+    "mkt.title":"🏛️ Advertiser Marketplace","mkt.sub":"Bid on premium routes, zones, and time slots — live auction for high-demand inventory",
+    "mkt.s.live":"Live Auctions","mkt.s.bids":"Total Bids Today","mkt.s.highest":"Highest Bid","mkt.s.gmv":"GMV This Week",
+    "mkt.live.auctions":"🔴 Live Auctions","mkt.price.index":"Route Price Index","mkt.bid.history":"Bid History",
+    "mkt.th.route":"Route / Zone","mkt.th.bidder":"Advertiser","mkt.th.amount":"Amount","mkt.th.time":"Time",
+    // Step 12 – Multi-City
+    "city.title":"🌍 Multi-City Framework","city.sub":"Manage operations across cities and countries — franchise operator model",
+    "city.s.cities":"Active Cities","city.s.countries":"Countries","city.s.cars":"Total Fleet","city.s.revenue":"Global Revenue",
+    "city.select":"Select City",
+    "city.franchise.title":"🤝 Franchise Operators","city.franchise.add":"Apply to Operate",
+    "city.roadmap":"📅 Expansion Roadmap",
     // Step 7 – AI Route
     "drv.p.ai-route":"AI Route","drv.ai.sub":"Smart route suggestions based on your campaign target zones",
     "ai.rqs":"Route Quality Score","ai.rqs.sub":"Your current route covers 3 of your campaign's 4 target zones. Add the Airport district for a +1.2 score boost.",
@@ -4318,6 +4535,28 @@ const i18n = {
     "drv.profile.sub":"معلوماتك الشخصية وبيانات المركبة والمستندات",
     "drv.doc.upload":"رفع مستند",
     "drv.paid":"مدفوع","drv.pending":"معلّق",
+    // Step 10 AR – Fleet Partnerships
+    "sb.expansion":"التوسع","sb.fleet":"شركاء الأسطول","sb.marketplace":"السوق","sb.cities":"متعدد المدن",
+    "fleet.title":"🚛 شراكات الأسطول","fleet.sub":"إدخال أساطيل الشركات وإدارة تقاسم الإيرادات والتعيين الجماعي",
+    "fleet.s.partners":"شركاء الأسطول","fleet.s.cars":"سيارات الأسطول","fleet.s.revenue":"حصة الإيرادات الشهرية","fleet.s.pending":"قيد الإدخال",
+    "fleet.pipeline":"خط الإدخال","fleet.add":"+ إضافة شريك أسطول",
+    "fleet.stage.lead":"عميل محتمل","fleet.stage.lead.sub":"التواصل الأولي",
+    "fleet.stage.negotiation":"تفاوض","fleet.stage.neg.sub":"مراجعة العقد",
+    "fleet.stage.setup":"إعداد","fleet.stage.setup.sub":"تركيب GPS والملصقات",
+    "fleet.stage.live":"مباشر","fleet.stage.live.sub":"تحقيق الإيرادات",
+    "fleet.active.partners":"شركاء الأسطول النشطون","fleet.rev.table":"تقاسم الإيرادات — هذا الشهر","fleet.export":"تصدير CSV",
+    "fleet.th.partner":"الشريك","fleet.th.cars":"السيارات","fleet.th.km":"إجمالي الكم","fleet.th.gross":"الإيرادات الإجمالية","fleet.th.share":"حصتهم (25%)","fleet.th.net":"صافي AdStick",
+    // Step 11 AR – Marketplace
+    "mkt.title":"🏛️ سوق المعلنين","mkt.sub":"المزايدة على المسارات والمناطق والأوقات المميزة — مزاد مباشر",
+    "mkt.s.live":"مزادات مباشرة","mkt.s.bids":"إجمالي العروض اليوم","mkt.s.highest":"أعلى عرض","mkt.s.gmv":"حجم المعاملات هذا الأسبوع",
+    "mkt.live.auctions":"🔴 المزادات المباشرة","mkt.price.index":"مؤشر أسعار المسارات","mkt.bid.history":"سجل العروض",
+    "mkt.th.route":"المسار / المنطقة","mkt.th.bidder":"المعلن","mkt.th.amount":"المبلغ","mkt.th.time":"الوقت",
+    // Step 12 AR – Multi-City
+    "city.title":"🌍 إطار متعدد المدن","city.sub":"إدارة العمليات عبر المدن والدول — نموذج المشغل الامتيازي",
+    "city.s.cities":"المدن النشطة","city.s.countries":"الدول","city.s.cars":"إجمالي الأسطول","city.s.revenue":"الإيرادات العالمية",
+    "city.select":"اختر مدينة",
+    "city.franchise.title":"🤝 مشغلو الامتياز","city.franchise.add":"تقديم طلب تشغيل",
+    "city.roadmap":"📅 خارطة طريق التوسع",
     // Step 7 AR – AI Route
     "drv.p.ai-route":"مسار AI","drv.ai.sub":"اقتراحات مسارات ذكية بناءً على مناطق حملتك المستهدفة",
     "ai.rqs":"نقاط جودة المسار","ai.rqs.sub":"مسارك الحالي يغطي 3 من 4 مناطق مستهدفة. أضف منطقة المطار لزيادة +1.2 نقطة.",
@@ -5143,6 +5382,9 @@ function showPanel(p, e) {
   if (p === 'roi')                         setTimeout(()=>initROIDashboard(), 80);
   if (p === 'events')                      setTimeout(renderEventCalendar, 50);
   if (p === 'predictions')                 setTimeout(()=>{ renderBenchmarks(); initPredForecastChart(); }, 80);
+  if (p === 'fleet')                       setTimeout(()=>{ renderFleetPartners(); renderFleetRevTable(); }, 50);
+  if (p === 'marketplace')                 setTimeout(()=>{ renderAuctionGrid(); renderMarketIndex(); renderBidHistory(); }, 50);
+  if (p === 'cities')                      setTimeout(()=>{ renderCities(); renderFranchise(); renderRoadmap(); }, 50);
 }
 
 // ── Data ──
@@ -6668,6 +6910,251 @@ function populateCarsTable() {
     </tr>`).join('');
 }
 
+
+// ═══════════════════════════════════════════════════
+// STEP 10 — FLEET PARTNERSHIPS
+// ═══════════════════════════════════════════════════
+const fleetPartners = [
+  {logo:'🚕', name:'RideStar KSA',    type:'Ride-hailing',   cars:142, km:187400, gross:28110, status:'active'},
+  {logo:'📦', name:'SwiftDeliver',    type:'Last-mile logistics',cars:88,km:112600,gross:16890, status:'active'},
+  {logo:'🚐', name:'CityShuttle',     type:'Corporate transport',cars:64,km:83200, gross:12480, status:'active'},
+  {logo:'🏢', name:'GovernmentFleet', type:'Public sector',   cars:52, km:67400,  gross:10110, status:'active'},
+  {logo:'🛻', name:'TruckMedia',      type:'Commercial trucks',cars:44,km:58900,  gross:8835,  status:'active'},
+  {logo:'🚌', name:'BusWrap Pro',     type:'Bus fleet',       cars:28, km:38200,  gross:5730,  status:'active'},
+  {logo:'🏎️',name:'LuxuryAdz',       type:'Premium vehicles', cars:14, km:19400,  gross:2910,  status:'active'},
+];
+
+function renderFleetPartners() {
+  const grid = document.getElementById('fleet-partner-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = fleetPartners.map(p => {
+    const share = Math.round(p.gross * 0.25);
+    const net   = p.gross - share;
+    return `
+    <div class="fleet-partner-card active">
+      <div class="fleet-partner-header">
+        <div class="fleet-logo" style="background:rgba(255,107,43,0.1);">${p.logo}</div>
+        <div>
+          <div class="fleet-partner-name">${p.name}</div>
+          <div class="fleet-partner-type">${p.type}</div>
+        </div>
+        <span class="badge badge-green" style="margin-left:auto;">Active</span>
+      </div>
+      <div class="fleet-rev-row">
+        <div><div class="fleet-rev-lbl">Monthly Revenue Share</div><div class="fleet-rev-val">$${share.toLocaleString()}</div></div>
+        <div style="text-align:right;"><div class="fleet-rev-lbl">Cars</div><div style="font-size:1.2rem;font-weight:900;color:var(--blue);">${p.cars}</div></div>
+      </div>
+      <div class="tier-bar" style="height:5px;"><div class="tier-bar-fill gold" style="width:${Math.round(p.cars/142*100)}%"></div></div>
+      <div style="font-size:0.72rem;color:var(--muted);">${p.km.toLocaleString()} km this month · Net to AdStick: <strong style="color:var(--green);">$${net.toLocaleString()}</strong></div>
+      <button class="btn btn-outline full-width" style="font-size:0.8rem;" onclick="showToast('${p.name} details opened')" >View Details →</button>
+    </div>`;
+  }).join('');
+}
+
+function renderFleetRevTable() {
+  const tb = document.getElementById('fleet-rev-table');
+  if (!tb || tb.dataset.rendered) return;
+  tb.dataset.rendered = '1';
+  tb.innerHTML = fleetPartners.map(p => {
+    const share = Math.round(p.gross * 0.25);
+    const net   = p.gross - share;
+    return `<tr>
+      <td><strong>${p.logo} ${p.name}</strong></td>
+      <td>${p.cars}</td>
+      <td>${p.km.toLocaleString()} km</td>
+      <td>$${p.gross.toLocaleString()}</td>
+      <td style="color:var(--muted);">$${share.toLocaleString()}</td>
+      <td style="color:var(--green);font-weight:700;">$${net.toLocaleString()}</td>
+      <td><span class="badge badge-green">Paid</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// STEP 11 — MARKETPLACE / AUCTION
+// ═══════════════════════════════════════════════════
+const auctionItems = [
+  {zone:'Downtown Premium Loop',   type:'Route',      currentBid:4200, bids:14, timer:'2h 18m', state:'live',   slots:'Mon–Fri · 7–10AM'},
+  {zone:'Airport Corridor',        type:'Zone',       currentBid:3100, bids:9,  timer:'4h 45m', state:'live',   slots:'Daily · 6AM–12PM'},
+  {zone:'Mall District Weekend',   type:'Time Slot',  currentBid:2800, bids:11, timer:'0h 32m', state:'ending', slots:'Sat–Sun · 12–8PM'},
+  {zone:'King Fahd Hwy North',     type:'Route',      currentBid:2200, bids:7,  timer:'1h 10m', state:'live',   slots:'Weekdays · All day'},
+  {zone:'Sports City Event Zone',  type:'Zone',       currentBid:5800, bids:22, timer:'0h 08m', state:'ending', slots:'Event nights only'},
+  {zone:'Olaya Business District', type:'Time Slot',  currentBid:1900, bids:5,  timer:'6h 00m', state:'open',   slots:'Weekdays · 9AM–5PM'},
+];
+const marketIndexZones = [
+  {zone:'Downtown',        price:'$4.20', delta:'+38%', trend:'up'},
+  {zone:'Airport Rd',      price:'$3.80', delta:'+24%', trend:'up'},
+  {zone:'Olaya District',  price:'$3.40', delta:'+18%', trend:'up'},
+  {zone:'King Fahd Hwy',   price:'$2.90', delta:'—',    trend:'flat'},
+  {zone:'North Ring Rd',   price:'$2.40', delta:'-5%',  trend:'down'},
+  {zone:'Industrial Zone', price:'$1.80', delta:'-12%', trend:'down'},
+];
+const bidHistory = [
+  {route:'Downtown Premium Loop', bidder:'Coca-Cola MENA',  amount:'$4,200', time:'2 min ago', status:'Leading'},
+  {route:'Airport Corridor',      bidder:'Nike KSA',        amount:'$3,100', time:'8 min ago', status:'Leading'},
+  {route:'Sports City Zone',      bidder:'Samsung Gulf',    amount:'$5,800', time:'11 min ago',status:'Leading'},
+  {route:'Mall District Weekend', bidder:'Pepsi Arabia',    amount:'$2,700', time:'14 min ago',status:'Outbid'},
+  {route:'Mall District Weekend', bidder:'Zara Fashion',    amount:'$2,800', time:'12 min ago',status:'Leading'},
+  {route:'King Fahd Hwy North',   bidder:'Apple MENA',      amount:'$2,200', time:'19 min ago',status:'Leading'},
+];
+
+function renderAuctionGrid() {
+  const grid = document.getElementById('auction-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = auctionItems.map(a => `
+    <div class="auction-card ${a.state}">
+      <div class="auction-card-header">
+        <div>
+          <div class="auction-route-name">${a.zone}</div>
+          <div style="font-size:0.72rem;color:var(--muted);">${a.type} · ${a.slots}</div>
+        </div>
+        <span class="auction-timer ${a.state}">⏱ ${a.timer}</span>
+      </div>
+      <div class="auction-price-row">
+        <div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.15rem;">Current Bid</div>
+          <div class="auction-current-bid">$${a.currentBid.toLocaleString()}</div>
+        </div>
+        <div class="auction-bids-count">${a.bids} bids</div>
+      </div>
+      <div class="auction-bid-input">
+        <input type="number" placeholder="Your bid ($)" min="${a.currentBid + 100}" step="100" />
+        <button class="btn btn-primary btn-sm" onclick="placeBid(this, '${a.zone}')">Bid →</button>
+      </div>
+    </div>`).join('');
+}
+
+function placeBid(btn, zone) {
+  const input = btn.previousElementSibling;
+  const val   = parseInt(input.value);
+  const card  = btn.closest('.auction-card');
+  const bidEl = card.querySelector('.auction-current-bid');
+  if (!val || val <= parseInt(bidEl.textContent.replace(/[$,]/g,''))) {
+    showToast('Bid must exceed current bid ⚠️'); return;
+  }
+  bidEl.textContent = '$' + val.toLocaleString();
+  card.querySelector('.auction-bids-count').textContent = (parseInt(card.querySelector('.auction-bids-count').textContent) + 1) + ' bids';
+  input.value = '';
+  showToast('Bid placed for ' + zone + ' ✓');
+}
+
+function renderMarketIndex() {
+  const grid = document.getElementById('market-index-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = marketIndexZones.map(z => {
+    const clr = z.trend==='up'?'var(--green)':z.trend==='down'?'var(--red)':'var(--muted)';
+    const arr = z.trend==='up'?'▲':z.trend==='down'?'▼':'—';
+    return `<div class="market-index-card">
+      <div class="market-index-zone">${z.zone}</div>
+      <div class="market-index-price" style="color:var(--brand);">${z.price} <span style="font-size:0.75rem;color:var(--muted);">CPM</span></div>
+      <div class="market-index-delta" style="color:${clr};">${arr} ${z.delta} vs last week</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBidHistory() {
+  const tb = document.getElementById('bid-history-table');
+  if (!tb || tb.dataset.rendered) return;
+  tb.dataset.rendered = '1';
+  tb.innerHTML = bidHistory.map(b => {
+    const cls = b.status==='Leading'?'badge-green':'badge-red';
+    return `<tr>
+      <td><strong>${b.route}</strong></td>
+      <td>${b.bidder}</td>
+      <td style="color:var(--brand);font-weight:700;">${b.amount}</td>
+      <td style="color:var(--muted);">${b.time}</td>
+      <td><span class="badge ${cls}">${b.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// STEP 12 — MULTI-CITY / MULTI-COUNTRY
+// ═══════════════════════════════════════════════════
+const citiesData = [
+  {flag:'🇸🇦', name:'Riyadh',    country:'Saudi Arabia', cars:1200, km:'3.4M', revenue:'$89K', status:'live',   active:true},
+  {flag:'🇸🇦', name:'Jeddah',    country:'Saudi Arabia', cars:480,  km:'1.2M', revenue:'$32K', status:'live',   active:true},
+  {flag:'🇸🇦', name:'Dammam',    country:'Saudi Arabia', cars:210,  km:'540K', revenue:'$14K', status:'live',   active:true},
+  {flag:'🇸🇦', name:'Makkah',    country:'Saudi Arabia', cars:95,   km:'240K', revenue:'$6K',  status:'live',   active:true},
+  {flag:'🇦🇪', name:'Dubai',     country:'UAE',          cars:0,    km:'—',    revenue:'—',    status:'soon',   active:false},
+  {flag:'🇦🇪', name:'Abu Dhabi', country:'UAE',          cars:0,    km:'—',    revenue:'—',    status:'soon',   active:false},
+  {flag:'🇶🇦', name:'Doha',      country:'Qatar',        cars:0,    km:'—',    revenue:'—',    status:'soon',   active:false},
+  {flag:'🇧🇭', name:'Manama',    country:'Bahrain',      cars:0,    km:'—',    revenue:'—',    status:'soon',   active:false},
+];
+const franchiseOps = [
+  {flag:'🇸🇦', name:'Abdullah Al-Rashid', city:'Riyadh',  since:'Jan 2025', cars:1200, revenue:'$89K', share:'$8.9K'},
+  {flag:'🇸🇦', name:'Sara Mohammed',      city:'Jeddah',  since:'Mar 2025', cars:480,  revenue:'$32K', share:'$3.2K'},
+  {flag:'🇸🇦', name:'Omar Khaled',        city:'Dammam',  since:'Jun 2025', cars:210,  revenue:'$14K', share:'$1.4K'},
+  {flag:'🇸🇦', name:'Fatima Al-Ghamdi',  city:'Makkah',  since:'Aug 2025', cars:95,   revenue:'$6K',  share:'$600'},
+];
+const roadmapItems = [
+  {q:'Q1 2026', label:'Riyadh & Jeddah Launch',   done:true},
+  {q:'Q2 2026', label:'Dammam & Makkah Expansion', done:true},
+  {q:'Q3 2026', label:'Dubai & Abu Dhabi Launch',  done:false},
+  {q:'Q4 2026', label:'Doha & Manama Entry',       done:false},
+  {q:'Q1 2027', label:'Cairo & Amman Markets',     done:false},
+  {q:'Q2 2027', label:'Kuwait & Oman Launch',      done:false},
+];
+
+function renderCities() {
+  const grid = document.getElementById('city-selector-grid');
+  if (!grid || grid.dataset.rendered) return;
+  grid.dataset.rendered = '1';
+  grid.innerHTML = citiesData.map(c => `
+    <div class="city-card ${c.active?'active-city':'coming-soon'}" onclick="${c.active?`showToast('Switching to ${c.name} dashboard…')`:`showToast('${c.name} launching soon! 🚀')`}">
+      <div class="city-status-pill ${c.status==='live'?'live':'soon'}">${c.status==='live'?'● Live':'🚀 Soon'}</div>
+      <div class="city-flag">${c.flag}</div>
+      <div class="city-name">${c.name}</div>
+      <div class="city-country">${c.country}</div>
+      ${c.active ? `<div class="city-stats-row">
+        <div class="city-stat"><div class="city-stat-val" style="color:var(--brand);">${c.cars.toLocaleString()}</div><div class="city-stat-lbl">Cars</div></div>
+        <div class="city-stat"><div class="city-stat-val" style="color:var(--blue);">${c.km}</div><div class="city-stat-lbl">KM</div></div>
+        <div class="city-stat"><div class="city-stat-val" style="color:var(--green);">${c.revenue}</div><div class="city-stat-lbl">Revenue</div></div>
+      </div>` : `<div style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem;">Expected Q3 2026 · Join waitlist</div>`}
+    </div>`).join('');
+}
+
+function renderFranchise() {
+  const el = document.getElementById('franchise-list');
+  if (!el || el.dataset.rendered) return;
+  el.dataset.rendered = '1';
+  el.innerHTML = franchiseOps.map(f => `
+    <div class="franchise-card">
+      <div class="franchise-avatar">${f.flag}</div>
+      <div style="flex:1;">
+        <div style="font-weight:800;margin-bottom:0.15rem;">${f.name} <span style="font-size:0.72rem;color:var(--muted);">· ${f.city}</span></div>
+        <div style="font-size:0.75rem;color:var(--muted);">Operator since ${f.since} · ${f.cars} cars managed</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="franchise-rev">${f.revenue}</div>
+        <div style="font-size:0.72rem;color:var(--muted);">Revenue · Share: <strong style="color:var(--yellow);">${f.share}</strong></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="showToast('${f.name} profile opened')" style="margin-left:0.5rem;">View →</button>
+    </div>`).join('');
+}
+
+function renderRoadmap() {
+  const el = document.getElementById('city-roadmap');
+  if (!el || el.dataset.rendered) return;
+  el.dataset.rendered = '1';
+  el.innerHTML = roadmapItems.map((r, i) => `
+    <div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;
+        background:${r.done?'rgba(34,197,94,0.15)':'rgba(255,255,255,0.05)'};
+        border:2px solid ${r.done?'#22C55E':'var(--border)'};
+        color:${r.done?'#22C55E':'var(--muted)'};">
+        ${r.done?'✓':(i+1)}
+      </div>
+      <div style="flex:1;">
+        <div style="font-weight:700;${r.done?'':'color:var(--muted);'}">${r.label}</div>
+        <div style="font-size:0.72rem;color:var(--muted);">${r.q}</div>
+      </div>
+      <span class="badge ${r.done?'badge-green':'badge-yellow'}">${r.done?'Complete':'Planned'}</span>
+    </div>`).join('');
+}
 
 // ═══════════════════════════════════════════════════
 // STEP 8 — EVENT SURGE TARGETING
