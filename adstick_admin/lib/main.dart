@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'l10n/app_l10n.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
@@ -34,7 +36,8 @@ class AdStickAdminApp extends StatelessWidget {
         GoRoute(path: '/splash',      builder: (_, __) => const SplashScreen()),
         GoRoute(path: '/login',       builder: (_, __) => const LoginScreen()),
         ShellRoute(
-          builder: (ctx, state, child) => AdminShell(child: child, location: state.uri.path),
+          builder: (ctx, state, child) =>
+              AdminShell(child: child, location: state.uri.path),
           routes: [
             GoRoute(path: '/dashboard',   builder: (_, __) => const DashboardScreen()),
             GoRoute(path: '/live-map',    builder: (_, __) => const LiveMapScreen()),
@@ -57,11 +60,24 @@ class AdStickAdminApp extends StatelessWidget {
       ],
     );
 
-    return MaterialApp.router(
-      title: 'AdStick Admin',
-      theme: AppTheme.adminTheme(),
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
+    return ValueListenableBuilder<String>(
+      valueListenable: localeNotifier,
+      builder: (_, locale, __) => AppL10n(
+        locale: locale,
+        child: MaterialApp.router(
+          title: 'AdStick Admin',
+          theme: AppTheme.adminTheme(),
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+          locale: Locale(locale),
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+        ),
+      ),
     );
   }
 }
@@ -73,18 +89,19 @@ class AdminShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AdStick Admin'),
-        leading: Builder(builder: (ctx) => IconButton(
-          icon: const Icon(Icons.menu_rounded),
-          onPressed: () => Scaffold.of(ctx).openDrawer(),
-        )),
+        title: Text(l.t('admin_title')),
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu_rounded),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        ),
+        actions: [_LangToggle(accentColor: AppTheme.brand)],
       ),
-      body: FloatCluster(
-        accentColor: AppTheme.brand,
-        child: child,
-      ),
+      body: FloatCluster(accentColor: AppTheme.brand, child: child),
       drawer: _AdminDrawer(currentPath: location),
     );
   }
@@ -96,71 +113,124 @@ class _AdminDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     return Drawer(
       backgroundColor: AppTheme.dark2,
-      child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Header
-        Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(width: 48, height: 48, decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [AppTheme.brand, Color(0xFFFF8A50)]),
-              borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.admin_panel_settings_rounded, color: Colors.white, size: 26)),
-          const SizedBox(height: 10),
-          const Text('Admin Portal', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
-          const Text('Super Administrator', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-        ])),
-        const Divider(color: AppTheme.border, height: 1),
-        Expanded(child: ListView(padding: const EdgeInsets.symmetric(vertical: 8), children: [
-          _sec('OVERVIEW'),
-          _t(context, Icons.dashboard_rounded, 'Dashboard', '/dashboard'),
-          _t(context, Icons.map_rounded, 'Live Map', '/live-map'),
-          _t(context, Icons.analytics_rounded, 'Reports', '/reports'),
-          _t(context, Icons.auto_awesome_rounded, 'Predictions', '/predictions'),
-
-          _sec('FLEET & DRIVERS'),
-          _t(context, Icons.directions_car_rounded, 'Cars', '/cars'),
-          _t(context, Icons.build_rounded, 'Fleet Management', '/fleet'),
-          _t(context, Icons.people_rounded, 'Drivers', '/drivers'),
-          _t(context, Icons.traffic_rounded, 'Traffic Intel', '/traffic'),
-
-          _sec('CAMPAIGNS & REVENUE'),
-          _t(context, Icons.campaign_rounded, 'Campaigns', '/campaigns'),
-          _t(context, Icons.trending_up_rounded, 'ROI Analytics', '/roi'),
-          _t(context, Icons.storefront_rounded, 'Marketplace', '/marketplace'),
-
-          _sec('PLATFORM'),
-          _t(context, Icons.event_rounded, 'Events', '/events'),
-          _t(context, Icons.location_city_rounded, 'Cities', '/cities'),
-          _t(context, Icons.verified_rounded, 'Quality Control', '/quality'),
-
-          _sec('GOVERNANCE'),
-          _t(context, Icons.description_rounded, 'Audit Log', '/audit'),
-          _t(context, Icons.eco_rounded, 'Carbon & ESG', '/carbon'),
-        ])),
-        const Divider(color: AppTheme.border, height: 1),
-        ListTile(
-          leading: const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
-          title: const Text('Sign Out', style: TextStyle(color: Colors.red, fontSize: 14)),
-          onTap: () => context.go('/login'),
-        ),
-      ])),
+      child: SafeArea(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 48, height: 48,
+                decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                        colors: [AppTheme.brand, Color(0xFFFF8A50)]),
+                    borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.admin_panel_settings_rounded,
+                    color: Colors.white, size: 26),
+              ),
+              const SizedBox(height: 10),
+              const Text('Admin Portal',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800)),
+              const Text('Super Administrator',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+            ]),
+          ),
+          const Divider(color: AppTheme.border, height: 1),
+          Expanded(
+            child: ListView(padding: const EdgeInsets.symmetric(vertical: 8), children: [
+              _sec(l.t('sec_overview')),
+              _t(context, Icons.dashboard_rounded,        l.t('dashboard'),   '/dashboard'),
+              _t(context, Icons.map_rounded,              l.t('live_map'),    '/live-map'),
+              _t(context, Icons.analytics_rounded,        l.t('reports'),     '/reports'),
+              _t(context, Icons.auto_awesome_rounded,     l.t('predictions'), '/predictions'),
+              _sec(l.t('sec_fleet')),
+              _t(context, Icons.directions_car_rounded,   l.t('cars'),        '/cars'),
+              _t(context, Icons.build_rounded,            l.t('fleet'),       '/fleet'),
+              _t(context, Icons.people_rounded,           l.t('drivers'),     '/drivers'),
+              _t(context, Icons.traffic_rounded,          l.t('traffic'),     '/traffic'),
+              _sec(l.t('sec_revenue')),
+              _t(context, Icons.campaign_rounded,         l.t('campaigns'),   '/campaigns'),
+              _t(context, Icons.trending_up_rounded,      l.t('roi'),         '/roi'),
+              _t(context, Icons.storefront_rounded,       l.t('marketplace'), '/marketplace'),
+              _sec(l.t('sec_platform')),
+              _t(context, Icons.event_rounded,            l.t('events'),      '/events'),
+              _t(context, Icons.location_city_rounded,    l.t('cities'),      '/cities'),
+              _t(context, Icons.verified_rounded,         l.t('quality'),     '/quality'),
+              _sec(l.t('sec_govern')),
+              _t(context, Icons.description_rounded,      l.t('audit'),       '/audit'),
+              _t(context, Icons.eco_rounded,              l.t('carbon'),      '/carbon'),
+            ]),
+          ),
+          const Divider(color: AppTheme.border, height: 1),
+          ListTile(
+            leading: const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
+            title: Text(l.t('sign_out'),
+                style: const TextStyle(color: Colors.red, fontSize: 14)),
+            onTap: () => context.go('/login'),
+          ),
+        ]),
+      ),
     );
   }
 
   Widget _sec(String label) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-    child: Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
-  );
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+      child: Text(label,
+          style: const TextStyle(
+              color: AppTheme.textMuted,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.8)));
 
   Widget _t(BuildContext ctx, IconData icon, String label, String path) {
     final sel = currentPath == path;
     return ListTile(
       dense: true,
       leading: Icon(icon, color: sel ? AppTheme.brand : AppTheme.textMuted, size: 19),
-      title: Text(label, style: TextStyle(color: sel ? AppTheme.brand : Colors.white, fontSize: 13, fontWeight: sel ? FontWeight.w700 : FontWeight.w400)),
-      tileColor: sel ? AppTheme.brand.withOpacity(0.08) : null,
+      title: Text(label,
+          style: TextStyle(
+              color: sel ? AppTheme.brand : Colors.white,
+              fontSize: 13,
+              fontWeight: sel ? FontWeight.w700 : FontWeight.w400)),
+      tileColor: sel ? AppTheme.brand.withValues(alpha: 0.08) : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       onTap: () { Navigator.pop(ctx); ctx.go(path); },
+    );
+  }
+}
+
+class _LangToggle extends StatelessWidget {
+  final Color accentColor;
+  const _LangToggle({required this.accentColor});
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: localeNotifier,
+      builder: (_, locale, __) => Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: GestureDetector(
+          onTap: () => localeNotifier.value = locale == 'en' ? 'ar' : 'en',
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.15),
+              border: Border.all(color: accentColor.withValues(alpha: 0.4)),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(locale == 'en' ? '🇺🇸' : '🇸🇦', style: const TextStyle(fontSize: 13)),
+              const SizedBox(width: 4),
+              Text(locale == 'en' ? 'EN' : 'AR',
+                  style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.w800)),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }

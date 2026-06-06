@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_l10n.dart';
 
 // ──────────────────────────────────────────────────────────────
 //  FloatCluster
@@ -55,11 +56,12 @@ class _FloatClusterState extends State<FloatCluster>
 
   void _openChat() {
     if (_socialOpen) _toggleSocial();
+    final locale = localeNotifier.value;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _ChatSheet(accentColor: widget.accentColor),
+      builder: (_) => _ChatSheet(accentColor: widget.accentColor, locale: locale),
     );
   }
 
@@ -236,7 +238,8 @@ class _SocBtn extends StatelessWidget {
 // ──────────────────────────────────────────────────────────────
 class _ChatSheet extends StatefulWidget {
   final Color accentColor;
-  const _ChatSheet({required this.accentColor});
+  final String locale;
+  const _ChatSheet({required this.accentColor, required this.locale});
 
   @override
   State<_ChatSheet> createState() => _ChatSheetState();
@@ -262,11 +265,40 @@ class _ChatSheetState extends State<_ChatSheet> {
     'map':      'The Live Map shows all active vehicles in real time. You can filter by zone, status, and campaign to see coverage density.',
   };
 
+  String _t(String key) => (widget.locale == 'ar' ? _chatAr : _chatEn)[key] ?? key;
+
+  static const _chatEn = <String, String>{
+    'greeting': '👋 Hi! I\'m AdStick AI. Ask me about pricing, campaigns, driver earnings, GPS tracking, and more!',
+    'hello': 'Hello! How can I help you today? Ask me about pricing, campaigns, driver earnings, GPS, or anything about AdStick.',
+    'fallback': 'Great question! Contact us at info@adstick.sa or tap the WhatsApp button. Available 9 AM–9 PM daily.',
+    'hint': 'Ask me anything…',
+    'title': 'AdStick AI',
+    'sub': 'Online · Smart assistant',
+    'qr_price': '💳 Pricing',
+    'qr_earn': '🚗 Earnings',
+    'qr_camp': '📢 Campaigns',
+    'qr_gps': '📍 GPS',
+    'qr_contact': '📞 Contact',
+  };
+  static const _chatAr = <String, String>{
+    'greeting': '👋 مرحباً! أنا AdStick AI. اسألني عن الأسعار والحملات وأرباح السائقين وتتبع GPS والمزيد!',
+    'hello': 'مرحباً! كيف يمكنني مساعدتك؟ اسألني عن الأسعار أو الحملات أو أرباح السائقين أو أي شيء عن AdStick.',
+    'fallback': 'سؤال رائع! تواصل معنا على info@adstick.sa أو اضغط زر WhatsApp. فريقنا متاح 9 ص – 9 م يومياً.',
+    'hint': 'اسألني أي شيء...',
+    'title': 'AdStick AI',
+    'sub': 'متصل · مساعد ذكي',
+    'qr_price': '💳 الأسعار',
+    'qr_earn': '🚗 الأرباح',
+    'qr_camp': '📢 الحملات',
+    'qr_gps': '📍 GPS',
+    'qr_contact': '📞 تواصل',
+  };
+
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 300), () {
-      _addBot('👋 Hi! I\'m AdStick AI. Ask me about pricing, campaigns, driver earnings, GPS tracking, and more!');
+      _addBot(_t('greeting'));
     });
   }
 
@@ -315,14 +347,15 @@ class _ChatSheetState extends State<_ChatSheet> {
     for (final entry in _kb.entries) {
       if (lower.contains(entry.key)) return entry.value;
     }
-    if (lower.contains('hello') || lower.contains('hi') || lower.contains('hey')) {
-      return 'Hello! How can I help you today? You can ask me about pricing, campaigns, driver earnings, GPS tracking, or anything about AdStick.';
+    if (lower.contains('hello') || lower.contains('hi') || lower.contains('hey') ||
+        lower.contains('مرحب') || lower.contains('سلام') || lower.contains('هلا')) {
+      return _t('hello');
     }
-    return 'Great question! For detailed support, contact us at info@adstick.sa or tap the WhatsApp button. Our team is available 9 AM–9 PM daily.';
+    return _t('fallback');
   }
 
-  static const _quickReplies = [
-    '💳 Pricing', '🚗 Earnings', '📢 Campaigns', '📍 GPS', '📞 Contact',
+  List<String> get _quickReplies => [
+    _t('qr_price'), _t('qr_earn'), _t('qr_camp'), _t('qr_gps'), _t('qr_contact'),
   ];
 
   @override
@@ -377,17 +410,17 @@ class _ChatSheetState extends State<_ChatSheet> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('AdStick AI',
-                              style: TextStyle(
+                          Text(_t('title'),
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800)),
-                          Text('Online · Smart assistant',
-                              style: TextStyle(
+                          Text(_t('sub'),
+                              style: const TextStyle(
                                   color: Colors.white70, fontSize: 11)),
                         ],
                       ),
@@ -432,7 +465,7 @@ class _ChatSheetState extends State<_ChatSheet> {
                       final q = _quickReplies[i];
                       return GestureDetector(
                         onTap: () {
-                          _ctrl.text = q.substring(3);
+                          _ctrl.text = q.length > 2 ? q.substring(3) : q;
                           _send();
                         },
                         child: Container(
@@ -479,7 +512,7 @@ class _ChatSheetState extends State<_ChatSheet> {
                         style: const TextStyle(
                             color: Colors.white, fontSize: 14),
                         decoration: InputDecoration(
-                          hintText: 'Ask me anything…',
+                          hintText: _t('hint'),
                           hintStyle: const TextStyle(
                               color: AppTheme.textMuted, fontSize: 14),
                           filled: true,
