@@ -152,7 +152,7 @@ class _FloatClusterState extends State<FloatCluster>
                       child: Icon(
                         _socialOpen
                             ? Icons.close_rounded
-                            : Icons.share_rounded,
+                            : Icons.message_rounded,
                         key: ValueKey(_socialOpen),
                         color: Colors.white,
                         size: 20,
