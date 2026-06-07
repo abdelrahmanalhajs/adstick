@@ -74,10 +74,16 @@ class _FloatClusterState extends State<FloatCluster>
         // ── Social + AI chat cluster (right in EN, left in AR) ──
         ValueListenableBuilder<String>(
           valueListenable: localeNotifier,
-          builder: (_, locale, __) => Positioned(
-          bottom: 24,
-          right: locale == 'en' ? 20 : null,
-          left:  locale == 'ar' ? 20 : null,
+          builder: (_, locale, __) => Align(
+          alignment: locale == 'ar'
+              ? Alignment.bottomLeft
+              : Alignment.bottomRight,
+          child: Padding(
+          padding: EdgeInsets.only(
+            bottom: 24,
+            left:  locale == 'ar' ? 20 : 0,
+            right: locale == 'ar' ? 0 : 20,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -189,7 +195,7 @@ class _FloatClusterState extends State<FloatCluster>
               ),
             ],
           ),
-        )),  // closes Positioned + ValueListenableBuilder
+        ))),  // closes Padding + Align + ValueListenableBuilder
       ],
     );
   }
