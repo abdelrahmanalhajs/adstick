@@ -13,6 +13,7 @@ import 'screens/leaderboard_screen.dart';
 import 'screens/referral_screen.dart';
 import 'screens/benefits_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/wallet_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/float_cluster.dart';
 
@@ -41,6 +42,7 @@ class AdStickDriverApp extends StatelessWidget {
             GoRoute(path: '/referrals',   builder: (_, __) => const ReferralScreen()),
             GoRoute(path: '/benefits',    builder: (_, __) => const BenefitsScreen()),
             GoRoute(path: '/profile',     builder: (_, __) => const ProfileScreen()),
+            GoRoute(path: '/wallet',      builder: (_, __) => const WalletScreen()),
           ],
         ),
       ],
@@ -170,6 +172,7 @@ class _DriverDrawer extends StatelessWidget {
               _t(context, Icons.handshake_rounded,              l.t('referrals'),  '/referrals'),
               _t(context, Icons.card_giftcard_rounded,          l.t('benefits'),   '/benefits'),
               _sec(l.t('sec_account')),
+              _t(context, Icons.account_balance_wallet_rounded, l.t('wallet'),     '/wallet'),
               _t(context, Icons.person_rounded,                 l.t('profile'),    '/profile'),
             ]),
           ),
@@ -224,7 +227,11 @@ class _LangToggle extends StatelessWidget {
     return ValueListenableBuilder<String>(
       valueListenable: localeNotifier,
       builder: (_, locale, __) {
-        return GestureDetector(
+        return Padding(
+          padding: locale == 'en'
+              ? const EdgeInsets.only(right: 20, left: 4)
+              : const EdgeInsets.only(left: 20, right: 4),
+          child: GestureDetector(
           onTap: () => localeNotifier.value = locale == 'en' ? 'ar' : 'en',
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -246,7 +253,7 @@ class _LangToggle extends StatelessWidget {
               Icon(Icons.swap_horiz_rounded, color: accentColor, size: 14),
             ]),
           ),
-        );
+        ));
       },
     );
   }

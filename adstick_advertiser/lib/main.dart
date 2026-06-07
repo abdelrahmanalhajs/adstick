@@ -197,7 +197,11 @@ class _LangToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: localeNotifier,
-      builder: (_, locale, __) => GestureDetector(
+      builder: (_, locale, __) => Padding(
+        padding: locale == 'en'
+            ? const EdgeInsets.only(right: 20, left: 4)
+            : const EdgeInsets.only(left: 20, right: 4),
+        child: GestureDetector(
         onTap: () => localeNotifier.value = locale == 'en' ? 'ar' : 'en',
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -215,7 +219,7 @@ class _LangToggle extends StatelessWidget {
             Icon(Icons.swap_horiz_rounded, color: accentColor, size: 14),
           ]),
         ),
-      ),
+      )),
     );
   }
 }
