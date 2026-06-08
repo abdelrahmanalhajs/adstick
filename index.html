@@ -6464,6 +6464,7 @@ function handleRegister(e) {
 
 // ── FIREBASE ERROR MAPPER ──
 function _mapFirebaseError(code) {
+  console.error('Firebase Auth error code:', code);
   switch (code) {
     case 'auth/user-not-found':       return 'No account found with this email.';
     case 'auth/wrong-password':       return 'Incorrect password. Please try again.';
