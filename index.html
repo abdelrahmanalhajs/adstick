@@ -6383,21 +6383,38 @@ function handleSignIn(e) {
   if (btn) btn.disabled = true;
 
   fbAuth.signInWithEmailAndPassword(email, pass)
-    .then(cred => fbDb.collection('users').doc(cred.user.uid).get())
-    .then(doc => {
+    .then(cred => {
+      // Auth succeeded — now try to read Firestore profile
       if (btn) btn.disabled = false;
-      const role = doc.exists ? doc.data().role : null;
-      const name = doc.exists ? doc.data().name : email.split('@')[0];
+      const name = email.split('@')[0];
       document.getElementById('adv-nav-name').textContent = name;
       showToast(t('auth.welcome') + ' ' + name + '!');
-      setTimeout(() => {
-        if (role === 'driver')      showView('driver');
-        else if (role === 'admin')  showView('dashboard');
-        else                        showView('advertiser');
-      }, 900);
+
+      // Try Firestore for role + real name, fall back to selected role
+      fbDb.collection('users').doc(cred.user.uid).get()
+        .then(doc => {
+          const role = doc.exists ? doc.data().role : siRole;
+          const realName = doc.exists ? doc.data().name : name;
+          document.getElementById('adv-nav-name').textContent = realName;
+          setTimeout(() => {
+            if (role === 'driver')      showView('driver');
+            else if (role === 'admin')  showView('dashboard');
+            else                        showView('advertiser');
+          }, 900);
+        })
+        .catch(() => {
+          // Firestore unavailable — use selected role from UI
+          console.warn('Firestore read failed, using selected role:', siRole);
+          setTimeout(() => {
+            if (siRole === 'driver')      showView('driver');
+            else if (siRole === 'admin')  showView('dashboard');
+            else                          showView('advertiser');
+          }, 900);
+        });
     })
     .catch(e => {
       if (btn) btn.disabled = false;
+      console.error('Firebase Auth error code:', e.code, e.message);
       err.textContent = _mapFirebaseError(e.code);
       err.classList.add('show');
     });
@@ -6564,14 +6581,17 @@ function startTrustCounter() {
 fbAuth.onAuthStateChanged(user => {
   if (!user) return; // not signed in — stay on landing
   fbDb.collection('users').doc(user.uid).get().then(doc => {
-    if (!doc.exists) return;
-    const role = doc.data().role;
-    const name = doc.data().name || user.email.split('@')[0];
+    const role = doc.exists ? doc.data().role : null;
+    const name = doc.exists ? doc.data().name : user.email.split('@')[0];
     document.getElementById('adv-nav-name').textContent = name;
     if (role === 'driver')     showView('driver');
     else if (role === 'admin') showView('dashboard');
-    else                       showView('advertiser');
-  }).catch(() => {});
+    else if (role === 'advertiser') showView('advertiser');
+    // unknown role — stay on landing
+  }).catch(() => {
+    // Firestore unavailable — still show the user is logged in
+    document.getElementById('adv-nav-name').textContent = user.email.split('@')[0];
+  });
 });
 
 // ── View switching ──
