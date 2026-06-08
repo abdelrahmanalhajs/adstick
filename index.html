@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey:            "AIzaSyCM6rwvSsXyK6fQAcHoEwTrlN9_yXZFvmk",
@@ -25,6 +26,7 @@
     firebase.initializeApp(firebaseConfig);
     const fbAuth = firebase.auth();
     const fbDb   = firebase.firestore();
+    const fbRtdb = firebase.database();
   </script>
   <style>
     :root {
@@ -3954,13 +3956,17 @@
         <div class="page-title" data-i18n="drv.p.route">My Route</div>
         <div class="page-sub"><span class="live-dot"></span><span data-i18n="drv.route.sub">Today's GPS trail — updates every 5 seconds</span></div>
         <div class="stats-row" style="margin-bottom:1.25rem;">
-          <div class="d-stat-card"><div class="stat-label" data-i18n="gps.d.speed">Current Speed</div><div class="d-stat-value" id="d-curr-speed">42 km/h</div></div>
-          <div class="d-stat-card"><div class="stat-label" data-i18n="th.todaykm">Today KM</div><div class="d-stat-value">87.4 km</div></div>
-          <div class="d-stat-card"><div class="stat-label" data-i18n="drv.route.stops">Stops Today</div><div class="d-stat-value" style="color:var(--yellow);">7</div></div>
-          <div class="d-stat-card"><div class="stat-label" data-i18n="drv.route.drive">Drive Time</div><div class="d-stat-value" style="color:var(--blue);">5h 12m</div></div>
+          <div class="d-stat-card"><div class="stat-label" data-i18n="gps.d.speed">Current Speed</div><div class="d-stat-value" id="d-curr-speed">0 km/h</div></div>
+          <div class="d-stat-card"><div class="stat-label" data-i18n="th.todaykm">Today KM</div><div class="d-stat-value" id="d-today-km">0.0 km</div></div>
+          <div class="d-stat-card"><div class="stat-label">GPS Status</div><div class="d-stat-value" id="d-gps-status" style="color:var(--muted);font-size:0.9rem;">Stopped</div></div>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <button id="d-track-btn" onclick="toggleDriverTracking()" class="btn btn-primary" style="width:100%;padding:0.85rem;font-size:1rem;font-weight:700;">
+            ▶ Start Tracking
+          </button>
         </div>
         <div class="map-card">
-          <div class="card-header"><div class="card-title" data-i18n="drv.route.today">Today's Route</div></div>
+          <div class="card-header"><div class="card-title" data-i18n="drv.route.today">Live Route</div></div>
           <div id="d-route-map" style="height:500px;"></div>
         </div>
       </div>
@@ -7464,30 +7470,148 @@ function initDriverMiniMap() {
   L.polyline(trail,{color:'#10B981',weight:3,dashArray:'5 5'}).addTo(dMiniMap);
 }
 
+// ── REAL DRIVER ROUTE MAP ─────────────────────────────────────
+let driverRouteTrail = [], driverMarker = null, driverPolyline = null;
+let driverWatchId = null, driverTracking = false;
+let driverTotalDist = 0, driverLastPos = null, driverStartTime = null;
+
 function initDriverRouteMap() {
   if (dRouteMap) return;
   dRouteMap = L.map('d-route-map',{zoomControl:true,scrollWheelZoom:true}).setView([baseLat,baseLng],13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(dRouteMap);
-  // Build a longer simulated route
-  let la=baseLat-0.08, ln=baseLng-0.08;
-  const trail=[];
-  for(let i=0;i<30;i++){la+=(Math.random()*0.008-0.002);ln+=(Math.random()*0.008+0.003);trail.push([la,ln]);}
-  L.polyline(trail,{color:'#10B981',weight:4,opacity:0.8}).addTo(dRouteMap);
-  trail.forEach((pt,i)=>{
-    if(i%8===0){
-      L.circleMarker(pt,{radius:5,color:'#fff',fillColor:'#F59E0B',fillOpacity:1,weight:2}).addTo(dRouteMap).bindPopup(`Stop ${Math.floor(i/8)+1} · ${6+i}:00`);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap'}).addTo(dRouteMap);
+
+  // Try to get initial position without tracking
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const ll = [pos.coords.latitude, pos.coords.longitude];
+      dRouteMap.setView(ll, 15);
+      _updateDriverMarker(ll);
+    }, () => {});
+  }
+}
+
+function toggleDriverTracking() {
+  const btn = document.getElementById('d-track-btn');
+  if (!driverTracking) {
+    _startDriverTracking(btn);
+  } else {
+    _stopDriverTracking(btn);
+  }
+}
+
+function _startDriverTracking(btn) {
+  if (!('geolocation' in navigator)) {
+    showToast('GPS not available in this browser.');
+    return;
+  }
+  const user = fbAuth.currentUser;
+  if (!user) { showToast('Please sign in to start tracking.'); return; }
+
+  driverTracking = true;
+  driverStartTime = Date.now();
+  driverTotalDist = 0;
+  driverLastPos = null;
+  driverRouteTrail = [];
+  if (btn) { btn.textContent = '⏹ Stop Tracking'; btn.style.background = '#EF4444'; }
+  const statusEl = document.getElementById('d-gps-status');
+  if (statusEl) { statusEl.textContent = '🟢 Live'; statusEl.style.color = 'var(--green)'; }
+
+  // Write active status to RTDB
+  fbRtdb.ref('drivers/' + user.uid).update({ isActive: true, name: user.displayName || user.email.split('@')[0] });
+
+  driverWatchId = navigator.geolocation.watchPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const speed = pos.coords.speed ? pos.coords.speed * 3.6 : 0; // m/s → km/h
+    const ll = [lat, lng];
+
+    // Distance calculation
+    if (driverLastPos) {
+      driverTotalDist += _haversineKm(driverLastPos[0], driverLastPos[1], lat, lng);
     }
-  });
-  const carIcon=L.divIcon({html:'🚗',iconSize:[24,24],className:'',iconAnchor:[12,12]});
-  L.marker(trail[trail.length-1],{icon:carIcon}).addTo(dRouteMap).bindPopup('Current position').openPopup();
-  // Animate car along trail
-  let trailIdx=0;
-  setInterval(()=>{
-    if(!dRouteMap) return;
-    trailIdx=(trailIdx+1)%trail.length;
+    driverLastPos = ll;
+
+    // Trail
+    driverRouteTrail.push(ll);
+    if (driverRouteTrail.length > 500) driverRouteTrail.shift();
+
+    // Update map
+    _updateDriverMarker(ll);
+    dRouteMap.setView(ll, dRouteMap.getZoom());
+    if (!driverPolyline) {
+      driverPolyline = L.polyline([ll], {color:'#10B981',weight:4,opacity:0.85}).addTo(dRouteMap);
+    } else {
+      driverPolyline.setLatLngs(driverRouteTrail);
+    }
+
+    // Update speed display
     const spd = document.getElementById('d-curr-speed');
-    if(spd) spd.textContent = Math.floor(Math.random()*50+20)+' km/h';
-  }, 4000);
+    if (spd) spd.textContent = Math.round(speed) + ' km/h';
+
+    // Update stats
+    const elapsed = Math.round((Date.now() - driverStartTime) / 60000);
+    const distEl = document.getElementById('d-today-km');
+    if (distEl) distEl.textContent = driverTotalDist.toFixed(1) + ' km';
+
+    // Write to Firebase RTDB
+    fbRtdb.ref('drivers/' + user.uid).update({
+      isActive: true,
+      lastSeen: Date.now(),
+      name: user.displayName || user.email.split('@')[0],
+      location: { lat, lng,
+        speed: speed.toFixed(1),
+        heading: pos.coords.heading || 0,
+        accuracy: pos.coords.accuracy || 0,
+        timestamp: Date.now()
+      },
+      todayStats: {
+        distanceKm: parseFloat(driverTotalDist.toFixed(2)),
+        durationMinutes: elapsed,
+        avgSpeedKmh: elapsed > 0 ? parseFloat((driverTotalDist / (elapsed/60)).toFixed(1)) : 0
+      }
+    });
+
+  }, err => {
+    showToast('Location access denied. Enable GPS in browser settings.');
+    _stopDriverTracking(btn);
+  }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 });
+}
+
+function _stopDriverTracking(btn) {
+  driverTracking = false;
+  if (driverWatchId !== null) {
+    navigator.geolocation.clearWatch(driverWatchId);
+    driverWatchId = null;
+  }
+  if (btn) { btn.textContent = '▶ Start Tracking'; btn.style.background = ''; }
+  const statusEl = document.getElementById('d-gps-status');
+  if (statusEl) { statusEl.textContent = 'Stopped'; statusEl.style.color = 'var(--muted)'; }
+  const spd = document.getElementById('d-curr-speed');
+  if (spd) spd.textContent = '0 km/h';
+
+  const user = fbAuth.currentUser;
+  if (user) fbRtdb.ref('drivers/' + user.uid).update({ isActive: false });
+  showToast('Tracking stopped. Route saved.');
+}
+
+function _updateDriverMarker(ll) {
+  if (!dRouteMap) return;
+  if (!driverMarker) {
+    const icon = L.divIcon({
+      html: `<div style="background:#10B981;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 10px #10B98188;"></div>`,
+      iconSize:[16,16], className:'', iconAnchor:[8,8]
+    });
+    driverMarker = L.marker(ll, {icon}).addTo(dRouteMap);
+  } else {
+    driverMarker.setLatLng(ll);
+  }
+}
+
+function _haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function initDriverKmChart() {
@@ -7772,58 +7896,101 @@ function exportKMCSV() {
 const gpsStatuses = ['moving','moving','moving','moving','moving','idle','idle','stopped'];
 const gpsSpeeds   = { moving: ()=> (Math.random()*70+15).toFixed(0), idle: ()=>'0', stopped: ()=>'0' };
 
-function buildGPSCarData() {
-  gpsCarData = Array.from({length: 20}, (_, i) => ({
-    idx: i,
-    plate:       plates[i % 10],
-    driver_en:   drivers_en[i % 10],
-    driver_ar:   drivers_ar[i % 10],
-    campaign_en: campaigns_en[i % 8],
-    campaign_ar: campaigns_ar[i % 8],
-    lat:  baseLat + (Math.random()-0.5)*0.35,
-    lng:  baseLng + (Math.random()-0.5)*0.35,
-    status: gpsStatuses[i % 8],
-    speed:  0,
-    todayKm:  +(Math.random()*140+5).toFixed(1),
-    totalKm:  +(Math.random()*8000+500).toFixed(0),
-    lastPing: Math.floor(Math.random()*55)+5,
-    trail: []
-  }));
-  gpsCarData.forEach(c => {
-    c.speed = +gpsSpeeds[c.status]();
-    // seed a short trail
-    let la = c.lat, ln = c.lng;
-    c.trail = Array.from({length:6}, () => {
-      la += (Math.random()-0.5)*0.003;
-      ln += (Math.random()-0.5)*0.003;
-      return [la, ln];
-    });
+// ── REAL GPS MAP — Firebase RTDB ──────────────────────────────
+let gpsRtdbRef = null;
+
+function initGPSMap() {
+  gpsMap = L.map('gps-main-map', {zoomControl:true, scrollWheelZoom:true}).setView([baseLat, baseLng], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap contributors'}).addTo(gpsMap);
+
+  // Show empty state initially
+  renderGPSCarList([]);
+  updateGPSBadge();
+
+  // Start real-time listener on Firebase RTDB /drivers
+  gpsRtdbRef = fbRtdb.ref('drivers');
+  gpsRtdbRef.on('value', snap => {
+    const raw = snap.val() || {};
+    _applyDriverSnapshot(raw);
   });
 }
 
-function initGPSMap() {
-  buildGPSCarData();
-  gpsMap = L.map('gps-main-map', {zoomControl:true, scrollWheelZoom:true}).setView([baseLat, baseLng], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(gpsMap);
+function _applyDriverSnapshot(raw) {
+  // Build new data array from RTDB snapshot
+  const newData = [];
+  let idx = 0;
+  Object.entries(raw).forEach(([uid, d]) => {
+    const loc = d.location || {};
+    const stats = d.todayStats || {};
+    const lat = parseFloat(loc.lat);
+    const lng = parseFloat(loc.lng);
+    if (isNaN(lat) || isNaN(lng)) return; // skip drivers without location yet
 
+    const speedVal  = parseFloat(loc.speed) || 0;
+    const isActive  = d.isActive === true;
+    const status    = !isActive ? 'stopped' : speedVal > 3 ? 'moving' : 'idle';
+    const lastSeen  = d.lastSeen ? Math.round((Date.now() - d.lastSeen) / 1000) : 0;
+
+    newData.push({
+      idx,
+      uid,
+      plate:       uid.slice(0,8).toUpperCase(),
+      driver_en:   d.name || 'Driver',
+      driver_ar:   d.name || 'سائق',
+      campaign_en: 'AdStick',
+      campaign_ar: 'أدستيك',
+      lat, lng,
+      status,
+      speed:    Math.round(speedVal),
+      todayKm:  parseFloat(stats.distanceKm || 0).toFixed(1),
+      totalKm:  0,
+      lastPing: lastSeen,
+      trail:    [],
+    });
+    idx++;
+  });
+
+  gpsCarData = newData;
+
+  // Clear existing markers + trails
+  gpsMarkers.forEach(m => gpsMap.removeLayer(m));
+  gpsTrails.forEach(t => gpsMap.removeLayer(t));
+  gpsMarkers = [];
+  gpsTrails  = [];
+
+  // Re-draw markers
   gpsCarData.forEach((c, i) => {
-    const color = c.status==='moving' ? '#22C55E' : c.status==='idle' ? '#F59E0B' : '#EF4444';
-    const icon  = L.divIcon({
-      html: `<div style="background:${color};width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px ${color}88;"></div>`,
-      iconSize:[12,12], className:'', iconAnchor:[6,6]
+    const color = c.status === 'moving' ? '#22C55E'
+                : c.status === 'idle'   ? '#F59E0B'
+                :                         '#EF4444';
+    const icon = L.divIcon({
+      html: `<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px ${color}aa;"></div>`,
+      iconSize:[14,14], className:'', iconAnchor:[7,7]
     });
     const marker = L.marker([c.lat, c.lng], {icon}).addTo(gpsMap);
     marker.on('click', () => selectGPSCar(i));
-    marker.bindTooltip(`<b>${c.plate}</b> · ${c.speed} km/h`, {permanent:false, direction:'top'});
-
-    // draw trail polyline
-    const trail = L.polyline(c.trail, {color, weight:2, opacity:0.45, dashArray:'4 4'}).addTo(gpsMap);
-    gpsTrails.push(trail);
+    marker.bindTooltip(`<b>${c.driver_en}</b> · ${c.speed} km/h`, {permanent:false, direction:'top'});
+    const trail = L.polyline([], {color, weight:2, opacity:0.5, dashArray:'4 4'}).addTo(gpsMap);
     gpsMarkers.push(marker);
+    gpsTrails.push(trail);
   });
+
+  // Update timestamp
+  const now = new Date();
+  const el = document.getElementById('gps-last-time');
+  if (el) el.textContent = now.toLocaleTimeString();
 
   renderGPSCarList(gpsCarData);
   updateGPSBadge();
+
+  // If no real drivers yet, show placeholder message
+  const body = document.getElementById('gps-car-list-body');
+  if (gpsCarData.length === 0 && body) {
+    body.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.85rem;">
+      No drivers online yet.<br>Drivers appear here once they start tracking in the app.
+    </div>`;
+  }
 }
 
 function renderGPSCarList(data) {
@@ -7913,35 +8080,7 @@ function gpsResetView() {
   if (gpsMap) gpsMap.setView([baseLat, baseLng], 12);
 }
 
-// Live GPS animation — moves markers + updates trail every 5s
-setInterval(() => {
-  if (!gpsMap) return;
-  const now = new Date();
-  const timeStr = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
-  const el = document.getElementById('gps-last-time');
-  if (el) el.textContent = timeStr;
-
-  gpsCarData.forEach((c, i) => {
-    if (c.status !== 'moving') return;
-    const newLat = c.lat + (Math.random()-0.5)*0.004;
-    const newLng = c.lng + (Math.random()-0.5)*0.004;
-    c.trail.push([newLat, newLng]);
-    if (c.trail.length > 10) c.trail.shift();
-    c.lat = newLat; c.lng = newLng;
-    c.speed = +gpsSpeeds.moving();
-    c.lastPing = Math.floor(Math.random()*8)+1;
-    gpsMarkers[i].setLatLng([newLat, newLng]);
-    gpsTrails[i].setLatLngs(c.trail);
-  });
-
-  // refresh list if GPS panel is visible
-  if (document.getElementById('panel-map').classList.contains('active')) {
-    const cf = document.getElementById('gps-filter-campaign').value;
-    const sf = document.getElementById('gps-filter-status').value;
-    renderGPSCarList(filteredGPSData(cf, sf));
-    updateGPSBadge();
-  }
-}, 5000);
+// GPS map now powered by Firebase RTDB real-time listener (no fake animation needed)
 
 function initKmChart() {
   const days_en = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
