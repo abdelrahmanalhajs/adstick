@@ -6559,6 +6559,20 @@ function startTrustCounter() {
   });
 })();
 
+// ── Auth state — auto-restore session on page load ──
+fbAuth.onAuthStateChanged(user => {
+  if (!user) return; // not signed in — stay on landing
+  fbDb.collection('users').doc(user.uid).get().then(doc => {
+    if (!doc.exists) return;
+    const role = doc.data().role;
+    const name = doc.data().name || user.email.split('@')[0];
+    document.getElementById('adv-nav-name').textContent = name;
+    if (role === 'driver')     showView('driver');
+    else if (role === 'admin') showView('dashboard');
+    else                       showView('advertiser');
+  }).catch(() => {});
+});
+
 // ── View switching ──
 function showView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
