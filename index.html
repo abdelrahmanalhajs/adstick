@@ -9,6 +9,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <!-- Firebase compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCM6rwvSsXyK6fQAcHoEwTrlN9_yXZFvmk",
+      authDomain:        "adstick-90329.firebaseapp.com",
+      projectId:         "adstick-90329",
+      storageBucket:     "adstick-90329.firebasestorage.app",
+      messagingSenderId: "217851652919",
+      appId:             "1:217851652919:web:ff6d6ce31e3fb0ec0b88b2"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const fbAuth = firebase.auth();
+    const fbDb   = firebase.firestore();
+  </script>
   <style>
     :root {
       --brand: #FF6B2B;
@@ -1527,17 +1544,17 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" data-i18n="auth.firstname">First Name</label>
-            <input class="form-input" type="text" data-i18n-ph="auth.firstname.ph" placeholder="Ahmed" required />
+            <input class="form-input" type="text" id="reg-firstname" data-i18n-ph="auth.firstname.ph" placeholder="Ahmed" required />
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="auth.lastname">Last Name</label>
-            <input class="form-input" type="text" data-i18n-ph="auth.lastname.ph" placeholder="Khalid" required />
+            <input class="form-input" type="text" id="reg-lastname" data-i18n-ph="auth.lastname.ph" placeholder="Khalid" required />
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" data-i18n="auth.email">Email Address</label>
-          <input class="form-input" type="email" data-i18n-ph="auth.email.ph" placeholder="you@example.com" required />
+          <input class="form-input" type="email" id="reg-email" data-i18n-ph="auth.email.ph" placeholder="you@example.com" required />
         </div>
 
         <div class="form-group">
@@ -3875,7 +3892,7 @@
         <div style="font-size:0.875rem;font-weight:700;" id="d-nav-name">Ahmed Khalid</div>
         <div style="font-size:0.72rem;color:#10B981;">● <span data-i18n="badge.active">Active</span></div>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="showView('auth')" data-i18n="drv.signout">Sign Out</button>
+      <button class="btn btn-outline btn-sm" onclick="handleSignOut()" data-i18n="drv.signout">Sign Out</button>
     </div>
   </div>
 
@@ -4484,7 +4501,7 @@
     <div style="display:flex;align-items:center;gap:0.75rem;">
       <button class="lang-toggle" onclick="toggleLang()">🌐 العربية</button>
       <div style="font-size:0.875rem;font-weight:700;" id="adv-nav-name">My Account</div>
-      <button class="btn btn-outline btn-sm" onclick="showView('auth')" data-i18n="drv.signout">Sign Out</button>
+      <button class="btn btn-outline btn-sm" onclick="handleSignOut()" data-i18n="drv.signout">Sign Out</button>
     </div>
   </div>
 
@@ -6360,42 +6377,109 @@ function handleSignIn(e) {
     err.textContent = t('auth.err.fields');
     err.classList.add('show'); return;
   }
-  if (pass.length < 6) {
-    err.textContent = t('auth.err.pass.short');
-    err.classList.add('show'); return;
-  }
   err.classList.remove('show');
-  const name = email.split('@')[0];
-  document.getElementById('adv-nav-name').textContent = name;
-  showToast(t('auth.welcome') + ' ' + name + '!');
-  setTimeout(() => {
-    if (siRole === 'driver')      showView('driver');
-    else if (siRole === 'admin')  showView('dashboard');
-    else                          showView('advertiser'); // default advertiser
-  }, 900);
+
+  const btn = e.target.querySelector('button[type=submit]');
+  if (btn) btn.disabled = true;
+
+  fbAuth.signInWithEmailAndPassword(email, pass)
+    .then(cred => fbDb.collection('users').doc(cred.user.uid).get())
+    .then(doc => {
+      if (btn) btn.disabled = false;
+      const role = doc.exists ? doc.data().role : null;
+      const name = doc.exists ? doc.data().name : email.split('@')[0];
+      document.getElementById('adv-nav-name').textContent = name;
+      showToast(t('auth.welcome') + ' ' + name + '!');
+      setTimeout(() => {
+        if (role === 'driver')      showView('driver');
+        else if (role === 'admin')  showView('dashboard');
+        else                        showView('advertiser');
+      }, 900);
+    })
+    .catch(e => {
+      if (btn) btn.disabled = false;
+      err.textContent = _mapFirebaseError(e.code);
+      err.classList.add('show');
+    });
 }
 
 // ── REGISTER ──
 function handleRegister(e) {
   e.preventDefault();
+  const firstName = document.getElementById('reg-firstname').value.trim();
+  const lastName  = document.getElementById('reg-lastname').value.trim();
+  const name      = (firstName + ' ' + lastName).trim();
+  const email     = document.getElementById('reg-email').value.trim();
   const pass    = document.getElementById('reg-password').value;
   const confirm = document.getElementById('reg-confirm').value;
   const err     = document.getElementById('reg-error');
 
+  if (!firstName || !email || !pass) {
+    err.textContent = t('auth.err.fields');
+    err.classList.add('show'); return;
+  }
   if (pass !== confirm) {
     err.textContent = t('auth.err.pass.match');
     err.classList.add('show'); return;
   }
-  if (pass.length < 8) {
-    err.textContent = t('auth.err.pass.short8');
+  if (pass.length < 6) {
+    err.textContent = t('auth.err.pass.short');
     err.classList.add('show'); return;
   }
   err.classList.remove('show');
-  showToast(t('auth.reg.success'));
-  setTimeout(() => {
-    if (regRole === 'driver') showView('driver');
-    else                      showView('advertiser');
-  }, 1000);
+
+  const btn = e.target.querySelector('button[type=submit]');
+  if (btn) btn.disabled = true;
+
+  fbAuth.createUserWithEmailAndPassword(email, pass)
+    .then(cred => {
+      const role = regRole === 'driver' ? 'driver' : 'advertiser';
+      return fbDb.collection('users').doc(cred.user.uid).set({
+        email:     email,
+        name:      name,
+        role:      role,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        ...(role === 'driver' ? {
+          vehicleId: '', tier: 'bronze', totalEarnings: 0, isActive: false
+        } : {
+          companyName: name, totalBudget: 0, activeAds: 0
+        })
+      }).then(() => role);
+    })
+    .then(role => {
+      if (btn) btn.disabled = false;
+      showToast(t('auth.reg.success'));
+      document.getElementById('adv-nav-name').textContent = name;
+      setTimeout(() => {
+        if (role === 'driver') showView('driver');
+        else                   showView('advertiser');
+      }, 1000);
+    })
+    .catch(e => {
+      if (btn) btn.disabled = false;
+      err.textContent = _mapFirebaseError(e.code);
+      err.classList.add('show');
+    });
+}
+
+// ── FIREBASE ERROR MAPPER ──
+function _mapFirebaseError(code) {
+  switch (code) {
+    case 'auth/user-not-found':       return 'No account found with this email.';
+    case 'auth/wrong-password':       return 'Incorrect password. Please try again.';
+    case 'auth/invalid-credential':   return 'Invalid email or password.';
+    case 'auth/email-already-in-use': return 'This email is already registered.';
+    case 'auth/weak-password':        return 'Password must be at least 6 characters.';
+    case 'auth/invalid-email':        return 'Please enter a valid email address.';
+    case 'auth/too-many-requests':    return 'Too many attempts. Please try again later.';
+    case 'auth/network-request-failed': return 'Network error. Check your connection.';
+    default: return 'An error occurred. Please try again.';
+  }
+}
+
+// ── SIGN OUT ──
+function handleSignOut() {
+  fbAuth.signOut().then(() => showView('auth'));
 }
 
 // ── TOAST ──
