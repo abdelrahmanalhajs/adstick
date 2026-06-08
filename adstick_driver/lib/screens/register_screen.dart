@@ -4,30 +4,62 @@ import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
 import '../l10n/app_l10n.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _name  = TextEditingController();
   final _email = TextEditingController();
+  final _phone = TextEditingController();
   final _pass  = TextEditingController();
+  final _pass2 = TextEditingController();
   bool _loading = false;
-  bool _obscure = true;
+  bool _obscure1 = true;
+  bool _obscure2 = true;
   String? _error;
 
   @override
   void dispose() {
-    _email.dispose();
-    _pass.dispose();
+    _name.dispose(); _email.dispose(); _phone.dispose();
+    _pass.dispose(); _pass2.dispose();
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     final l = AppL10n.of(context);
-    setState(() { _loading = true; _error = null; });
-    final err = await authService.signIn(_email.text, _pass.text);
+    setState(() { _error = null; });
+
+    // Validate
+    if (_name.text.trim().isEmpty || _email.text.trim().isEmpty ||
+        _pass.text.isEmpty) {
+      setState(() => _error = l.isAr
+          ? 'يرجى ملء جميع الحقول'
+          : 'Please fill in all required fields.');
+      return;
+    }
+    if (_pass.text != _pass2.text) {
+      setState(() => _error = l.isAr
+          ? 'كلمات المرور غير متطابقة'
+          : 'Passwords do not match.');
+      return;
+    }
+    if (_pass.text.length < 6) {
+      setState(() => _error = l.isAr
+          ? 'يجب أن تكون كلمة المرور 6 أحرف على الأقل'
+          : 'Password must be at least 6 characters.');
+      return;
+    }
+
+    setState(() => _loading = true);
+    final err = await authService.register(
+      email:    _email.text,
+      password: _pass.text,
+      name:     _name.text,
+      phone:    _phone.text,
+    );
     if (!mounted) return;
     setState(() => _loading = false);
     if (err != null) {
@@ -35,23 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       context.go('/overview');
     }
-  }
-
-  Future<void> _forgotPassword() async {
-    final l = AppL10n.of(context);
-    if (_email.text.trim().isEmpty) {
-      setState(() => _error = l.isAr
-          ? 'أدخل بريدك الإلكتروني أولاً'
-          : 'Enter your email first');
-      return;
-    }
-    final err = await authService.resetPassword(_email.text);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(err ??
-          (l.isAr ? 'تم إرسال رابط إعادة التعيين' : 'Reset link sent to your email')),
-      backgroundColor: err != null ? Colors.red : AppTheme.driverGreen,
-    ));
   }
 
   @override
@@ -63,26 +78,44 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+            // Back
+            GestureDetector(
+              onTap: () => context.go('/login'),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.card,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: const Icon(Icons.arrow_back_rounded,
+                    color: Colors.white, size: 20),
+              ),
+            ),
+            const SizedBox(height: 32),
             RichText(text: const TextSpan(children: [
               TextSpan(text: 'Ad', style: TextStyle(
-                  fontSize: 30, fontWeight: FontWeight.w900,
+                  fontSize: 28, fontWeight: FontWeight.w900,
                   color: AppTheme.driverGreen)),
               TextSpan(text: 'Stick', style: TextStyle(
-                  fontSize: 30, fontWeight: FontWeight.w900,
+                  fontSize: 28, fontWeight: FontWeight.w900,
                   color: Colors.white)),
             ])),
-            const SizedBox(height: 4),
-            Text(l.t('portal_title'),
-                style: const TextStyle(color: AppTheme.textMuted, fontSize: 15)),
-            const SizedBox(height: 48),
-            Text(l.t('welcome_back'),
-                style: const TextStyle(fontSize: 26,
-                    fontWeight: FontWeight.w900, color: Colors.white)),
+            const SizedBox(height: 8),
+            Text(
+              l.isAr ? 'إنشاء حساب سائق جديد' : 'Create Driver Account',
+              style: const TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white),
+            ),
             const SizedBox(height: 6),
-            Text(l.t('sign_in_sub'),
-                style: const TextStyle(color: AppTheme.textMuted, fontSize: 14)),
-            const SizedBox(height: 36),
+            Text(
+              l.isAr
+                  ? 'انضم إلى شبكة سائقي AdStick'
+                  : 'Join the AdStick driver network',
+              style: const TextStyle(color: AppTheme.textMuted, fontSize: 14),
+            ),
+            const SizedBox(height: 30),
 
             // Error banner
             if (_error != null) ...[
@@ -104,82 +137,76 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
             ],
 
-            _field(l.t('email'), _email, Icons.email_rounded),
-            const SizedBox(height: 16),
-            _passwordField(l),
+            _field(l.isAr ? 'الاسم الكامل' : 'Full Name *',
+                _name, Icons.person_rounded),
+            const SizedBox(height: 14),
+            _field(l.t('email'), _email, Icons.email_rounded,
+                type: TextInputType.emailAddress),
+            const SizedBox(height: 14),
+            _field(l.isAr ? 'رقم الهاتف' : 'Phone Number',
+                _phone, Icons.phone_rounded,
+                type: TextInputType.phone),
+            const SizedBox(height: 14),
+            _passField(
+              label: l.isAr ? 'كلمة المرور *' : 'Password *',
+              ctrl: _pass,
+              obscure: _obscure1,
+              toggle: () => setState(() => _obscure1 = !_obscure1),
+            ),
+            const SizedBox(height: 14),
+            _passField(
+              label: l.isAr ? 'تأكيد كلمة المرور *' : 'Confirm Password *',
+              ctrl: _pass2,
+              obscure: _obscure2,
+              toggle: () => setState(() => _obscure2 = !_obscure2),
+            ),
             const SizedBox(height: 28),
 
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _loading ? null : _login,
+                onPressed: _loading ? null : _register,
                 child: _loading
                     ? const SizedBox(width: 20, height: 20,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : Text(l.t('sign_in')),
+                    : Text(l.isAr ? 'إنشاء الحساب' : 'Create Account',
+                        style: const TextStyle(fontSize: 16,
+                            fontWeight: FontWeight.w800)),
               ),
             ),
-            const SizedBox(height: 12),
-            Center(child: TextButton(
-              onPressed: _forgotPassword,
-              child: Text(l.t('forgot_pw'),
-                  style: const TextStyle(color: AppTheme.driverGreen)),
-            )),
-            const SizedBox(height: 24),
-
-            // Register link
+            const SizedBox(height: 16),
             Center(child: GestureDetector(
-              onTap: () => context.go('/register'),
+              onTap: () => context.go('/login'),
               child: RichText(text: TextSpan(children: [
                 TextSpan(
-                    text: l.isAr
-                        ? 'ليس لديك حساب؟ '
-                        : "Don't have an account? ",
+                    text: l.isAr ? 'لديك حساب بالفعل؟ ' : 'Already registered? ',
                     style: const TextStyle(
                         color: AppTheme.textMuted, fontSize: 14)),
                 TextSpan(
-                    text: l.isAr ? 'إنشاء حساب' : 'Register',
+                    text: l.t('sign_in'),
                     style: const TextStyle(
                         color: AppTheme.driverGreen,
                         fontSize: 14,
                         fontWeight: FontWeight.w700)),
               ])),
             )),
-            const SizedBox(height: 40),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border),
-              ),
-              child: Row(children: [
-                const Icon(Icons.shield_rounded,
-                    color: AppTheme.driverGreen, size: 20),
-                const SizedBox(width: 10),
-                Expanded(child: Text(l.t('security_note'),
-                    style: const TextStyle(
-                        color: AppTheme.textMuted,
-                        fontSize: 12, height: 1.5))),
-              ]),
-            ),
           ]),
         ),
       ),
     );
   }
 
-  Widget _field(String label, TextEditingController ctrl, IconData icon) {
+  Widget _field(String label, TextEditingController ctrl, IconData icon,
+      {TextInputType type = TextInputType.text}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: const TextStyle(
           color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-      const SizedBox(height: 8),
+      const SizedBox(height: 6),
       TextField(
         controller: ctrl,
+        keyboardType: type,
         style: const TextStyle(color: Colors.white),
-        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: AppTheme.textMuted, size: 20),
           filled: true, fillColor: AppTheme.card,
@@ -198,23 +225,29 @@ class _LoginScreenState extends State<LoginScreen> {
     ]);
   }
 
-  Widget _passwordField(AppL10n l) {
+  Widget _passField({
+    required String label,
+    required TextEditingController ctrl,
+    required bool obscure,
+    required VoidCallback toggle,
+  }) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(l.t('password'), style: const TextStyle(
+      Text(label, style: const TextStyle(
           color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-      const SizedBox(height: 8),
+      const SizedBox(height: 6),
       TextField(
-        controller: _pass,
-        obscureText: _obscure,
+        controller: ctrl,
+        obscureText: obscure,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.lock_rounded,
               color: AppTheme.textMuted, size: 20),
           suffixIcon: IconButton(
-            icon: Icon(_obscure ? Icons.visibility_rounded
+            icon: Icon(obscure
+                ? Icons.visibility_rounded
                 : Icons.visibility_off_rounded,
                 color: AppTheme.textMuted, size: 20),
-            onPressed: () => setState(() => _obscure = !_obscure),
+            onPressed: toggle,
           ),
           filled: true, fillColor: AppTheme.card,
           border: OutlineInputBorder(
@@ -228,7 +261,6 @@ class _LoginScreenState extends State<LoginScreen> {
               borderSide: const BorderSide(
                   color: AppTheme.driverGreen, width: 2)),
         ),
-        onSubmitted: (_) => _login(),
       ),
     ]);
   }

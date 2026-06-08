@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 import 'l10n/app_l10n.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
@@ -23,7 +26,12 @@ import 'screens/audit_screen.dart';
 import 'screens/carbon_screen.dart';
 import 'widgets/float_cluster.dart';
 
-void main() => runApp(const AdStickAdminApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const AdStickAdminApp());
+}
 
 class AdStickAdminApp extends StatelessWidget {
   const AdStickAdminApp({super.key});
@@ -32,6 +40,13 @@ class AdStickAdminApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       initialLocation: '/splash',
+      redirect: (ctx, state) {
+        final user = FirebaseAuth.instance.currentUser;
+        final loc  = state.matchedLocation;
+        final pub  = loc == '/splash' || loc == '/login';
+        if (user == null && !pub) return '/login';
+        return null;
+      },
       routes: [
         GoRoute(path: '/splash',      builder: (_, __) => const SplashScreen()),
         GoRoute(path: '/login',       builder: (_, __) => const LoginScreen()),
@@ -171,7 +186,10 @@ class _AdminDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
             title: Text(l.t('sign_out'),
                 style: const TextStyle(color: Colors.red, fontSize: 14)),
-            onTap: () => context.go('/login'),
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) context.go('/login');
+            },
           ),
         ]),
       ),

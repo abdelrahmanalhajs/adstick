@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 import 'l10n/app_l10n.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 import 'screens/overview_screen.dart';
 import 'screens/earnings_screen.dart';
 import 'screens/route_screen.dart';
@@ -17,7 +21,12 @@ import 'screens/wallet_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/float_cluster.dart';
 
-void main() => runApp(const AdStickDriverApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const AdStickDriverApp());
+}
 
 class AdStickDriverApp extends StatelessWidget {
   const AdStickDriverApp({super.key});
@@ -26,9 +35,17 @@ class AdStickDriverApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       initialLocation: '/splash',
+      redirect: (ctx, state) {
+        final user = FirebaseAuth.instance.currentUser;
+        final loc  = state.matchedLocation;
+        final pub  = loc == '/splash' || loc == '/login' || loc == '/register';
+        if (user == null && !pub) return '/login';
+        return null;
+      },
       routes: [
         GoRoute(path: '/splash',      builder: (_, __) => const SplashScreen()),
         GoRoute(path: '/login',       builder: (_, __) => const LoginScreen()),
+        GoRoute(path: '/register',    builder: (_, __) => const RegisterScreen()),
         ShellRoute(
           builder: (ctx, state, child) =>
               DriverShell(child: child, location: state.uri.path),
@@ -181,7 +198,10 @@ class _DriverDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
             title: Text(l.t('sign_out'),
                 style: const TextStyle(color: Colors.red, fontSize: 14)),
-            onTap: () => context.go('/login'),
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) context.go('/login');
+            },
           ),
         ]),
       ),

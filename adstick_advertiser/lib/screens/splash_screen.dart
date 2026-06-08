@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,7 +18,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
-    Future.delayed(const Duration(milliseconds: 2200), () { if (mounted) context.go('/login'); });
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      if (!mounted) return;
+      final user = FirebaseAuth.instance.currentUser;
+      context.go(user != null ? '/overview' : '/login');
+    });
   }
   @override
   void dispose() { _ctrl.dispose(); super.dispose(); }
