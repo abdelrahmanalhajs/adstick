@@ -1450,8 +1450,19 @@
   </div>
   <div class="nav-cta">
     <button class="lang-toggle" onclick="toggleLang()" id="lang-btn">🌐 العربية</button>
-    <button class="btn btn-outline" onclick="showView('auth')" data-i18n="nav.signin">Sign In</button>
-    <button class="btn btn-primary" onclick="showView('auth')" data-i18n="nav.dashboard">Dashboard</button>
+    <!-- Logged-out state -->
+    <div id="nav-logged-out" style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-outline" onclick="showView('auth')" data-i18n="nav.signin">Sign In</button>
+      <button class="btn btn-primary" onclick="showView('auth')" data-i18n="nav.dashboard">Dashboard</button>
+    </div>
+    <!-- Logged-in state -->
+    <div id="nav-logged-in" style="display:none;gap:10px;align-items:center;">
+      <div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:5px 14px 5px 8px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;" id="nav-avatar">A</div>
+        <span style="font-size:13px;font-weight:700;color:var(--text);" id="nav-username">Admin</span>
+      </div>
+      <button class="btn btn-outline" onclick="handleSignOut()" style="font-size:13px;padding:6px 14px;">Sign Out</button>
+    </div>
   </div>
 </nav>
 
@@ -6387,7 +6398,7 @@ function handleSignIn(e) {
       // Auth succeeded — now try to read Firestore profile
       if (btn) btn.disabled = false;
       const name = email.split('@')[0];
-      document.getElementById('adv-nav-name').textContent = name;
+      setNavAuth(name);
       showToast(t('auth.welcome') + ' ' + name + '!');
 
       // Try Firestore for role + real name, fall back to selected role
@@ -6395,7 +6406,7 @@ function handleSignIn(e) {
         .then(doc => {
           const role = doc.exists ? doc.data().role : siRole;
           const realName = doc.exists ? doc.data().name : name;
-          document.getElementById('adv-nav-name').textContent = realName;
+          setNavAuth(realName);
           setTimeout(() => {
             if (role === 'driver')      showView('driver');
             else if (role === 'admin')  showView('dashboard');
@@ -6502,9 +6513,26 @@ function _mapFirebaseError(code) {
   }
 }
 
+// ── NAV AUTH STATE ──
+function setNavAuth(name) {
+  const loggedOut = document.getElementById('nav-logged-out');
+  const loggedIn  = document.getElementById('nav-logged-in');
+  const username  = document.getElementById('nav-username');
+  const avatar    = document.getElementById('nav-avatar');
+  if (name) {
+    loggedOut.style.display = 'none';
+    loggedIn.style.display  = 'flex';
+    username.textContent    = name;
+    avatar.textContent      = name.charAt(0).toUpperCase();
+  } else {
+    loggedOut.style.display = 'flex';
+    loggedIn.style.display  = 'none';
+  }
+}
+
 // ── SIGN OUT ──
 function handleSignOut() {
-  fbAuth.signOut().then(() => showView('auth'));
+  fbAuth.signOut().then(() => { setNavAuth(null); showView('landing'); });
 }
 
 // ── TOAST ──
@@ -6586,18 +6614,18 @@ function startTrustCounter() {
 
 // ── Auth state — auto-restore session on page load ──
 fbAuth.onAuthStateChanged(user => {
-  if (!user) return; // not signed in — stay on landing
+  if (!user) { setNavAuth(null); return; }
+  const fallbackName = user.email.split('@')[0];
+  setNavAuth(fallbackName);
   fbDb.collection('users').doc(user.uid).get().then(doc => {
     const role = doc.exists ? doc.data().role : null;
-    const name = doc.exists ? doc.data().name : user.email.split('@')[0];
-    document.getElementById('adv-nav-name').textContent = name;
-    if (role === 'driver')     showView('driver');
-    else if (role === 'admin') showView('dashboard');
+    const name = doc.exists ? doc.data().name : fallbackName;
+    setNavAuth(name);
+    if (role === 'driver')          showView('driver');
+    else if (role === 'admin')      showView('dashboard');
     else if (role === 'advertiser') showView('advertiser');
-    // unknown role — stay on landing
   }).catch(() => {
-    // Firestore unavailable — still show the user is logged in
-    document.getElementById('adv-nav-name').textContent = user.email.split('@')[0];
+    setNavAuth(fallbackName);
   });
 });
 
