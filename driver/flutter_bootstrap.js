@@ -35,4 +35,20 @@ if (!window._flutter) {
 }
 _flutter.buildConfig = {"engineRevision":"c416acfeb8126e097f758c664aaa3da929e27da0","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
-_flutter.loader.load({});
+(async () => {
+  try {
+    const [fc, fa, ff, fd] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"),
+    ]);
+    self.firebase_core     = fc;
+    self.firebase_auth     = fa;
+    self.firebase_firestore = ff;
+    self.firebase_database  = fd;
+  } catch(e) {
+    console.error("Firebase SDK load failed:", e);
+  }
+  _flutter.loader.load({});
+})();
