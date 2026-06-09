@@ -19,9 +19,72 @@ import 'widgets/float_cluster.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const AdStickAdvertiserApp());
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    runApp(const AdStickAdvertiserApp());
+  } catch (e, stack) {
+    runApp(_ErrorApp(message: e.toString(), stack: stack.toString()));
+  }
+}
+
+class _ErrorApp extends StatelessWidget {
+  final String message;
+  final String stack;
+  const _ErrorApp({required this.message, required this.stack});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: const Color(0xFF1A1A2E),
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 60),
+              const Text('🔥 Firebase Init Error',
+                  style: TextStyle(color: Color(0xFFFF6B6B), fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D0D1A),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFFF6B6B).withOpacity(0.4)),
+                ),
+                child: SelectableText(
+                  message,
+                  style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 13, fontFamily: 'monospace'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Stack trace:', style: TextStyle(color: Colors.white54, fontSize: 12)),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D0D1A),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: SingleChildScrollView(
+                    child: SelectableText(
+                      stack,
+                      style: const TextStyle(color: Colors.white38, fontSize: 11, fontFamily: 'monospace'),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class AdStickAdvertiserApp extends StatelessWidget {
