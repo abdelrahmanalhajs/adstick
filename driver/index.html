@@ -31,6 +31,7 @@
 
   <title>adstick_driver</title>
   <link rel="manifest" href="manifest.json">
+  <script>if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(let reg of r){reg.unregister();}});}</script>
 </head>
 <body>
   <!--
