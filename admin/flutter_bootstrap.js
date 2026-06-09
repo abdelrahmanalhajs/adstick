@@ -38,10 +38,10 @@ _flutter.buildConfig = {"engineRevision":"c416acfeb8126e097f758c664aaa3da929e27d
 (async () => {
   try {
     const [fc, fa, ff, fd] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"),
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"),
+      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js"),
     ]);
     self.firebase_core     = fc;
     self.firebase_auth     = fa;
