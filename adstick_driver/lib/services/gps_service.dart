@@ -9,7 +9,10 @@ final gpsService = GpsService._();
 class GpsService {
   GpsService._();
 
-  final _rtdb = FirebaseDatabase.instance;
+  final _rtdb = FirebaseDatabase.instanceFor(
+    app: FirebaseDatabase.instance.app,
+    databaseURL: 'https://adstick-90329-default-rtdb.europe-west1.firebasedatabase.app',
+  );
 
   StreamSubscription<Position>? _sub;
   final _positionController = StreamController<Position>.broadcast();

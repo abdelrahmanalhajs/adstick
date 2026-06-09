@@ -9,7 +9,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '217851652919',
     projectId:         'adstick-90329',
     authDomain:        'adstick-90329.firebaseapp.com',
-    storageBucket:     'adstick-90329.firebasestorage.app',
-    databaseURL:       'https://adstick-90329-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket:     'adstick-90329.appspot.com',
   );
 }

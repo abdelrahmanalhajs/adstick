@@ -40,7 +40,10 @@ class _LiveMapScreenState extends State<LiveMapScreen> {
         ],
       ),
       body: StreamBuilder<DatabaseEvent>(
-        stream: FirebaseDatabase.instance.ref('drivers').onValue,
+        stream: FirebaseDatabase.instanceFor(
+          app: FirebaseDatabase.instance.app,
+          databaseURL: 'https://adstick-90329-default-rtdb.europe-west1.firebasedatabase.app',
+        ).ref('drivers').onValue,
         builder: (context, snapshot) {
           final drivers = <String, Map<String, dynamic>>{};
 
