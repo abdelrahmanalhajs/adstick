@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-      for (let r of registrations) { r.unregister(); }
-    });
-  }
-</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(let x of r)x.unregister();});}</script>
   <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.

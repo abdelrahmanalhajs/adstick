@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -21,15 +22,26 @@ import 'screens/wallet_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/float_cluster.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-    runApp(const AdStickDriverApp());
-  } catch (e, stack) {
-    runApp(_ErrorApp(message: e.toString(), stack: stack.toString()));
-  }
+bool _appStarted = false;
+
+void _launchError(Object e, StackTrace s) {
+  if (_appStarted) return;
+  _appStarted = true;
+  runApp(_ErrorApp(message: e.toString(), stack: s.toString()));
+}
+
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    try {
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+      _appStarted = true;
+      runApp(const AdStickDriverApp());
+    } catch (e, s) {
+      _launchError(e, s);
+    }
+  }, _launchError);
 }
 
 class _ErrorApp extends StatelessWidget {
