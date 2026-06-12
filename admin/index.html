@@ -4,7 +4,7 @@
   <!-- Unregister stale service workers immediately -->
   <script>if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(let s of r)s.unregister();});}</script>
 
-  <base href="/adstick/admin/">
+  <base href="/">
 
   <!-- Warm up CDN connection before JS even runs -->
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js">
 
   <!-- Pre-fetch Flutter assets in parallel with Firebase -->
-  <link rel="preload" href="main.dart.js?v=927227c8" as="script">
+  <link rel="preload" href="main.dart.js" as="script">
   <link rel="preload" href="canvaskit/canvaskit.js" as="script">
 
   <meta charset="UTF-8">

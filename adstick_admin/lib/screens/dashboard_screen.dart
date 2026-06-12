@@ -1,106 +1,471 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/firestore_service.dart';
+import '../models/models.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(children: [
-          Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppTheme.green, shape: BoxShape.circle)),
-          const SizedBox(width: 8),
-          const Text('Admin Dashboard'),
-        ]),
-        actions: [
-          IconButton(icon: Badge(label: const Text('3'), child: const Icon(Icons.notifications_rounded, color: AppTheme.textMuted)), onPressed: () {}),
-          Padding(padding: const EdgeInsets.only(right: 12),
-            child: CircleAvatar(radius: 16, backgroundColor: AppTheme.brand.withOpacity(0.2),
-                child: const Icon(Icons.admin_panel_settings_rounded, color: AppTheme.brand, size: 18))),
-        ],
+      appBar: AppBar(title: const Text('🏠 Platform Dashboard')),
+      body: StreamBuilder<PlatformStats>(
+        stream: fsService.platformStatsStream(),
+        builder: (_, statsSnap) {
+          final stats = statsSnap.data;
+          final isLoading =
+              statsSnap.connectionState == ConnectionState.waiting;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+              // ── Live health banner ────────────────────────────
+              _LiveBanner(activeDrivers: stats?.activeDrivers ?? 0),
+              const SizedBox(height: 20),
+
+              // ── KPI grid ──────────────────────────────────────
+              const Text('Platform KPIs',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white)),
+              const SizedBox(height: 12),
+              if (isLoading)
+                const Center(
+                    child: Padding(
+                  padding: EdgeInsets.all(40),
+                  child: CircularProgressIndicator(color: AppTheme.brand),
+                ))
+              else
+                _KpiGrid(stats: stats),
+              const SizedBox(height: 24),
+
+              // ── Revenue overview ──────────────────────────────
+              const Text('Revenue Overview',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white)),
+              const SizedBox(height: 12),
+              _RevenueCard(stats: stats),
+              const SizedBox(height: 24),
+
+              // ── Pending actions ───────────────────────────────
+              const Text('Pending Actions',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white)),
+              const SizedBox(height: 12),
+              const _PendingActions(),
+              const SizedBox(height: 24),
+
+              // ── Recent fraud alerts ───────────────────────────
+              const Text('Recent Fraud Alerts',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white)),
+              const SizedBox(height: 12),
+              const _RecentFraudAlerts(),
+              const SizedBox(height: 80),
+            ]),
+          );
+        },
       ),
-      body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // KPI grid
-        GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.4,
-          children: const [
-            _KPI(label: 'Active Cars', value: '847', delta: '+12 today', icon: Icons.directions_car_rounded, color: AppTheme.green),
-            _KPI(label: 'KM Today', value: '74.2K', delta: '+8.4% vs last week', icon: Icons.route_rounded, color: AppTheme.blue),
-            _KPI(label: 'Active Campaigns', value: '28', delta: '+3 this month', icon: Icons.campaign_rounded, color: AppTheme.brand),
-            _KPI(label: 'Traffic Score', value: '8.4', delta: '▲ Morning peak', icon: Icons.traffic_rounded, color: AppTheme.yellow),
-          ],
+    );
+  }
+}
+
+// ── Live banner ───────────────────────────────────────────────────
+class _LiveBanner extends StatelessWidget {
+  final int activeDrivers;
+  const _LiveBanner({required this.activeDrivers});
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+              colors: [Color(0xFF064E3B), Color(0xFF065F46)]),
+          borderRadius: BorderRadius.circular(12),
         ),
-        const SizedBox(height: 20),
-        const Text('Fleet Health', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-        const SizedBox(height: 12),
-        Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
-          _bar('Active',    847, 1000, AppTheme.green),
-          _bar('Idle',      124, 1000, AppTheme.yellow),
-          _bar('Offline',    29, 1000, AppTheme.red),
-          _bar('Sticker Issue', 8, 1000, AppTheme.brand),
-        ]))),
-        const SizedBox(height: 20),
-        const Text('Revenue This Month', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-        const SizedBox(height: 12),
-        Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('SAR 284,500', style: TextStyle(color: AppTheme.brand, fontSize: 32, fontWeight: FontWeight.w900)),
-          const Text('Total platform revenue · June 2026', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-          const SizedBox(height: 16),
-          _revRow('Advertiser Fees', 'SAR 210,000', 0.74),
-          _revRow('Driver Payouts', 'SAR −58,000', null),
-          _revRow('Data Subscriptions', 'SAR 18,500', 0.07),
-          _revRow('Platform Fee (15%)', 'SAR 56,000', 0.20),
-        ]))),
-        const SizedBox(height: 20),
-        const Text('Recent Alerts', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-        const SizedBox(height: 12),
-        ...[
-          (AppTheme.yellow, Icons.warning_rounded, 'Sticker damage reported · CAR-204', '5 min ago'),
-          (AppTheme.blue,   Icons.info_rounded,    'New campaign awaiting approval',    '12 min ago'),
-          (AppTheme.green,  Icons.check_circle_rounded, 'CAR-089 reached 1,000 km milestone', '1 hr ago'),
-          (AppTheme.red,    Icons.error_rounded,   'Driver offline 3h+ · DRV-412',     '2 hr ago'),
-        ].map((a) => Card(margin: const EdgeInsets.only(bottom: 8), child: ListTile(
-          leading: Icon(a.$2, color: a.$1, size: 22),
-          title: Text(a.$3, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-          trailing: Text(a.$4, style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-        ))),
-      ])),
+        child: Row(children: [
+          Container(
+              width: 10, height: 10,
+              decoration: const BoxDecoration(
+                  color: AppTheme.green, shape: BoxShape.circle)),
+          const SizedBox(width: 8),
+          Text(
+            activeDrivers > 0
+                ? '$activeDrivers drivers on-road right now'
+                : 'No active drivers currently',
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w700),
+          ),
+          const Spacer(),
+          const Text('LIVE',
+              style: TextStyle(
+                  color: AppTheme.green,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1)),
+        ]),
+      );
+}
+
+// ── KPI grid ──────────────────────────────────────────────────────
+class _KpiGrid extends StatelessWidget {
+  final PlatformStats? stats;
+  const _KpiGrid({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = stats;
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 1.4,
+      children: [
+        _KpiCard(
+          label: 'Total Drivers',
+          value: '${s?.totalDrivers ?? 0}',
+          sub: '${s?.activeDrivers ?? 0} active now',
+          icon: Icons.person_pin_rounded,
+          color: AppTheme.brand,
+        ),
+        _KpiCard(
+          label: 'Active Campaigns',
+          value: '${s?.activeCampaigns ?? 0}',
+          sub: '${s?.totalCampaigns ?? 0} total',
+          icon: Icons.campaign_rounded,
+          color: AppTheme.blue,
+        ),
+        _KpiCard(
+          label: 'Revenue MTD',
+          value: 'SAR ${_fmtD(s?.revenueThisMonth ?? 0)}',
+          sub: '30% platform fee',
+          icon: Icons.attach_money_rounded,
+          color: AppTheme.green,
+        ),
+        _KpiCard(
+          label: 'Pending Payouts',
+          value: '${s?.pendingPayouts ?? 0}',
+          sub: 'SAR ${_fmtD(s?.pendingPayoutsAmount ?? 0)}',
+          icon: Icons.pending_actions_rounded,
+          color: AppTheme.yellow,
+        ),
+        _KpiCard(
+          label: 'Impressions Today',
+          value: _fmtN(s?.totalImpressionsToday ?? 0),
+          sub: 'Platform-wide',
+          icon: Icons.visibility_rounded,
+          color: AppTheme.brand,
+        ),
+        _KpiCard(
+          label: 'KM Covered Today',
+          value: _fmtN(s?.totalKmToday.toInt() ?? 0),
+          sub: 'All active drivers',
+          icon: Icons.route_rounded,
+          color: const Color(0xFF60A5FA),
+        ),
+      ],
     );
   }
 
-  Widget _bar(String lbl, int val, int max, Color color) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 5),
-    child: Row(children: [
-      SizedBox(width: 90, child: Text(lbl, style: const TextStyle(color: AppTheme.textMuted, fontSize: 12))),
-      Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-        value: val / max, backgroundColor: Colors.white12, valueColor: AlwaysStoppedAnimation(color), minHeight: 6))),
-      const SizedBox(width: 8),
-      SizedBox(width: 36, child: Text('$val', textAlign: TextAlign.right,
-          style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700))),
-    ]),
-  );
+  static String _fmtD(double v) {
+    if (v >= 1000000) return '${(v / 1000000).toStringAsFixed(1)}M';
+    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}K';
+    return v.toStringAsFixed(0);
+  }
 
-  Widget _revRow(String lbl, String val, double? pct) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 5),
-    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(lbl, style: const TextStyle(color: AppTheme.textMuted, fontSize: 13)),
-      Text(val, style: TextStyle(color: pct != null ? AppTheme.brand : AppTheme.red,
-          fontSize: 13, fontWeight: FontWeight.w700)),
-    ]),
-  );
+  static String _fmtN(int n) {
+    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+    return n.toString();
+  }
 }
 
-class _KPI extends StatelessWidget {
-  final String label, value, delta; final IconData icon; final Color color;
-  const _KPI({required this.label, required this.value, required this.delta, required this.icon, required this.color});
+class _KpiCard extends StatelessWidget {
+  final String label, value, sub;
+  final IconData icon;
+  final Color color;
+  const _KpiCard(
+      {required this.label,
+      required this.value,
+      required this.sub,
+      required this.icon,
+      required this.color});
+
   @override
-  Widget build(BuildContext context) => Card(child: Padding(padding: const EdgeInsets.all(12),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-        Icon(icon, color: color, size: 16),
-      ]),
-      Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w900)),
-      Text(delta, style: const TextStyle(color: AppTheme.green, fontSize: 10)),
-    ])));
+  Widget build(BuildContext context) => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+              Flexible(
+                child: Text(label,
+                    style: const TextStyle(
+                        color: AppTheme.textMuted, fontSize: 10),
+                    overflow: TextOverflow.ellipsis),
+              ),
+              Icon(icon, color: color, size: 16),
+            ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+              Text(value,
+                  style: TextStyle(
+                      color: color,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900)),
+              Text(sub,
+                  style: const TextStyle(
+                      color: AppTheme.textMuted, fontSize: 10)),
+            ]),
+          ]),
+        ),
+      );
+}
+
+// ── Revenue card ──────────────────────────────────────────────────
+class _RevenueCard extends StatelessWidget {
+  final PlatformStats? stats;
+  const _RevenueCard({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final gross = stats?.revenueThisMonth ?? 0;
+    final commission = gross * 0.30;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+            const Text('This Month',
+                style: TextStyle(
+                    color: AppTheme.textMuted, fontSize: 12)),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                  color: AppTheme.green.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(999)),
+              child: const Text('MTD',
+                  style: TextStyle(
+                      color: AppTheme.green,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700)),
+            ),
+          ]),
+          const SizedBox(height: 12),
+          Row(children: [
+            Expanded(
+                child: _revItem('Gross Revenue',
+                    'SAR ${_fmt(gross)}', AppTheme.blue)),
+            const SizedBox(width: 12),
+            Expanded(
+                child: _revItem('Platform (30%)',
+                    'SAR ${_fmt(commission)}', AppTheme.green)),
+            const SizedBox(width: 12),
+            Expanded(
+                child: _revItem('Driver Pool (70%)',
+                    'SAR ${_fmt(gross - commission)}', AppTheme.brand)),
+          ]),
+        ]),
+      ),
+    );
+  }
+
+  Widget _revItem(String lbl, String val, Color c) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(val,
+            style: TextStyle(
+                color: c, fontSize: 14, fontWeight: FontWeight.w800)),
+        Text(lbl,
+            style: const TextStyle(
+                color: AppTheme.textMuted, fontSize: 9)),
+      ]);
+
+  static String _fmt(double v) {
+    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}K';
+    return v.toStringAsFixed(0);
+  }
+}
+
+// ── Pending actions ───────────────────────────────────────────────
+class _PendingActions extends StatelessWidget {
+  const _PendingActions();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<PayoutRequest>>(
+      stream: fsService.pendingPayoutsStream(),
+      builder: (_, paySnap) {
+        final pendingPayouts = paySnap.data?.length ?? 0;
+        final payoutAmount =
+            paySnap.data?.fold(0.0, (s, p) => s + p.amount) ?? 0.0;
+        return StreamBuilder<List<Campaign>>(
+          stream: fsService.pendingCampaignsStream(),
+          builder: (_, campSnap) {
+            final pendingCamps = campSnap.data?.length ?? 0;
+            return StreamBuilder<List<FraudAlert>>(
+              stream: fsService.openFraudAlertsStream(),
+              builder: (_, fraudSnap) {
+                final openFraud = fraudSnap.data?.length ?? 0;
+                return Column(children: [
+                  _ActionRow(
+                    icon: Icons.pending_actions_rounded,
+                    color: AppTheme.yellow,
+                    label: 'Payout Requests',
+                    count: pendingPayouts,
+                    sub: 'SAR ${payoutAmount.toStringAsFixed(0)} total',
+                  ),
+                  const SizedBox(height: 8),
+                  _ActionRow(
+                    icon: Icons.campaign_rounded,
+                    color: AppTheme.blue,
+                    label: 'Campaign Approvals',
+                    count: pendingCamps,
+                    sub: 'Awaiting admin review',
+                  ),
+                  const SizedBox(height: 8),
+                  _ActionRow(
+                    icon: Icons.warning_amber_rounded,
+                    color: Colors.red,
+                    label: 'Open Fraud Alerts',
+                    count: openFraud,
+                    sub: 'Needs investigation',
+                  ),
+                ]);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String label, sub;
+  final int count;
+  const _ActionRow(
+      {required this.icon,
+      required this.color,
+      required this.label,
+      required this.sub,
+      required this.count});
+
+  @override
+  Widget build(BuildContext context) => Card(
+        child: ListTile(
+          leading: Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          title: Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700)),
+          subtitle: Text(sub,
+              style: const TextStyle(
+                  color: AppTheme.textMuted, fontSize: 11)),
+          trailing: count > 0
+              ? Container(
+                  width: 28, height: 28,
+                  decoration:
+                      BoxDecoration(color: color, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Text('$count',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900)),
+                )
+              : const Icon(Icons.check_circle_rounded,
+                  color: AppTheme.green, size: 24),
+        ),
+      );
+}
+
+// ── Recent fraud alerts ───────────────────────────────────────────
+class _RecentFraudAlerts extends StatelessWidget {
+  const _RecentFraudAlerts();
+
+  @override
+  Widget build(BuildContext context) =>
+      StreamBuilder<List<FraudAlert>>(
+        stream: fsService.openFraudAlertsStream(),
+        builder: (_, snap) {
+          final alerts = snap.data?.take(3).toList() ?? [];
+          if (alerts.isEmpty) {
+            return Card(
+              child: const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.shield_rounded,
+                        color: AppTheme.green, size: 20),
+                    SizedBox(width: 8),
+                    Text('No open fraud alerts',
+                        style: TextStyle(
+                            color: AppTheme.textMuted, fontSize: 13)),
+                  ]),
+                ),
+              ),
+            );
+          }
+          return Column(
+            children: alerts
+                .map((a) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: const Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.orange, size: 20),
+                        title: Text(a.typeLabel,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700)),
+                        subtitle: Text(
+                          a.description.isNotEmpty
+                              ? a.description
+                              : 'Flagged for review',
+                          style: const TextStyle(
+                              color: AppTheme.textMuted, fontSize: 11),
+                        ),
+                        trailing: const Icon(
+                            Icons.chevron_right_rounded,
+                            color: AppTheme.textMuted),
+                      ),
+                    ))
+                .toList(),
+          );
+        },
+      );
 }

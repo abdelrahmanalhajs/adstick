@@ -1,75 +1,224 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/firestore_service.dart';
+import '../models/models.dart';
 
 class AuditScreen extends StatelessWidget {
   const AuditScreen({super.key});
 
-  static const _logs = [
-    ('Campaign Approved', 'admin@adstick.com', '2026-06-06 09:14', 'Campaign: Riyadh Retail Blitz', AppTheme.green, Icons.check_circle_rounded),
-    ('Driver Suspended', 'admin@adstick.com', '2026-06-06 08:47', 'Driver ID: D-0034 · Reason: QC Fail', AppTheme.red, Icons.block_rounded),
-    ('Budget Updated', 'ops@adstick.com', '2026-06-05 16:32', 'Tech Launch Q2: SAR 8,000 → SAR 8,500', AppTheme.blue, Icons.edit_rounded),
-    ('Vehicle Added', 'ops@adstick.com', '2026-06-05 14:10', 'V-023 · Toyota Camry 2025', AppTheme.brand, Icons.add_circle_rounded),
-    ('Advertiser Onboarded', 'admin@adstick.com', '2026-06-05 11:55', 'AutoDrive Arabia · Growth Plan', AppTheme.green, Icons.person_add_rounded),
-    ('Payout Processed', 'finance@adstick.com', '2026-06-04 18:00', 'Batch #42 · SAR 47,320 · 23 drivers', AppTheme.yellow, Icons.payments_rounded),
-    ('City Zone Updated', 'ops@adstick.com', '2026-06-04 10:20', 'Jeddah zone boundary extended', AppTheme.blue, Icons.map_rounded),
-    ('System Alert Cleared', 'system', '2026-06-03 22:14', 'GPS dropout · V-007 · Resolved', AppTheme.textMuted, Icons.notifications_rounded),
-  ];
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('🔍 Fraud & Audit'),
+          bottom: const TabBar(tabs: [
+            Tab(text: 'Open Alerts'),
+            Tab(text: 'All Alerts'),
+          ]),
+        ),
+        body: const TabBarView(children: [
+          _OpenAlertsTab(),
+          _AllAlertsTab(),
+        ]),
+      ),
+    );
+  }
+}
 
-  static const _stats = [
-    ('Total Actions', '1,247', AppTheme.blue),
-    ('This Month', '284', AppTheme.brand),
-    ('Alerts', '12', AppTheme.yellow),
-    ('Violations', '3', AppTheme.red),
-  ];
+class _OpenAlertsTab extends StatelessWidget {
+  const _OpenAlertsTab();
+
+  @override
+  Widget build(BuildContext context) =>
+      StreamBuilder<List<FraudAlert>>(
+        stream: fsService.openFraudAlertsStream(),
+        builder: (_, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(
+                child: CircularProgressIndicator(color: AppTheme.brand));
+          }
+          final alerts = snap.data ?? [];
+          if (alerts.isEmpty) {
+            return const Center(
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                Icon(Icons.shield_rounded,
+                    color: AppTheme.green, size: 48),
+                SizedBox(height: 12),
+                Text('No open fraud alerts',
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 16,
+                        fontWeight: FontWeight.w700)),
+                SizedBox(height: 6),
+                Text('Platform looks clean ✓',
+                    style: TextStyle(
+                        color: AppTheme.textMuted, fontSize: 13)),
+              ]),
+            );
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: alerts.length,
+            itemBuilder: (_, i) => _AlertCard(
+                alert: alerts[i],
+                key: ValueKey(alerts[i].id)),
+          );
+        },
+      );
+}
+
+class _AllAlertsTab extends StatelessWidget {
+  const _AllAlertsTab();
+
+  @override
+  Widget build(BuildContext context) =>
+      StreamBuilder<List<FraudAlert>>(
+        stream: fsService.fraudAlertsStream(),
+        builder: (_, snap) {
+          final alerts = snap.data ?? [];
+          if (alerts.isEmpty) {
+            return const Center(
+              child: Text('No fraud alerts recorded',
+                  style: TextStyle(
+                      color: AppTheme.textMuted, fontSize: 13)),
+            );
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: alerts.length,
+            itemBuilder: (_, i) => _AlertCard(
+                alert: alerts[i],
+                key: ValueKey(alerts[i].id)),
+          );
+        },
+      );
+}
+
+// ── Alert card ────────────────────────────────────────────────────
+class _AlertCard extends StatelessWidget {
+  final FraudAlert alert;
+  const _AlertCard({required this.alert, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('📋 Audit Log'),
-          actions: [
-            IconButton(icon: const Icon(Icons.download_rounded), onPressed: () {}),
-            IconButton(icon: const Icon(Icons.filter_list_rounded), onPressed: () {}),
-          ]),
-      body: Column(children: [
-        // Stats
-        Padding(padding: const EdgeInsets.all(16), child: Row(children: _stats.map((s) {
-          final last = s == _stats.last;
-          return Expanded(child: Row(children: [
-            Expanded(child: Card(child: Padding(padding: const EdgeInsets.all(10), child: Column(children: [
-              Text(s.$2, style: TextStyle(color: s.$3, fontSize: 16, fontWeight: FontWeight.w800)),
-              Text(s.$1, style: const TextStyle(color: AppTheme.textMuted, fontSize: 9), textAlign: TextAlign.center),
-            ])))),
-            if (!last) const SizedBox(width: 6),
-          ]));
-        }).toList())),
+    final severityColor = _severityColor(alert.severity);
+    final isOpen = alert.status == 'open';
 
-        // Log list
-        Expanded(child: ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: _logs.length,
-          itemBuilder: (_, i) {
-            final l = _logs[i];
-            return Card(margin: const EdgeInsets.only(bottom: 8), child: Padding(padding: const EdgeInsets.all(12), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(width: 36, height: 36, decoration: BoxDecoration(color: l.$5.withOpacity(0.12), borderRadius: BorderRadius.circular(9)),
-                  child: Icon(l.$6, color: l.$5, size: 18)),
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          Row(children: [
+            Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                  color: severityColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Icon(Icons.warning_amber_rounded,
+                  color: severityColor, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(alert.typeLabel,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700)),
+                Text('Driver: ${alert.driverName}',
+                    style: const TextStyle(
+                        color: AppTheme.textMuted, fontSize: 11)),
+              ]),
+            ),
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                    color: severityColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(999)),
+                child: Text(alert.severity.toUpperCase(),
+                    style: TextStyle(
+                        color: severityColor,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700)),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isOpen ? 'OPEN' : alert.status.toUpperCase(),
+                style: TextStyle(
+                    color: isOpen ? Colors.red : AppTheme.textMuted,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700),
+              ),
+            ]),
+          ]),
+          if (alert.description.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(alert.description,
+                style: const TextStyle(
+                    color: AppTheme.textMuted, fontSize: 12)),
+          ],
+          if (alert.createdAt != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Detected: ${_fmt(alert.createdAt!)}',
+              style: const TextStyle(
+                  color: AppTheme.textMuted, fontSize: 10),
+            ),
+          ],
+          if (isOpen) ...[
+            const SizedBox(height: 10),
+            Row(children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => fsService.updateFraudAlertStatus(
+                      alert.id, 'dismissed'),
+                  style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                          color: AppTheme.textMuted)),
+                  child: const Text('Dismiss',
+                      style: TextStyle(
+                          color: AppTheme.textMuted,
+                          fontSize: 12)),
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(l.$1, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 2),
-                Text(l.$4, style: const TextStyle(color: AppTheme.textMuted, fontSize: 11, height: 1.4)),
-                const SizedBox(height: 4),
-                Row(children: [
-                  const Icon(Icons.person_outline_rounded, color: AppTheme.textMuted, size: 11),
-                  const SizedBox(width: 3),
-                  Text(l.$2, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-                  const Spacer(),
-                  Text(l.$3, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-                ]),
-              ])),
-            ])));
-          },
-        )),
-      ]),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => fsService.updateFraudAlertStatus(
+                      alert.id, 'resolved'),
+                  child: const Text('Resolve', style: TextStyle(fontSize: 12)),
+                ),
+              ),
+            ]),
+          ],
+        ]),
+      ),
     );
+  }
+
+  Color _severityColor(String s) {
+    switch (s) {
+      case 'high':   return Colors.red;
+      case 'medium': return Colors.orange;
+      default:       return AppTheme.yellow;
+    }
+  }
+
+  String _fmt(DateTime dt) {
+    const m = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${dt.day} ${m[dt.month]}  ${dt.hour.toString().padLeft(2, "0")}:${dt.minute.toString().padLeft(2, "0")}';
   }
 }

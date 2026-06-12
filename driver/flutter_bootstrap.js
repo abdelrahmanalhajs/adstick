@@ -33,22 +33,10 @@ addEventListener("message", eventListener);
 if (!window._flutter) {
   window._flutter = {};
 }
-_flutter.buildConfig = {"engineRevision":"c416acfeb8126e097f758c664aaa3da929e27da0","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js?v=f44c8d31"},{}]};
+_flutter.buildConfig = {"engineRevision":"c416acfeb8126e097f758c664aaa3da929e27da0","builds":[{"compileTarget":"dart2js","renderer":"canvaskit","mainJsPath":"main.dart.js"},{}]};
 
-(async () => {
-  try {
-    const [fc, fa, ff, fd] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"),
-      import("https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js"),
-    ]);
-    self.firebase_core     = fc;
-    self.firebase_auth     = fa;
-    self.firebase_firestore = ff;
-    self.firebase_database  = fd;
-  } catch(e) {
-    console.error("Firebase SDK load failed:", e);
+_flutter.loader.load({
+  serviceWorkerSettings: {
+    serviceWorkerVersion: "4181241789" /* Flutter's service worker is deprecated and will be removed in a future Flutter release. */
   }
-  _flutter.loader.load({});
-})();
+});

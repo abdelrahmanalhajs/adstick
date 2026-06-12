@@ -17,6 +17,9 @@ import 'screens/reports_screen.dart';
 import 'screens/km_analytics_screen.dart';
 import 'screens/profile_screen.dart';
 import 'widgets/float_cluster.dart';
+import 'services/auth_service.dart';
+import 'services/firestore_service.dart';
+import 'models/models.dart';
 
 bool _appStarted = false;
 
@@ -209,28 +212,61 @@ class _AdvDrawer extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: AppTheme.brand.withValues(alpha: 0.2),
-                  child: const Icon(Icons.business_rounded, color: AppTheme.brand, size: 28),
-                ),
-                const Spacer(),
-                _LangToggle(accentColor: AppTheme.brand),
-              ]),
-              const SizedBox(height: 10),
-              const Text('MyBrand Co.',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                    color: AppTheme.brand.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(999)),
-                child: const Text('Growth Plan',
-                    style: TextStyle(color: AppTheme.brand, fontSize: 11, fontWeight: FontWeight.w600)),
-              ),
-            ]),
+            child: Builder(builder: (context) {
+              final uid = authService.currentUser?.uid;
+              if (uid == null) return const SizedBox.shrink();
+              return StreamBuilder<AdvertiserProfile>(
+                stream: fsService.advertiserProfileStream(uid),
+                builder: (_, snap) {
+                  final profile = snap.data;
+                  final company = profile?.companyName ?? '…';
+                  final plan    = profile?.plan ?? 'starter';
+                  final initial = company.isNotEmpty
+                      ? company[0].toUpperCase() : 'A';
+                  final planLabel = plan == 'enterprise'
+                      ? '💎 Enterprise'
+                      : plan == 'growth'
+                          ? '🚀 Growth Plan'
+                          : '⭐ Starter';
+                  return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Row(children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: AppTheme.brand.withValues(alpha: 0.2),
+                        child: Text(initial,
+                            style: const TextStyle(
+                                color: AppTheme.brand,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900)),
+                      ),
+                      const Spacer(),
+                      _LangToggle(accentColor: AppTheme.brand),
+                    ]),
+                    const SizedBox(height: 10),
+                    Text(company,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                          color: AppTheme.brand.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(999)),
+                      child: Text(planLabel,
+                          style: const TextStyle(
+                              color: AppTheme.brand,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600)),
+                    ),
+                  ]);
+                },
+              );
+            }),
           ),
           const Divider(color: AppTheme.border, height: 1),
           Expanded(

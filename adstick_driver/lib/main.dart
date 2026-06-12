@@ -21,6 +21,9 @@ import 'screens/profile_screen.dart';
 import 'screens/wallet_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/float_cluster.dart';
+import 'services/auth_service.dart';
+import 'services/firestore_service.dart';
+import 'models/models.dart';
 
 bool _appStarted = false;
 
@@ -212,7 +215,9 @@ class _DriverDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l = AppL10n.of(context);
+    final l   = AppL10n.of(context);
+    final uid = authService.currentUser?.uid;
+
     return Drawer(
       backgroundColor: AppTheme.dark2,
       child: SafeArea(
@@ -220,35 +225,44 @@ class _DriverDrawer extends StatelessWidget {
           // Header + lang toggle
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: AppTheme.driverGreen.withValues(alpha: 0.2),
-                  child: const Icon(Icons.directions_car_rounded,
-                      color: AppTheme.driverGreen, size: 28),
-                ),
-                const Spacer(),
-                _LangToggle(accentColor: AppTheme.driverGreen),
-              ]),
-              const SizedBox(height: 10),
-              const Text('Ahmed Khalid',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                    color: const Color(0xFF78350F),
-                    borderRadius: BorderRadius.circular(999)),
-                child: Text(l.t('gold_driver'),
-                    style: const TextStyle(
-                        color: Color(0xFFFDE68A),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600)),
-              ),
-            ]),
+            child: uid == null
+                ? const SizedBox.shrink()
+                : StreamBuilder<DriverProfile>(
+                    stream: fsService.driverProfileStream(uid),
+                    builder: (_, snap) {
+                      final profile = snap.data;
+                      final name    = profile?.name ?? '...';
+                      final tier    = profile?.tier ?? 'bronze';
+                      return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        Row(children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor:
+                                AppTheme.driverGreen.withValues(alpha: 0.2),
+                            child: Text(
+                              name.isNotEmpty ? name[0].toUpperCase() : '?',
+                              style: const TextStyle(
+                                  color: AppTheme.driverGreen,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                          const Spacer(),
+                          _LangToggle(accentColor: AppTheme.driverGreen),
+                        ]),
+                        const SizedBox(height: 10),
+                        Text(name,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 4),
+                        _TierChip(tier: tier),
+                      ]);
+                    },
+                  ),
           ),
           const Divider(color: AppTheme.border, height: 1),
           Expanded(
@@ -308,6 +322,40 @@ class _DriverDrawer extends StatelessWidget {
         Navigator.pop(ctx);
         ctx.go(path);
       },
+    );
+  }
+}
+
+// ── Tier chip ─────────────────────────────────────────────────
+class _TierChip extends StatelessWidget {
+  final String tier;
+  const _TierChip({required this.tier});
+
+  @override
+  Widget build(BuildContext context) {
+    Color bg, fg;
+    String label;
+    switch (tier) {
+      case 'elite':
+        bg = const Color(0xFF4C1D95); fg = const Color(0xFFA78BFA);
+        label = '👑 Elite Driver'; break;
+      case 'gold':
+        bg = const Color(0xFF78350F); fg = const Color(0xFFFDE68A);
+        label = '🥇 Gold Driver'; break;
+      case 'silver':
+        bg = const Color(0xFF1F2937); fg = const Color(0xFF94A3B8);
+        label = '🥈 Silver Driver'; break;
+      default:
+        bg = const Color(0xFF1C1007); fg = const Color(0xFFCD7F32);
+        label = '🥉 Bronze Driver';
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+          color: bg, borderRadius: BorderRadius.circular(999)),
+      child: Text(label,
+          style: TextStyle(
+              color: fg, fontSize: 11, fontWeight: FontWeight.w600)),
     );
   }
 }
