@@ -1,7 +1,33 @@
+#!/usr/bin/env bash
+# postbuild.sh — replaces Flutter's self-destructing SW with a real caching one
+# Run after each "flutter build web" for all 3 apps
+set -e
+
+patch_app() {
+  local BUILD="$1"   # path to build/web
+  local DEPLOY="$2"  # path to deployed directory
+  local APP_NAME="$3"
+
+  echo "Patching $APP_NAME..."
+
+  # Extract the SW version Flutter embedded (used as cache key)
+  SW_VER=$(grep -o 'serviceWorkerVersion: "[0-9]*"' "$BUILD/flutter_bootstrap.js" \
+    | grep -o '[0-9]*' | head -1)
+  [ -z "$SW_VER" ] && SW_VER=$(date +%s)
+
+  # Remove serviceWorkerSettings from flutter_bootstrap.js so Flutter
+  # doesn't try to register the self-destructing SW itself.
+  # We register our custom SW from index.html instead.
+  sed -i '' \
+    's/serviceWorkerSettings: *{[^}]*}[, ]*//' \
+    "$BUILD/flutter_bootstrap.js"
+
+  # Build file list for pre-cache (all same-origin critical files)
+  cat > "$BUILD/flutter_service_worker.js" <<SW_EOF
 'use strict';
 
 // Cache version — tied to Flutter build. Change triggers cache clear + re-download.
-const CACHE = 'adstick-advertiser-2475737828b';
+const CACHE = 'adstick-${APP_NAME}-${SW_VER}';
 
 // Critical files to pre-cache on install
 const PRECACHE = [
@@ -14,7 +40,7 @@ const PRECACHE = [
   // dart2wasm path (Chrome / WasmGC browsers)
   './main.dart.wasm',
   './main.dart.mjs',
-  // CanvasKit + skwasm
+  // CanvasKit + skwasm (served locally via --no-web-resources-cdn)
   './canvaskit/canvaskit.js',
   './canvaskit/canvaskit.wasm',
   './canvaskit/skwasm.js',
@@ -90,3 +116,20 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+SW_EOF
+
+  echo "  ✓ Wrote flutter_service_worker.js (cache: adstick-${APP_NAME}-${SW_VER})"
+
+  # Sync to deploy directory
+  rsync -a --delete "$BUILD/" "$DEPLOY/"
+  echo "  ✓ Deployed to $DEPLOY"
+}
+
+BASE="/Users/abdelrahmanalhaj/Documents/Claude/Projects/Ads"
+
+patch_app "$BASE/adstick_admin/build/web"      "$BASE/admin"      "admin"
+patch_app "$BASE/adstick_driver/build/web"     "$BASE/driver"     "driver"
+patch_app "$BASE/adstick_advertiser/build/web" "$BASE/advertiser" "advertiser"
+
+echo ""
+echo "✅ All 3 apps patched and deployed."
