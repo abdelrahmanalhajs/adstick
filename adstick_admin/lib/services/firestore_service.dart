@@ -351,6 +351,46 @@ class FirestoreService {
     await batch.commit();
   }
 
+  // ── EVENTS ──────────────────────────────────────────────────
+
+  Stream<List<PlatformEvent>> eventsStream() => _db
+      .collection('events')
+      .orderBy('date')
+      .snapshots()
+      .map((s) => s.docs.map(PlatformEvent.fromDoc).toList());
+
+  Future<void> createEvent(PlatformEvent event) =>
+      _db.collection('events').add(event.toMap());
+
+  Future<void> deleteEvent(String id) =>
+      _db.collection('events').doc(id).delete();
+
+  Future<void> updateEventStatus(String id, String status) =>
+      _db.collection('events').doc(id).update({'status': status});
+
+  // ── PLATFORM SETTINGS ────────────────────────────────────────
+
+  Stream<Map<String, dynamic>> platformSettingsStream() => _db
+      .collection('platform_settings')
+      .doc('config')
+      .snapshots()
+      .map((s) => Map<String, dynamic>.from(s.data() ?? _defaultSettings));
+
+  Future<void> updatePlatformSetting(String key, dynamic value) =>
+      _db.collection('platform_settings').doc('config').set(
+          {key: value}, SetOptions(merge: true));
+
+  static const _defaultSettings = {
+    'commissionRate': 0.30,
+    'minPayoutAmount': 50.0,
+    'baseRatePerKm': 1.0,
+    'peakMultiplier': 1.5,
+    'maxActiveCampaigns': 10,
+    'impressionsPerKm': 14,
+    'referralBonus': 50.0,
+    'streakBonusPerDay': 2.0,
+  };
+
   // ── HELPERS ─────────────────────────────────────────────────
 
   String _dateKey(DateTime dt) =>

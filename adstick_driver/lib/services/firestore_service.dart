@@ -263,6 +263,9 @@ class FirestoreService {
     });
   }
 
+  Future<void> deleteNotification(String uid, String notifId) =>
+      _db.collection('notifications').doc(uid).collection('items').doc(notifId).delete();
+
   // ── STREAK ──────────────────────────────────────────────────
 
   /// Call at end of each active driving day to update streak.

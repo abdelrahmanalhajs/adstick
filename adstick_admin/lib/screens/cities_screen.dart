@@ -1,94 +1,232 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/firestore_service.dart';
+import '../models/models.dart';
 
 class CitiesScreen extends StatelessWidget {
   const CitiesScreen({super.key});
 
-  static const _cities = [
-    ('Riyadh', 'HQ', 23, 18, 'SAR 320K', 0.91, 'Active'),
-    ('Jeddah', 'Expansion', 8, 6, 'SAR 98K', 0.68, 'Active'),
-    ('Dammam', 'Pilot', 4, 3, 'SAR 44K', 0.52, 'Active'),
-    ('Khobar', 'Pilot', 3, 2, 'SAR 31K', 0.45, 'Active'),
-    ('Mecca', 'Planned', 0, 0, '—', 0.0, 'Planning'),
-    ('Medina', 'Planned', 0, 0, '—', 0.0, 'Planning'),
-    ('Abha', 'Planned', 0, 0, '—', 0.0, 'Planning'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('🏙️ City Coverage'),
-          actions: [IconButton(icon: const Icon(Icons.add_rounded), onPressed: () {})]),
-      body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // National summary
-        Row(children: [
-          _kpi('Cities Live', '4', AppTheme.green),
-          const SizedBox(width: 10),
-          _kpi('Total Vehicles', '38', AppTheme.blue),
-          const SizedBox(width: 10),
-          _kpi('Monthly Rev', 'SAR 493K', AppTheme.brand),
-        ]),
-        const SizedBox(height: 24),
+      appBar: AppBar(title: const Text('🏙️ City Coverage')),
+      body: StreamBuilder<List<DriverRecord>>(
+        stream: fsService.allDriversStream(),
+        builder: (_, dSnap) {
+          return StreamBuilder<List<Campaign>>(
+            stream: fsService.allCampaignsStream(),
+            builder: (_, cSnap) {
+              if (dSnap.connectionState == ConnectionState.waiting ||
+                  cSnap.connectionState == ConnectionState.waiting) {
+                return const Center(
+                    child: CircularProgressIndicator(color: AppTheme.brand));
+              }
 
-        // Coverage map placeholder
-        Container(height: 160, width: double.infinity,
-          decoration: BoxDecoration(color: const Color(0xFF0F2027), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppTheme.border)),
-          child: const Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.public_rounded, color: AppTheme.brand, size: 40),
-            SizedBox(height: 8),
-            Text('Saudi Arabia Coverage Map', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-            Text('4 active cities · 3 planned', style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-          ])),
-        ),
-        const SizedBox(height: 20),
+              final drivers   = dSnap.data ?? [];
+              final campaigns = cSnap.data ?? [];
+              final cityMap   = _buildCityMap(drivers, campaigns);
 
-        const Text('City Performance', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-        const SizedBox(height: 12),
-        ..._cities.map((c) {
-          final isActive = c.$7 == 'Active';
-          final isPilot = c.$2 == 'Pilot';
-          final badgeColor = isActive ? (c.$2 == 'HQ' ? AppTheme.brand : isPilot ? AppTheme.yellow : AppTheme.green) : AppTheme.textMuted;
-          return Card(margin: const EdgeInsets.only(bottom: 10), child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Container(width: 38, height: 38, decoration: BoxDecoration(color: badgeColor.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
-                  child: Icon(Icons.location_city_rounded, color: badgeColor, size: 20)),
-              const SizedBox(width: 10),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(c.$1, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
-                Text(c.$2, style: TextStyle(color: badgeColor, fontSize: 11, fontWeight: FontWeight.w600)),
-              ])),
-              Text(c.$5, style: const TextStyle(color: AppTheme.brand, fontSize: 14, fontWeight: FontWeight.w800)),
-            ]),
-            if (isActive) ...[
-              const SizedBox(height: 10),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                _cityStat('Vehicles', '${c.$3}'),
-                _cityStat('Active', '${c.$4}'),
-                _cityStat('Coverage', '${(c.$6 * 100).toInt()}%'),
-              ]),
-              const SizedBox(height: 10),
-              ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-                  value: c.$6, backgroundColor: AppTheme.border,
-                  valueColor: AlwaysStoppedAnimation(badgeColor), minHeight: 6)),
-            ] else ...[
-              const SizedBox(height: 8),
-              const Text('Expansion coming Q4 2026', style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-            ],
-          ])));
-        }),
-      ])),
+              if (cityMap.isEmpty) {
+                return const Center(
+                  child: Text('No city data yet',
+                      style: TextStyle(
+                          color: AppTheme.textMuted, fontSize: 13)),
+                );
+              }
+
+              final sorted = cityMap.entries.toList()
+                ..sort((a, b) =>
+                    b.value.totalDrivers.compareTo(a.value.totalDrivers));
+
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: Wrap(spacing: 8, children: [
+                      _pill('${cityMap.length} Cities', AppTheme.brand),
+                      _pill('${drivers.length} Drivers', AppTheme.green),
+                      _pill(
+                          '${campaigns.where((c) => c.status == "active").length} Campaigns',
+                          AppTheme.blue),
+                    ]),
+                  ),
+                  ...sorted.map((e) => _CityCard(
+                      city: e.key, data: e.value, key: ValueKey(e.key))),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
-  Widget _kpi(String label, String val, Color c) => Expanded(
-    child: Card(child: Padding(padding: const EdgeInsets.all(12), child: Column(children: [
-      Text(val, style: TextStyle(color: c, fontSize: 15, fontWeight: FontWeight.w800)),
-      Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10), textAlign: TextAlign.center),
-    ]))),
-  );
+  Map<String, _CityData> _buildCityMap(
+      List<DriverRecord> drivers, List<Campaign> campaigns) {
+    final map = <String, _CityData>{};
 
-  Widget _cityStat(String label, String value) => Column(children: [
-    Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
-    Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-  ]);
+    for (final d in drivers) {
+      final cityName = _inferCity(d.vehicleId) ?? 'Riyadh';
+      map.putIfAbsent(cityName, () => _CityData(name: cityName));
+      map[cityName]!.drivers.add(d);
+    }
+
+    for (final c in campaigns) {
+      final cityName = c.city.isNotEmpty ? _capitalise(c.city) : 'Riyadh';
+      map.putIfAbsent(cityName, () => _CityData(name: cityName));
+      map[cityName]!.campaigns.add(c);
+    }
+
+    return map;
+  }
+
+  String? _inferCity(String vehicleId) {
+    final v = vehicleId.toLowerCase();
+    if (v.contains('ryd') || v.contains('riyadh')) return 'Riyadh';
+    if (v.contains('jed') || v.contains('jeddah')) return 'Jeddah';
+    if (v.contains('mec') || v.contains('makkah')) return 'Makkah';
+    if (v.contains('dam') || v.contains('dammam')) return 'Dammam';
+    return null;
+  }
+
+  String _capitalise(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+  Widget _pill(String label, Color c) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+            color: c.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: c.withValues(alpha: 0.3))),
+        child: Text(label,
+            style: TextStyle(
+                color: c, fontSize: 11, fontWeight: FontWeight.w700)),
+      );
+}
+
+class _CityData {
+  final String name;
+  final List<DriverRecord> drivers   = [];
+  final List<Campaign> campaigns     = [];
+
+  _CityData({required this.name});
+
+  int get totalDrivers    => drivers.length;
+  int get activeDrivers   => drivers.where((d) => d.isActive).length;
+  int get activeCampaigns =>
+      campaigns.where((c) => c.status == 'active').length;
+  double get totalKm =>
+      drivers.fold(0.0, (s, d) => s + d.totalKm);
+  double get totalSpend =>
+      campaigns.fold(0.0, (s, c) => s + c.spentBudget);
+}
+
+class _CityCard extends StatelessWidget {
+  final String city;
+  final _CityData data;
+  const _CityCard({required this.city, required this.data, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          Row(children: [
+            const Text('🏙️', style: TextStyle(fontSize: 22)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(city,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800)),
+            ),
+            if (data.activeDrivers > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                    color: AppTheme.green.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(999)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    width: 6, height: 6,
+                    decoration: const BoxDecoration(
+                        color: AppTheme.green, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 4),
+                  Text('${data.activeDrivers} live',
+                      style: const TextStyle(
+                          color: AppTheme.green,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700)),
+                ]),
+              ),
+          ]),
+          const SizedBox(height: 14),
+          Row(children: [
+            _stat(Icons.people_rounded, '${data.totalDrivers}', 'Drivers'),
+            _stat(Icons.campaign_rounded, '${data.activeCampaigns}',
+                'Active Ads'),
+            _stat(Icons.route_rounded,
+                '${data.totalKm.toStringAsFixed(0)} km', 'Total KM'),
+            _stat(Icons.payments_rounded, 'SAR ${_fmt(data.totalSpend)}',
+                'Ad Spend'),
+          ]),
+          if (data.totalDrivers > 0) ...[
+            const SizedBox(height: 12),
+            Row(children: [
+              const Text('Active ratio: ',
+                  style: TextStyle(
+                      color: AppTheme.textMuted, fontSize: 11)),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: data.activeDrivers / data.totalDrivers,
+                    backgroundColor: AppTheme.border,
+                    valueColor:
+                        const AlwaysStoppedAnimation(AppTheme.green),
+                    minHeight: 6,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '${(data.activeDrivers / data.totalDrivers * 100).toInt()}%',
+                style: const TextStyle(
+                    color: AppTheme.green,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700),
+              ),
+            ]),
+          ],
+        ]),
+      ),
+    );
+  }
+
+  Widget _stat(IconData icon, String val, String label) => Expanded(
+        child: Column(children: [
+          Icon(icon, color: AppTheme.brand, size: 16),
+          const SizedBox(height: 3),
+          Text(val,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center),
+          Text(label,
+              style: const TextStyle(
+                  color: AppTheme.textMuted, fontSize: 10)),
+        ]),
+      );
+
+  String _fmt(double v) =>
+      v >= 1000 ? '${(v / 1000).toStringAsFixed(1)}K' : v.toStringAsFixed(0);
 }

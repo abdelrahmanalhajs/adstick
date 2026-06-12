@@ -25,6 +25,7 @@ import 'screens/cities_screen.dart';
 import 'screens/quality_screen.dart';
 import 'screens/audit_screen.dart';
 import 'screens/carbon_screen.dart';
+import 'screens/settings_screen.dart';
 import 'widgets/float_cluster.dart';
 
 bool _appStarted = false;
@@ -145,6 +146,7 @@ class AdStickAdminApp extends StatelessWidget {
             GoRoute(path: '/quality',     builder: (_, __) => const QualityScreen()),
             GoRoute(path: '/audit',       builder: (_, __) => const AuditScreen()),
             GoRoute(path: '/carbon',      builder: (_, __) => const CarbonScreen()),
+            GoRoute(path: '/settings',    builder: (_, __) => const SettingsScreen()),
           ],
         ),
       ],
@@ -254,6 +256,7 @@ class _AdminDrawer extends StatelessWidget {
               _sec(l.t('sec_govern')),
               _t(context, Icons.description_rounded,      l.t('audit'),       '/audit'),
               _t(context, Icons.eco_rounded,              l.t('carbon'),      '/carbon'),
+              _t(context, Icons.settings_rounded,         'Settings',         '/settings'),
             ]),
           ),
           const Divider(color: AppTheme.border, height: 1),

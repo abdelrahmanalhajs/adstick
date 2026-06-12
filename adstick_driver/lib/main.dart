@@ -19,6 +19,7 @@ import 'screens/referral_screen.dart';
 import 'screens/benefits_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/wallet_screen.dart';
+import 'screens/notifications_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/float_cluster.dart';
 import 'services/auth_service.dart';
@@ -136,8 +137,9 @@ class AdStickDriverApp extends StatelessWidget {
             GoRoute(path: '/leaderboard', builder: (_, __) => const LeaderboardScreen()),
             GoRoute(path: '/referrals',   builder: (_, __) => const ReferralScreen()),
             GoRoute(path: '/benefits',    builder: (_, __) => const BenefitsScreen()),
-            GoRoute(path: '/profile',     builder: (_, __) => const ProfileScreen()),
-            GoRoute(path: '/wallet',      builder: (_, __) => const WalletScreen()),
+            GoRoute(path: '/profile',        builder: (_, __) => const ProfileScreen()),
+            GoRoute(path: '/wallet',         builder: (_, __) => const WalletScreen()),
+            GoRoute(path: '/notifications',  builder: (_, __) => const NotificationsScreen()),
           ],
         ),
       ],
@@ -278,8 +280,9 @@ class _DriverDrawer extends StatelessWidget {
               _t(context, Icons.handshake_rounded,              l.t('referrals'),  '/referrals'),
               _t(context, Icons.card_giftcard_rounded,          l.t('benefits'),   '/benefits'),
               _sec(l.t('sec_account')),
-              _t(context, Icons.account_balance_wallet_rounded, l.t('wallet'),     '/wallet'),
-              _t(context, Icons.person_rounded,                 l.t('profile'),    '/profile'),
+              _t(context, Icons.notifications_rounded,          l.t('notifications'), '/notifications'),
+              _t(context, Icons.account_balance_wallet_rounded, l.t('wallet'),        '/wallet'),
+              _t(context, Icons.person_rounded,                 l.t('profile'),       '/profile'),
             ]),
           ),
           const Divider(color: AppTheme.border, height: 1),

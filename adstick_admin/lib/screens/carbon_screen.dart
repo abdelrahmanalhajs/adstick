@@ -1,108 +1,276 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/firestore_service.dart';
+import '../models/models.dart';
 
 class CarbonScreen extends StatelessWidget {
   const CarbonScreen({super.key});
 
-  static const _metrics = [
-    ('CO₂ Saved vs Billboards', '18.4 t', AppTheme.green, Icons.eco_rounded),
-    ('Fuel Efficiency', '12.3 L/100km', AppTheme.blue, Icons.local_gas_station_rounded),
-    ('Electric Vehicles', '6 / 47', AppTheme.green, Icons.electric_car_rounded),
-    ('Carbon Offset', '23%', AppTheme.yellow, Icons.forest_rounded),
-  ];
-
-  static const _monthly = [
-    ('Jan', 0.6), ('Feb', 0.65), ('Mar', 0.72), ('Apr', 0.78), ('May', 0.84), ('Jun', 0.91),
-  ];
+  static const _co2PerKm = 0.12;
 
   static const _initiatives = [
-    ('EV Fleet Transition', 'Phase 1: 10 EVs by Q3 2026', 0.32, AppTheme.green),
-    ('Carbon Offset Program', 'Tree planting partnership with NEOM', 0.23, AppTheme.green),
-    ('Route Optimization', 'AI-minimized unnecessary km driven', 0.65, AppTheme.blue),
-    ('Solar Charging Hubs', 'Pilot at 3 Riyadh locations', 0.15, AppTheme.yellow),
+    {
+      'icon': '🌱',
+      'title': 'Solar-Charged Fleet',
+      'desc': 'Partnering with EV charging stations in Riyadh & Jeddah',
+      'status': 'Active',
+    },
+    {
+      'icon': '♻️',
+      'title': 'Vinyl Recycling Programme',
+      'desc': 'End-of-campaign vinyls recycled through certified partners',
+      'status': 'Active',
+    },
+    {
+      'icon': '🌳',
+      'title': 'Tree Planting Initiative',
+      'desc': '1 tree planted for every 500 km driven on the platform',
+      'status': 'Pilot',
+    },
+    {
+      'icon': '🔋',
+      'title': 'EV Driver Incentive',
+      'desc': 'EV drivers earn a 15% bonus multiplier on all campaigns',
+      'status': 'Coming Soon',
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('🌿 Carbon & Sustainability')),
-      body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Green hero
-        Container(width: double.infinity, padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFF052e16), Color(0xFF14532d)]),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(children: [
-            const Icon(Icons.eco_rounded, color: Color(0xFF86EFAC), size: 40),
-            const SizedBox(height: 8),
-            const Text('AdStick Green Score', style: TextStyle(color: Colors.white70, fontSize: 13)),
-            const SizedBox(height: 4),
-            const Text('74/100', style: TextStyle(color: Color(0xFF86EFAC), fontSize: 48, fontWeight: FontWeight.w900)),
-            const SizedBox(height: 6),
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: const LinearProgressIndicator(
-                value: 0.74, backgroundColor: Colors.white12,
-                valueColor: AlwaysStoppedAnimation(Color(0xFF86EFAC)), minHeight: 10)),
-            const SizedBox(height: 6),
-            const Text('26 pts to reach Platinum Green status', style: TextStyle(color: Colors.white60, fontSize: 11)),
-          ]),
-        ),
-        const SizedBox(height: 20),
+      body: StreamBuilder<PlatformStats>(
+        stream: fsService.platformStatsStream(),
+        builder: (_, snap) {
+          final stats    = snap.data ?? const PlatformStats();
+          final totalKm  = stats.totalKmAllTime;
+          final co2Saved = totalKm * _co2PerKm;
+          final treesEq  = (co2Saved / 21).floor();
+          final todayCo2 = stats.totalKmToday * _co2PerKm;
 
-        // Metric cards
-        GridView.count(crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), childAspectRatio: 1.6,
-          children: _metrics.map((m) => Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(m.$4, color: m.$3, size: 22),
-            const Spacer(),
-            Text(m.$2, style: TextStyle(color: m.$3, fontSize: 15, fontWeight: FontWeight.w800)),
-            Text(m.$1, style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-          ])))).toList(),
-        ),
-        const SizedBox(height: 20),
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // ── Hero metric ────────────────────────────────────
+              Card(
+                color: const Color(0xFF052E16),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                      const Text('🌿', style: TextStyle(fontSize: 32)),
+                      const SizedBox(width: 12),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                        Text(
+                          '${co2Saved.toStringAsFixed(1)} kg',
+                          style: const TextStyle(
+                              color: Color(0xFF4ADE80),
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900),
+                        ),
+                        const Text('CO₂ saved vs. billboards',
+                            style: TextStyle(
+                                color: Color(0xFF86EFAC),
+                                fontSize: 12)),
+                      ]),
+                    ]),
+                    const SizedBox(height: 16),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                      _greenStat('🚗', '${totalKm.toStringAsFixed(0)} km',
+                          'Total platform km'),
+                      _greenStat('🌳', '$treesEq', 'Trees equivalent'),
+                      _greenStat('📅',
+                          '${todayCo2.toStringAsFixed(2)} kg', 'Saved today'),
+                    ]),
+                  ]),
+                ),
+              ),
 
-        // Monthly CO2 savings trend
-        const Text('Monthly CO₂ Reduction', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-        const SizedBox(height: 12),
-        Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceAround, children: _monthly.map((m) =>
-            Column(children: [
-              Container(width: 32, height: (m.$2 * 80).toDouble(), decoration: BoxDecoration(
-                  color: const Color(0xFF22C55E).withOpacity(0.7 + m.$2 * 0.3),
-                  borderRadius: BorderRadius.circular(4))),
-              const SizedBox(height: 6),
-              Text(m.$1, style: const TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-            ])).toList(),
-          ),
-          const SizedBox(height: 8),
-          const Text('Trend: +52% vs Jan · Goal on track', style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-        ]))),
-        const SizedBox(height: 20),
+              const SizedBox(height: 16),
+              _sectionHeader('Monthly CO₂ Progress'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(children: [
+                    Row(children: [
+                      const Expanded(
+                        child: Text('Monthly Target: 500 kg',
+                            style: TextStyle(
+                                color: AppTheme.textMuted, fontSize: 12)),
+                      ),
+                      Text(
+                        '${(co2Saved % 500).toStringAsFixed(1)} / 500 kg',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ]),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: LinearProgressIndicator(
+                        value: ((co2Saved % 500) / 500).clamp(0.0, 1.0),
+                        backgroundColor: AppTheme.border,
+                        valueColor: const AlwaysStoppedAnimation(
+                            Color(0xFF4ADE80)),
+                        minHeight: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      stats.activeDrivers > 0
+                          ? '${stats.activeDrivers} active drivers contributing right now'
+                          : 'No drivers active currently',
+                      style: const TextStyle(
+                          color: AppTheme.textMuted, fontSize: 11),
+                      textAlign: TextAlign.center,
+                    ),
+                  ]),
+                ),
+              ),
 
-        // Initiatives
-        const Text('Green Initiatives', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-        const SizedBox(height: 12),
-        ..._initiatives.map((ini) => Card(margin: const EdgeInsets.only(bottom: 10), child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: Text(ini.$1, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700))),
-            Text('${(ini.$3 * 100).toInt()}%', style: TextStyle(color: ini.$4, fontSize: 13, fontWeight: FontWeight.w800)),
-          ]),
-          const SizedBox(height: 3),
-          Text(ini.$2, style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
-          const SizedBox(height: 8),
-          ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(
-              value: ini.$3, backgroundColor: AppTheme.border,
-              valueColor: AlwaysStoppedAnimation(ini.$4), minHeight: 7)),
-        ])))),
-        const SizedBox(height: 16),
-        Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Sustainability Report', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              _sectionHeader('Impact by the Numbers'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(children: [
+                    _impactRow('🛣️', '${totalKm.toStringAsFixed(0)} km driven',
+                        'eliminates billboard truck deliveries'),
+                    const Divider(color: AppTheme.border, height: 20),
+                    _impactRow('💡',
+                        '${(co2Saved * 4.2).toStringAsFixed(0)} kWh',
+                        'equivalent energy offset'),
+                    const Divider(color: AppTheme.border, height: 20),
+                    _impactRow('🌳', '$treesEq trees',
+                        'annual absorption equivalent'),
+                  ]),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              _sectionHeader('Green Initiatives'),
+              ..._initiatives.map((init) => _InitiativeCard(
+                    icon: init['icon']!,
+                    title: init['title']!,
+                    desc: init['desc']!,
+                    status: init['status']!,
+                  )),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String title) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Text(title,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w800)),
+      );
+
+  Widget _greenStat(String icon, String val, String label) => Column(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 20)),
           const SizedBox(height: 4),
-          const Text('Download full ESG report for Q1–Q2 2026', style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-          const SizedBox(height: 10),
-          ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.download_rounded, size: 16), label: const Text('Download PDF Report'),
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.green, foregroundColor: Colors.white, minimumSize: const Size(double.infinity, 40))),
-        ]))),
-      ])),
+          Text(val,
+              style: const TextStyle(
+                  color: Color(0xFF4ADE80),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800)),
+          Text(label,
+              style: const TextStyle(
+                  color: Color(0xFF86EFAC), fontSize: 10),
+              textAlign: TextAlign.center),
+        ],
+      );
+
+  Widget _impactRow(String icon, String value, String label) =>
+      Row(children: [
+        Text(icon, style: const TextStyle(fontSize: 22)),
+        const SizedBox(width: 12),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(value,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700)),
+          Text(label,
+              style: const TextStyle(
+                  color: AppTheme.textMuted, fontSize: 11)),
+        ]),
+      ]);
+}
+
+class _InitiativeCard extends StatelessWidget {
+  final String icon, title, desc, status;
+  const _InitiativeCard(
+      {required this.icon,
+      required this.title,
+      required this.desc,
+      required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color sc;
+    switch (status) {
+      case 'Active':
+        sc = AppTheme.green; break;
+      case 'Pilot':
+        sc = AppTheme.yellow; break;
+      default:
+        sc = AppTheme.textMuted;
+    }
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(children: [
+          Text(icon, style: const TextStyle(fontSize: 26)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+              Text(title,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(desc,
+                  style: const TextStyle(
+                      color: AppTheme.textMuted,
+                      fontSize: 11,
+                      height: 1.4)),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+                color: sc.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(999)),
+            child: Text(status,
+                style: TextStyle(
+                    color: sc,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700)),
+          ),
+        ]),
+      ),
     );
   }
 }

@@ -549,3 +549,53 @@ class PayoutRequest {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────
+// PlatformEvent — event intelligence
+// Firestore: events/{id}
+// ─────────────────────────────────────────────────────────────
+class PlatformEvent {
+  final String id;
+  final String name;
+  final String location;
+  final String dateLabel;   // e.g. "Jun 15–18"
+  final String expectedReach; // e.g. "850K"
+  final String status;      // upcoming | active | planning | completed
+  final DateTime? date;
+  final DateTime? createdAt;
+
+  const PlatformEvent({
+    required this.id,
+    required this.name,
+    required this.location,
+    required this.dateLabel,
+    this.expectedReach = '',
+    this.status = 'planning',
+    this.date,
+    this.createdAt,
+  });
+
+  factory PlatformEvent.fromDoc(DocumentSnapshot doc) {
+    final d = doc.data() as Map<String, dynamic>? ?? {};
+    return PlatformEvent(
+      id: doc.id,
+      name: d['name'] ?? '',
+      location: d['location'] ?? '',
+      dateLabel: d['dateLabel'] ?? '',
+      expectedReach: d['expectedReach'] ?? '',
+      status: d['status'] ?? 'planning',
+      date: (d['date'] as Timestamp?)?.toDate(),
+      createdAt: (d['createdAt'] as Timestamp?)?.toDate(),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+    'name': name,
+    'location': location,
+    'dateLabel': dateLabel,
+    'expectedReach': expectedReach,
+    'status': status,
+    'date': date != null ? Timestamp.fromDate(date!) : null,
+    'createdAt': FieldValue.serverTimestamp(),
+  };
+}
