@@ -1,23 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!-- Unregister stale service workers immediately -->
-  <script>if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(r){for(let s of r)s.unregister();});}</script>
-
   <base href="$FLUTTER_BASE_HREF">
 
-  <!-- Warm up CDN connection before JS even runs -->
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
 
-  <!-- Pre-fetch Firebase SDK modules so they're in cache when bootstrap.js runs -->
-  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js">
-  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js">
-  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js">
-  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js">
-
-  <!-- Pre-fetch Flutter assets in parallel with Firebase -->
   <link rel="preload" href="main.dart.js" as="script">
-  <link rel="preload" href="canvaskit/canvaskit.js" as="script">
+  <link rel="preload" href="flutter.js" as="script">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -31,48 +22,110 @@
   <link rel="manifest" href="manifest.json">
 
   <style>
-    html,body{margin:0;padding:0;background:#0A0A0F;}
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;height:100%;background:#0A0A0F;}
     #_splash{
       position:fixed;inset:0;background:#0A0A0F;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      z-index:9999;transition:opacity .35s ease;
+      z-index:9999;transition:opacity .4s ease;
     }
     #_splash.out{opacity:0;pointer-events:none;}
+    ._logo{
+      width:64px;height:64px;
+      background:linear-gradient(135deg,#FF6B2B,#FF8A50);
+      border-radius:18px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:30px;
+      box-shadow:0 8px 32px rgba(255,107,43,.35);
+      margin-bottom:24px;
+    }
     ._ring{
-      width:52px;height:52px;
+      width:48px;height:48px;
       border:3px solid rgba(255,107,43,.18);
       border-top-color:#FF6B2B;
       border-radius:50%;
-      animation:_spin .75s linear infinite;
+      animation:_spin .8s linear infinite;
     }
     ._name{
-      margin-top:18px;
+      margin-top:16px;
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      font-size:20px;font-weight:700;letter-spacing:.6px;
+      font-size:22px;font-weight:800;letter-spacing:.4px;
       color:#FF6B2B;
     }
     ._sub{
       margin-top:4px;
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      font-size:11px;font-weight:400;letter-spacing:.4px;
-      color:#8B8BA0;
+      font-size:12px;font-weight:400;
+      color:#8B8BA0;letter-spacing:.3px;
+    }
+    ._progress-wrap{margin-top:28px;width:180px;}
+    ._progress-bar{height:3px;background:#1C1C28;border-radius:2px;overflow:hidden;}
+    ._progress-fill{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#FF6B2B,#FF8A50);
+      border-radius:2px;transition:width .4s ease;
+    }
+    ._status{
+      margin-top:8px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      font-size:10px;color:#8B8BA0;text-align:center;letter-spacing:.3px;
+    }
+    ._cached-note{
+      margin-top:12px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      font-size:10px;color:#555568;text-align:center;display:none;
     }
     @keyframes _spin{to{transform:rotate(360deg);}}
   </style>
 </head>
 <body>
   <div id="_splash">
+    <div class="_logo">⚙️</div>
     <div class="_ring"></div>
     <div class="_name">AdStick</div>
     <div class="_sub">Admin Portal</div>
+    <div class="_progress-wrap">
+      <div class="_progress-bar"><div class="_progress-fill" id="_pf"></div></div>
+      <div class="_status" id="_st">Starting…</div>
+    </div>
+    <div class="_cached-note" id="_cn">⚡ Loaded from cache — should be fast</div>
   </div>
 
   <script>
+    var _pf = document.getElementById('_pf');
+    var _st = document.getElementById('_st');
+    var _cn = document.getElementById('_cn');
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(function(reg) {
+        if (reg && reg.active) { _cn.style.display = 'block'; }
+      });
+    }
+
+    function _setProgress(p, msg) {
+      _pf.style.width = p + '%';
+      if (msg) _st.textContent = msg;
+    }
+
+    var _steps = [
+      [0,   0,  'Starting…'],
+      [500, 20, 'Loading engine…'],
+      [1200,45, 'Fetching renderer…'],
+      [2500,65, 'Initialising Firebase…'],
+      [4000,82, 'Almost ready…'],
+    ];
+    _steps.forEach(function(s){
+      setTimeout(function(){ _setProgress(s[1], s[2]); }, s[0]);
+    });
+
     window.addEventListener('flutter-first-frame', function() {
-      var el = document.getElementById('_splash');
-      if (!el) return;
-      el.classList.add('out');
-      setTimeout(function(){ el.remove(); }, 400);
+      _setProgress(100, 'Ready!');
+      setTimeout(function() {
+        var el = document.getElementById('_splash');
+        if (!el) return;
+        el.classList.add('out');
+        setTimeout(function(){ el.remove(); }, 450);
+      }, 120);
     });
   </script>
 
