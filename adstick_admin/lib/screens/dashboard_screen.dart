@@ -10,70 +10,113 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('🏠 Platform Dashboard')),
-      body: StreamBuilder<PlatformStats>(
-        stream: fsService.platformStatsStream(),
-        builder: (_, statsSnap) {
-          final stats = statsSnap.data;
-          final isLoading =
-              statsSnap.connectionState == ConnectionState.waiting;
+      body: StreamBuilder<Map<String, Map<String, dynamic>>>(
+        stream: fsService.allDriversRtdbStream(),
+        builder: (_, rtdbSnap) {
+          final rtdbDrivers = rtdbSnap.data ?? {};
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          // Compute live stats directly from RTDB
+          final activeDrivers = rtdbDrivers.values
+              .where((d) => d['isActive'] == true)
+              .length;
+          final totalKmToday = rtdbDrivers.values.fold<double>(
+            0,
+            (sum, d) {
+              final km = double.tryParse(
+                  (d['todayStats'] as Map?)?['distanceKm']?.toString() ?? '0') ?? 0;
+              return sum + km;
+            },
+          );
+          final totalImpressionsToday = (totalKmToday * 14).round();
 
-              // ── Live health banner ────────────────────────────
-              _LiveBanner(activeDrivers: stats?.activeDrivers ?? 0),
-              const SizedBox(height: 20),
+          return StreamBuilder<PlatformStats>(
+            stream: fsService.platformStatsStream(),
+            builder: (_, statsSnap) {
+              final stats = statsSnap.data;
+              final isLoading =
+                  statsSnap.connectionState == ConnectionState.waiting &&
+                  rtdbSnap.connectionState == ConnectionState.waiting;
 
-              // ── KPI grid ──────────────────────────────────────
-              const Text('Platform KPIs',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white)),
-              const SizedBox(height: 12),
-              if (isLoading)
-                const Center(
-                    child: Padding(
-                  padding: EdgeInsets.all(40),
-                  child: CircularProgressIndicator(color: AppTheme.brand),
-                ))
-              else
-                _KpiGrid(stats: stats),
-              const SizedBox(height: 24),
+              // Merge: RTDB provides live counts; Firestore provides revenue/totals
+              final mergedStats = _MergedStats(
+                totalDrivers: stats?.totalDrivers ?? rtdbDrivers.length,
+                activeDrivers: activeDrivers,
+                totalKmToday: totalKmToday,
+                totalKmAllTime: stats?.totalKmAllTime ?? 0,
+                revenueToday: stats?.revenueToday ?? 0,
+                revenueThisMonth: stats?.revenueThisMonth ?? 0,
+                revenueAllTime: stats?.revenueAllTime ?? 0,
+                activeCampaigns: stats?.activeCampaigns ?? 0,
+                totalCampaigns: stats?.totalCampaigns ?? 0,
+                totalImpressionsToday: totalImpressionsToday,
+                avgQualityScore: stats?.avgQualityScore ?? 0,
+                fraudAlertsOpen: stats?.fraudAlertsOpen ?? 0,
+                pendingPayouts: stats?.pendingPayouts ?? 0,
+                pendingPayoutsAmount: stats?.pendingPayoutsAmount ?? 0,
+              );
 
-              // ── Revenue overview ──────────────────────────────
-              const Text('Revenue Overview',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white)),
-              const SizedBox(height: 12),
-              _RevenueCard(stats: stats),
-              const SizedBox(height: 24),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
 
-              // ── Pending actions ───────────────────────────────
-              const Text('Pending Actions',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white)),
-              const SizedBox(height: 12),
-              const _PendingActions(),
-              const SizedBox(height: 24),
+                  // ── Live health banner ──────────────────────────
+                  _LiveBanner(
+                    activeDrivers: activeDrivers,
+                    totalKmToday: totalKmToday,
+                  ),
+                  const SizedBox(height: 20),
 
-              // ── Recent fraud alerts ───────────────────────────
-              const Text('Recent Fraud Alerts',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white)),
-              const SizedBox(height: 12),
-              const _RecentFraudAlerts(),
-              const SizedBox(height: 80),
-            ]),
+                  // ── KPI grid ────────────────────────────────────
+                  const Text('Platform KPIs',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white)),
+                  const SizedBox(height: 12),
+                  if (isLoading)
+                    const Center(
+                        child: Padding(
+                      padding: EdgeInsets.all(40),
+                      child: CircularProgressIndicator(color: AppTheme.brand),
+                    ))
+                  else
+                    _KpiGrid(stats: mergedStats),
+                  const SizedBox(height: 24),
+
+                  // ── Revenue overview ──────────────────────────────
+                  const Text('Revenue Overview',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white)),
+                  const SizedBox(height: 12),
+                  _RevenueCard(stats: mergedStats),
+                  const SizedBox(height: 24),
+
+                  // ── Pending actions ───────────────────────────────
+                  const Text('Pending Actions',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white)),
+                  const SizedBox(height: 12),
+                  const _PendingActions(),
+                  const SizedBox(height: 24),
+
+                  // ── Recent fraud alerts ───────────────────────────
+                  const Text('Recent Fraud Alerts',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white)),
+                  const SizedBox(height: 12),
+                  const _RecentFraudAlerts(),
+                  const SizedBox(height: 80),
+                ]),
+              );
+            },
           );
         },
       ),
@@ -81,10 +124,36 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+// ── Merged stats from RTDB + Firestore ────────────────────────────
+class _MergedStats {
+  final int totalDrivers, activeDrivers, activeCampaigns, totalCampaigns,
+      totalImpressionsToday, fraudAlertsOpen, pendingPayouts;
+  final double totalKmToday, totalKmAllTime, revenueToday,
+      revenueThisMonth, revenueAllTime, avgQualityScore, pendingPayoutsAmount;
+
+  const _MergedStats({
+    required this.totalDrivers,
+    required this.activeDrivers,
+    required this.totalKmToday,
+    required this.totalKmAllTime,
+    required this.revenueToday,
+    required this.revenueThisMonth,
+    required this.revenueAllTime,
+    required this.activeCampaigns,
+    required this.totalCampaigns,
+    required this.totalImpressionsToday,
+    required this.avgQualityScore,
+    required this.fraudAlertsOpen,
+    required this.pendingPayouts,
+    required this.pendingPayoutsAmount,
+  });
+}
+
 // ── Live banner ───────────────────────────────────────────────────
 class _LiveBanner extends StatelessWidget {
   final int activeDrivers;
-  const _LiveBanner({required this.activeDrivers});
+  final double totalKmToday;
+  const _LiveBanner({required this.activeDrivers, required this.totalKmToday});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -101,16 +170,17 @@ class _LiveBanner extends StatelessWidget {
               decoration: const BoxDecoration(
                   color: AppTheme.green, shape: BoxShape.circle)),
           const SizedBox(width: 8),
-          Text(
-            activeDrivers > 0
-                ? '$activeDrivers drivers on-road right now'
-                : 'No active drivers currently',
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w700),
+          Expanded(
+            child: Text(
+              activeDrivers > 0
+                  ? '$activeDrivers drivers on-road · ${totalKmToday.toStringAsFixed(1)} km today'
+                  : 'No active drivers currently',
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700),
+            ),
           ),
-          const Spacer(),
           const Text('LIVE',
               style: TextStyle(
                   color: AppTheme.green,
@@ -123,12 +193,11 @@ class _LiveBanner extends StatelessWidget {
 
 // ── KPI grid ──────────────────────────────────────────────────────
 class _KpiGrid extends StatelessWidget {
-  final PlatformStats? stats;
+  final _MergedStats stats;
   const _KpiGrid({required this.stats});
 
   @override
   Widget build(BuildContext context) {
-    final s = stats;
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -139,43 +208,45 @@ class _KpiGrid extends StatelessWidget {
       children: [
         _KpiCard(
           label: 'Total Drivers',
-          value: '${s?.totalDrivers ?? 0}',
-          sub: '${s?.activeDrivers ?? 0} active now',
+          value: '${stats.totalDrivers}',
+          sub: '${stats.activeDrivers} active now',
           icon: Icons.person_pin_rounded,
           color: AppTheme.brand,
         ),
         _KpiCard(
           label: 'Active Campaigns',
-          value: '${s?.activeCampaigns ?? 0}',
-          sub: '${s?.totalCampaigns ?? 0} total',
+          value: '${stats.activeCampaigns}',
+          sub: '${stats.totalCampaigns} total',
           icon: Icons.campaign_rounded,
           color: AppTheme.blue,
         ),
         _KpiCard(
           label: 'Revenue MTD',
-          value: 'SAR ${_fmtD(s?.revenueThisMonth ?? 0)}',
+          value: 'SAR ${_fmtD(stats.revenueThisMonth)}',
           sub: '30% platform fee',
           icon: Icons.attach_money_rounded,
           color: AppTheme.green,
         ),
         _KpiCard(
           label: 'Pending Payouts',
-          value: '${s?.pendingPayouts ?? 0}',
-          sub: 'SAR ${_fmtD(s?.pendingPayoutsAmount ?? 0)}',
+          value: '${stats.pendingPayouts}',
+          sub: 'SAR ${_fmtD(stats.pendingPayoutsAmount)}',
           icon: Icons.pending_actions_rounded,
           color: AppTheme.yellow,
         ),
         _KpiCard(
           label: 'Impressions Today',
-          value: _fmtN(s?.totalImpressionsToday ?? 0),
-          sub: 'Platform-wide',
+          value: _fmtN(stats.totalImpressionsToday),
+          sub: '${stats.activeDrivers > 0 ? "Live from RTDB" : "No drivers active"}',
           icon: Icons.visibility_rounded,
           color: AppTheme.brand,
         ),
         _KpiCard(
           label: 'KM Covered Today',
-          value: _fmtN(s?.totalKmToday.toInt() ?? 0),
-          sub: 'All active drivers',
+          value: stats.totalKmToday > 0
+              ? stats.totalKmToday.toStringAsFixed(1)
+              : '0',
+          sub: 'Live from active drivers',
           icon: Icons.route_rounded,
           color: const Color(0xFF60A5FA),
         ),
@@ -243,12 +314,12 @@ class _KpiCard extends StatelessWidget {
 
 // ── Revenue card ──────────────────────────────────────────────────
 class _RevenueCard extends StatelessWidget {
-  final PlatformStats? stats;
+  final _MergedStats stats;
   const _RevenueCard({required this.stats});
 
   @override
   Widget build(BuildContext context) {
-    final gross = stats?.revenueThisMonth ?? 0;
+    final gross = stats.revenueThisMonth;
     final commission = gross * 0.30;
 
     return Card(

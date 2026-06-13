@@ -101,6 +101,21 @@ class FirestoreService {
       SetOptions(merge: true),
     );
 
+    // Update platform-wide stats so the admin dashboard reflects real data.
+    // Driver keeps 70%, platform keeps 30% → platformRevenue = earnings × (30/70).
+    final platformRevenue = earnings * (30 / 70);
+    batch.set(
+      _db.collection('platform_stats').doc('summary'),
+      {
+        'totalKmAllTime':   FieldValue.increment(kmDriven),
+        'revenueThisMonth': FieldValue.increment(platformRevenue),
+        'revenueAllTime':   FieldValue.increment(platformRevenue),
+        'revenueToday':     FieldValue.increment(platformRevenue),
+        'lastUpdated':      FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
     await batch.commit();
   }
 

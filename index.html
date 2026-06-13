@@ -2278,10 +2278,10 @@
         <div class="page-title" data-i18n="sb.overview">Overview</div>
         <div class="page-sub"><span class="live-dot"></span><span data-i18n="dash.live">Live data · Last updated just now</span></div>
         <div class="stats-row">
-          <div class="stat-card"><div class="stat-label" data-i18n="stat.cars">Active Cars</div><div class="stat-value" style="color:var(--green)">847</div><div class="stat-delta delta-up">▲ <span data-i18n="d.cars">12 since yesterday</span></div></div>
-          <div class="stat-card"><div class="stat-label" data-i18n="d.kmtoday">KM Today</div><div class="stat-value" style="color:var(--blue)">24,891</div><div class="stat-delta delta-up">▲ <span data-i18n="d.kmup">8.4% vs last week</span></div></div>
-          <div class="stat-card"><div class="stat-label" data-i18n="stat.campaigns">Active Campaigns</div><div class="stat-value" style="color:var(--brand)">23</div><div class="stat-delta delta-up">▲ <span data-i18n="d.camp">3 new this month</span></div></div>
-          <div class="stat-card"><div class="stat-label" data-i18n="d.traffic">Avg Traffic Score</div><div class="stat-value" style="color:var(--yellow)">7.4</div><div class="stat-delta delta-down">▼ <span data-i18n="d.trafficd">0.3 from morning peak</span></div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="stat.cars">Active Cars</div><div class="stat-value" style="color:var(--green)" id="ov-active-cars">—</div><div class="stat-delta delta-up"><span class="live-dot"></span> <span data-i18n="d.cars">Live from RTDB</span></div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="d.kmtoday">KM Today</div><div class="stat-value" style="color:var(--blue)" id="ov-km-today">—</div><div class="stat-delta delta-up"><span class="live-dot"></span> <span data-i18n="d.kmup">Live from active drivers</span></div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="stat.campaigns">Active Campaigns</div><div class="stat-value" style="color:var(--brand)" id="ov-campaigns">—</div><div class="stat-delta delta-up"><span class="live-dot"></span> <span data-i18n="d.camp">From Firestore</span></div></div>
+          <div class="stat-card"><div class="stat-label" data-i18n="d.traffic">Impressions Today</div><div class="stat-value" style="color:var(--yellow)" id="ov-impressions">—</div><div class="stat-delta delta-up"><span class="live-dot"></span> <span data-i18n="d.trafficd">14 per km driven</span></div></div>
         </div>
         <div class="map-card">
           <div class="card-header"><div class="card-title"><span class="live-dot"></span><span data-i18n="map.title">Live Car Locations</span></div><button class="btn btn-outline" style="font-size:0.8rem;padding:0.35rem 0.8rem" onclick="showPanel('map',event)" data-i18n="map.full">Full Map →</button></div>
@@ -9077,6 +9077,37 @@ setInterval(() => {
     }
   });
 }, 3000);
+
+// ── Live Overview Stats from Firebase ──────────────────────────────
+// RTDB: count active drivers + sum today's KM → impressions
+fbRtdb.ref('drivers').on('value', snap => {
+  const raw = snap.val() || {};
+  let activeCars = 0, kmToday = 0;
+  Object.values(raw).forEach(d => {
+    if (d.isActive === true) activeCars++;
+    const km = parseFloat((d.todayStats || {}).distanceKm || 0);
+    kmToday += km;
+  });
+  const impressions = Math.round(kmToday * 14);
+
+  const elCars = document.getElementById('ov-active-cars');
+  const elKm   = document.getElementById('ov-km-today');
+  const elImp  = document.getElementById('ov-impressions');
+  if (elCars) elCars.textContent = activeCars;
+  if (elKm)   elKm.textContent   = kmToday >= 1000
+      ? (kmToday/1000).toFixed(1)+'K'
+      : kmToday.toFixed(1);
+  if (elImp)  elImp.textContent  = impressions >= 1000
+      ? (impressions/1000).toFixed(1)+'K'
+      : impressions;
+});
+
+// Firestore: active campaigns count
+fbDb.collection('campaigns').where('status','==','active')
+  .onSnapshot(snap => {
+    const el = document.getElementById('ov-campaigns');
+    if (el) el.textContent = snap.size;
+  });
 </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart' as rtdb;
 import '../models/models.dart';
 
 // ── Singleton ────────────────────────────────────────────────
@@ -8,6 +9,24 @@ class FirestoreService {
   FirestoreService._();
 
   final _db = FirebaseFirestore.instance;
+
+  final _rtdb = rtdb.FirebaseDatabase.instanceFor(
+    app: rtdb.FirebaseDatabase.instance.app,
+    databaseURL:
+        'https://adstick-90329-default-rtdb.europe-west1.firebasedatabase.app',
+  );
+
+  // ── RTDB LIVE DRIVERS ────────────────────────────────────────
+  /// Streams ALL driver nodes from RTDB — includes isActive, location,
+  /// todayStats (distanceKm, durationMinutes, avgSpeedKmh).
+  Stream<Map<String, Map<String, dynamic>>> allDriversRtdbStream() =>
+      _rtdb.ref('drivers').onValue.map((event) {
+        if (event.snapshot.value == null) return {};
+        final raw = Map<String, dynamic>.from(
+            event.snapshot.value as Map<dynamic, dynamic>);
+        return raw.map((k, v) => MapEntry(
+            k, Map<String, dynamic>.from(v as Map<dynamic, dynamic>)));
+      });
 
   // ── PLATFORM STATS ───────────────────────────────────────────
 
