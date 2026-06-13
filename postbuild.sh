@@ -16,11 +16,21 @@ patch_app() {
   [ -z "$SW_VER" ] && SW_VER=$(date +%s)
 
   # Remove serviceWorkerSettings from flutter_bootstrap.js so Flutter
-  # doesn't try to register the self-destructing SW itself.
-  # We register our custom SW from index.html instead.
-  sed -i '' \
-    's/serviceWorkerSettings: *{[^}]*}[, ]*//' \
-    "$BUILD/flutter_bootstrap.js"
+  # doesn't wait 4 s for the SW before starting to load the app.
+  # We register our custom SW from index.html instead (non-blocking).
+  python3 - <<PY
+import re
+path = "$BUILD/flutter_bootstrap.js"
+content = open(path).read()
+patched, n = re.subn(
+    r'_flutter\.loader\.load\(\s*\{[^}]*serviceWorkerSettings\s*:\s*\{[^}]*\}[^}]*\}\s*\)',
+    '_flutter.loader.load({})',
+    content,
+    flags=re.DOTALL
+)
+open(path, 'w').write(patched)
+print(f'  serviceWorkerSettings stripped ({n} replacement(s))')
+PY
 
   # Build file list for pre-cache (all same-origin critical files)
   cat > "$BUILD/flutter_service_worker.js" <<SW_EOF

@@ -97,9 +97,11 @@
     var _cn = document.getElementById('_cn');
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then(function(reg) {
-        if (reg && reg.active) { _cn.style.display = 'block'; }
-      });
+      navigator.serviceWorker.register('./flutter_service_worker.js')
+        .then(function(reg) {
+          if (reg.active) { _cn.style.display = 'block'; }
+        })
+        .catch(function(err) { console.warn('[SW] registration failed:', err); });
     }
 
     function _setProgress(p, msg) {
@@ -108,11 +110,11 @@
     }
 
     var _steps = [
-      [0,   0,  'Starting…'],
-      [500, 20, 'Loading engine…'],
-      [1200,45, 'Fetching renderer…'],
-      [2500,65, 'Initialising Firebase…'],
-      [4000,82, 'Almost ready…'],
+      [0,    0,  'Starting…'],
+      [300,  25, 'Loading engine…'],
+      [900,  50, 'Fetching renderer…'],
+      [2000, 72, 'Initialising…'],
+      [3500, 88, 'Almost ready…'],
     ];
     _steps.forEach(function(s){
       setTimeout(function(){ _setProgress(s[1], s[2]); }, s[0]);
