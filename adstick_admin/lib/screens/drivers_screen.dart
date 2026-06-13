@@ -33,26 +33,35 @@ class _AllDriversTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StreamBuilder<List<DriverRecord>>(
-        stream: fsService.allDriversStream(),
-        builder: (_, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator(color: AppTheme.brand));
-          }
-          final drivers = snap.data ?? [];
-          if (drivers.isEmpty) {
-            return const Center(
-              child: Text('No drivers registered yet',
-                  style:
-                      TextStyle(color: AppTheme.textMuted, fontSize: 13)),
-            );
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: drivers.length,
-            itemBuilder: (_, i) =>
-                _DriverCard(driver: drivers[i], key: ValueKey(drivers[i].uid)),
+      StreamBuilder<Map<String, Map<String, dynamic>>>(
+        stream: fsService.allDriversRtdbStream(),
+        builder: (_, rtdbSnap) {
+          final rtdb = rtdbSnap.data ?? {};
+          return StreamBuilder<List<DriverRecord>>(
+            stream: fsService.allDriversStream(),
+            builder: (_, snap) {
+              if (snap.connectionState == ConnectionState.waiting &&
+                  rtdbSnap.connectionState == ConnectionState.waiting) {
+                return const Center(
+                    child: CircularProgressIndicator(color: AppTheme.brand));
+              }
+              final drivers = snap.data ?? [];
+              if (drivers.isEmpty) {
+                return const Center(
+                  child: Text('No drivers registered yet',
+                      style: TextStyle(
+                          color: AppTheme.textMuted, fontSize: 13)),
+                );
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: drivers.length,
+                itemBuilder: (_, i) => _DriverCard(
+                    driver: drivers[i],
+                    rtdbData: rtdb[drivers[i].uid],
+                    key: ValueKey(drivers[i].uid)),
+              );
+            },
           );
         },
       );
@@ -64,24 +73,31 @@ class _ActiveDriversTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StreamBuilder<List<DriverRecord>>(
-        stream: fsService.activeDriversStream(),
-        builder: (_, snap) {
-          final drivers = snap.data ?? [];
-          if (drivers.isEmpty) {
-            return const Center(
-              child: Text('No drivers active right now',
-                  style:
-                      TextStyle(color: AppTheme.textMuted, fontSize: 13)),
-            );
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: drivers.length,
-            itemBuilder: (_, i) => _DriverCard(
-                driver: drivers[i],
-                showLive: true,
-                key: ValueKey(drivers[i].uid)),
+      StreamBuilder<Map<String, Map<String, dynamic>>>(
+        stream: fsService.allDriversRtdbStream(),
+        builder: (_, rtdbSnap) {
+          final rtdb = rtdbSnap.data ?? {};
+          return StreamBuilder<List<DriverRecord>>(
+            stream: fsService.activeDriversStream(),
+            builder: (_, snap) {
+              final drivers = snap.data ?? [];
+              if (drivers.isEmpty) {
+                return const Center(
+                  child: Text('No drivers active right now',
+                      style: TextStyle(
+                          color: AppTheme.textMuted, fontSize: 13)),
+                );
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: drivers.length,
+                itemBuilder: (_, i) => _DriverCard(
+                    driver: drivers[i],
+                    rtdbData: rtdb[drivers[i].uid],
+                    showLive: true,
+                    key: ValueKey(drivers[i].uid)),
+              );
+            },
           );
         },
       );
@@ -90,15 +106,28 @@ class _ActiveDriversTab extends StatelessWidget {
 // ── Driver card ───────────────────────────────────────────────────
 class _DriverCard extends StatelessWidget {
   final DriverRecord driver;
+  final Map<String, dynamic>? rtdbData;
   final bool showLive;
   const _DriverCard(
-      {required this.driver, this.showLive = false, super.key});
+      {required this.driver,
+      this.rtdbData,
+      this.showLive = false,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
-    final tierColor = _tierColor(driver.tier);
+    final tierColor   = _tierColor(driver.tier);
     final statusColor =
         driver.status == 'active' ? AppTheme.green : Colors.orange;
+
+    // Today's live stats from RTDB
+    final stats     = rtdbData?['todayStats'] as Map?;
+    final todayKm   = double.tryParse(
+            stats?['distanceKm']?.toString() ?? '0') ?? 0;
+    final todayMin  = int.tryParse(
+            stats?['durationMinutes']?.toString() ?? '0') ?? 0;
+    final todayEarn = todayKm * 1.0; // SAR 1 / km base rate
+    final isLive    = rtdbData?['isActive'] == true;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
@@ -107,16 +136,17 @@ class _DriverCard extends StatelessWidget {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+          // ── Header row ──────────────────────────────────────
           Row(children: [
             CircleAvatar(
               radius: 20,
               backgroundColor: tierColor.withValues(alpha: 0.15),
               child: Text(
                 driver.name.isNotEmpty
-                    ? driver.name[0].toUpperCase() : '?',
+                    ? driver.name[0].toUpperCase()
+                    : '?',
                 style: TextStyle(
-                    color: tierColor,
-                    fontWeight: FontWeight.w900),
+                    color: tierColor, fontWeight: FontWeight.w900),
               ),
             ),
             const SizedBox(width: 10),
@@ -124,15 +154,32 @@ class _DriverCard extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text(driver.name,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700)),
+                Row(children: [
+                  Text(driver.name,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700)),
+                  if (isLive) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 7, height: 7,
+                      decoration: const BoxDecoration(
+                          color: AppTheme.green,
+                          shape: BoxShape.circle),
+                    ),
+                  ],
+                ]),
                 Text(driver.email,
                     style: const TextStyle(
                         color: AppTheme.textMuted, fontSize: 11),
                     overflow: TextOverflow.ellipsis),
+                if (driver.vehicleId.isNotEmpty)
+                  Text(driver.vehicleId,
+                      style: const TextStyle(
+                          color: AppTheme.brand,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700)),
               ]),
             ),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -154,11 +201,52 @@ class _DriverCard extends StatelessWidget {
               ),
             ]),
           ]),
+
           const SizedBox(height: 10),
+
+          // ── Today's live stats ────────────────────────────────
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+                color: isLive
+                    ? AppTheme.green.withValues(alpha: 0.07)
+                    : const Color(0xFF12121A),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: isLive
+                        ? AppTheme.green.withValues(alpha: 0.25)
+                        : AppTheme.border)),
+            child: Row(children: [
+              Text(isLive ? '🟢 Today (live)' : '📅 Today',
+                  style: TextStyle(
+                      color: isLive ? AppTheme.green : AppTheme.textMuted,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700)),
+              const Spacer(),
+              _todayStat(
+                  Icons.route_rounded, '${todayKm.toStringAsFixed(1)} km',
+                  AppTheme.brand),
+              const SizedBox(width: 12),
+              _todayStat(
+                  Icons.timer_rounded, _fmtMin(todayMin),
+                  AppTheme.blue),
+              const SizedBox(width: 12),
+              _todayStat(
+                  Icons.monetization_on_rounded,
+                  'SAR ${todayEarn.toStringAsFixed(1)}',
+                  AppTheme.green),
+            ]),
+          ),
+
+          const SizedBox(height: 10),
+
+          // ── All-time stats ────────────────────────────────────
           Row(children: [
             _stat('Total KM',
-                '${driver.totalKm.toStringAsFixed(0)} km', AppTheme.brand),
-            _stat('Earnings',
+                '${driver.totalKm.toStringAsFixed(0)} km',
+                AppTheme.brand),
+            _stat('All-time Earn',
                 'SAR ${driver.totalEarnings.toStringAsFixed(0)}',
                 AppTheme.green),
             _stat('Quality',
@@ -167,7 +255,10 @@ class _DriverCard extends StatelessWidget {
                     : '—',
                 AppTheme.yellow),
           ]),
+
           const SizedBox(height: 10),
+
+          // ── Actions ───────────────────────────────────────────
           Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             if (driver.status == 'active')
               TextButton.icon(
@@ -219,17 +310,35 @@ class _DriverCard extends StatelessWidget {
     );
   }
 
+  Widget _todayStat(IconData icon, String val, Color c) =>
+      Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, color: c, size: 12),
+        const SizedBox(width: 3),
+        Text(val,
+            style: TextStyle(
+                color: c, fontSize: 11, fontWeight: FontWeight.w700)),
+      ]);
+
   Widget _stat(String lbl, String val, Color c) => Expanded(
-        child:
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           Text(lbl,
               style: const TextStyle(
                   color: AppTheme.textMuted, fontSize: 9)),
           Text(val,
               style: TextStyle(
-                  color: c, fontSize: 12, fontWeight: FontWeight.w800)),
+                  color: c,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800)),
         ]),
       );
+
+  static String _fmtMin(int m) {
+    if (m == 0) return '0m';
+    if (m < 60) return '${m}m';
+    return '${m ~/ 60}h ${m % 60}m';
+  }
 
   Color _tierColor(String tier) {
     switch (tier) {
@@ -315,8 +424,7 @@ class _TierBadge extends StatelessWidget {
         label = '🥉 Bronze';
     }
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
           color: bg, borderRadius: BorderRadius.circular(999)),
       child: Text(label,
