@@ -2,138 +2,19 @@
 <html>
 <head>
   <base href="$FLUTTER_BASE_HREF">
-
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
-  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
-
-  <link rel="preload" href="main.dart.js" as="script">
-  <link rel="preload" href="flutter.js" as="script">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="AdStick Admin Portal">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AdStick Admin">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="icon" type="image/png" href="favicon.png"/>
   <title>AdStick Admin</title>
   <link rel="manifest" href="manifest.json">
-
-  <style>
-    *{box-sizing:border-box;}
-    html,body{margin:0;padding:0;height:100%;background:#0A0A0F;}
-    #_splash{
-      position:fixed;inset:0;background:#0A0A0F;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      z-index:9999;transition:opacity .4s ease;
-    }
-    #_splash.out{opacity:0;pointer-events:none;}
-    ._logo{
-      width:64px;height:64px;
-      background:linear-gradient(135deg,#FF6B2B,#FF8A50);
-      border-radius:18px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:30px;
-      box-shadow:0 8px 32px rgba(255,107,43,.35);
-      margin-bottom:24px;
-    }
-    ._ring{
-      width:48px;height:48px;
-      border:3px solid rgba(255,107,43,.18);
-      border-top-color:#FF6B2B;
-      border-radius:50%;
-      animation:_spin .8s linear infinite;
-    }
-    ._name{
-      margin-top:16px;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      font-size:22px;font-weight:800;letter-spacing:.4px;
-      color:#FF6B2B;
-    }
-    ._sub{
-      margin-top:4px;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      font-size:12px;font-weight:400;
-      color:#8B8BA0;letter-spacing:.3px;
-    }
-    ._progress-wrap{margin-top:28px;width:180px;}
-    ._progress-bar{height:3px;background:#1C1C28;border-radius:2px;overflow:hidden;}
-    ._progress-fill{
-      height:100%;width:0%;
-      background:linear-gradient(90deg,#FF6B2B,#FF8A50);
-      border-radius:2px;transition:width .4s ease;
-    }
-    ._status{
-      margin-top:8px;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      font-size:10px;color:#8B8BA0;text-align:center;letter-spacing:.3px;
-    }
-    ._cached-note{
-      margin-top:12px;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      font-size:10px;color:#555568;text-align:center;display:none;
-    }
-    @keyframes _spin{to{transform:rotate(360deg);}}
-  </style>
+  <style>html,body{margin:0;padding:0;background:#0A0A0F;}</style>
 </head>
 <body>
-  <div id="_splash">
-    <div class="_logo">⚙️</div>
-    <div class="_ring"></div>
-    <div class="_name">AdStick</div>
-    <div class="_sub">Admin Portal</div>
-    <div class="_progress-wrap">
-      <div class="_progress-bar"><div class="_progress-fill" id="_pf"></div></div>
-      <div class="_status" id="_st">Starting…</div>
-    </div>
-    <div class="_cached-note" id="_cn">⚡ Loaded from cache — should be fast</div>
-  </div>
-
-  <script>
-    var _pf = document.getElementById('_pf');
-    var _st = document.getElementById('_st');
-    var _cn = document.getElementById('_cn');
-
-    // Register caching SW non-blocking — Flutter no longer waits for it,
-    // so app load starts immediately. SW pre-caches assets in background
-    // so the *next* visit is served entirely from cache (~1-2 s).
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./flutter_service_worker.js')
-        .then(function(reg) {
-          if (reg.active) { _cn.style.display = 'block'; }
-        })
-        .catch(function(err) { console.warn('[SW] registration failed:', err); });
-    }
-
-    function _setProgress(p, msg) {
-      _pf.style.width = p + '%';
-      if (msg) _st.textContent = msg;
-    }
-
-    var _steps = [
-      [0,    0,  'Starting…'],
-      [300,  25, 'Loading engine…'],
-      [900,  50, 'Fetching renderer…'],
-      [2000, 72, 'Initialising…'],
-      [3500, 88, 'Almost ready…'],
-    ];
-    _steps.forEach(function(s){
-      setTimeout(function(){ _setProgress(s[1], s[2]); }, s[0]);
-    });
-
-    window.addEventListener('flutter-first-frame', function() {
-      _setProgress(100, 'Ready!');
-      setTimeout(function() {
-        var el = document.getElementById('_splash');
-        if (!el) return;
-        el.classList.add('out');
-        setTimeout(function(){ el.remove(); }, 450);
-      }, 120);
-    });
-  </script>
-
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
