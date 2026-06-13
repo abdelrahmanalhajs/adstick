@@ -1,7 +1,7 @@
 'use strict';
 
 // Cache version — tied to Flutter build. Change triggers cache clear + re-download.
-const CACHE = 'adstick-admin-3556403765b';
+const CACHE = 'adstick-admin-317308991';
 
 // Critical files to pre-cache on install
 const PRECACHE = [
@@ -14,7 +14,7 @@ const PRECACHE = [
   // dart2wasm path (Chrome / WasmGC browsers)
   './main.dart.wasm',
   './main.dart.mjs',
-  // CanvasKit + skwasm
+  // CanvasKit + skwasm (served locally via --no-web-resources-cdn)
   './canvaskit/canvaskit.js',
   './canvaskit/canvaskit.wasm',
   './canvaskit/skwasm.js',

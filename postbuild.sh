@@ -15,22 +15,10 @@ patch_app() {
     | grep -o '[0-9]*' | head -1)
   [ -z "$SW_VER" ] && SW_VER=$(date +%s)
 
-  # Remove serviceWorkerSettings from flutter_bootstrap.js so Flutter
-  # doesn't wait 4 s for the SW before starting to load the app.
-  # We register our custom SW from index.html instead (non-blocking).
-  python3 - <<PY
-import re
-path = "$BUILD/flutter_bootstrap.js"
-content = open(path).read()
-patched, n = re.subn(
-    r'_flutter\.loader\.load\(\s*\{[^}]*serviceWorkerSettings\s*:\s*\{[^}]*\}[^}]*\}\s*\)',
-    '_flutter.loader.load({})',
-    content,
-    flags=re.DOTALL
-)
-open(path, 'w').write(patched)
-print(f'  serviceWorkerSettings stripped ({n} replacement(s))')
-PY
+  # Keep serviceWorkerSettings intact — Flutter uses it to register our
+  # custom caching SW at the correct URL (now that base-href is right).
+  # Flutter will find the SW already active on repeat visits and proceed
+  # immediately, giving fast cached loads.
 
   # Build file list for pre-cache (all same-origin critical files)
   cat > "$BUILD/flutter_service_worker.js" <<SW_EOF
