@@ -521,21 +521,30 @@ class _LiveDriversListState extends State<_LiveDriversList> {
     super.dispose();
   }
 
+  // Safe timestamp → int (RTDB on web can return num/double for server timestamps)
+  static int? _ts(dynamic v) =>
+      v == null ? null : v is int ? v : v is num ? v.toInt() : null;
+
   // Determine status and time label from RTDB fields
   ({String status, Color color, String timeLbl}) _classify(
       Map<String, dynamic> d) {
     final isActive = d['isActive'] == true;
-    final speedRaw = (d['location'] as Map?)?['speed'];
+    final locMap   = d['location'];
+    final speedRaw = locMap is Map ? locMap['speed'] : null;
     final speed    = double.tryParse(speedRaw?.toString() ?? '0') ?? 0;
 
     final now = DateTime.now().millisecondsSinceEpoch;
 
     if (isActive && speed > 3) {
       // Moving — use trackingStartedAt for total session duration
-      final startMs = d['trackingStartedAt'] as int?;
+      final startMs = _ts(d['trackingStartedAt']);
+      final statsMap = d['todayStats'];
+      final fallbackMin = statsMap is Map
+          ? int.tryParse(statsMap['durationMinutes']?.toString() ?? '0') ?? 0
+          : 0;
       final diffMin = startMs != null
           ? ((now - startMs) / 60000).floor()
-          : (d['todayStats'] as Map?)?['durationMinutes'] as int? ?? 0;
+          : fallbackMin;
       return (
         status: 'Moving',
         color: AppTheme.green,
@@ -543,7 +552,7 @@ class _LiveDriversListState extends State<_LiveDriversList> {
       );
     } else if (isActive) {
       // Idle — use lastSeen for how long they've been idle
-      final lastSeenMs = d['lastSeen'] as int?;
+      final lastSeenMs = _ts(d['lastSeen']);
       final idleMin = lastSeenMs != null
           ? ((now - lastSeenMs) / 60000).floor()
           : 0;
@@ -554,7 +563,7 @@ class _LiveDriversListState extends State<_LiveDriversList> {
       );
     } else {
       // Stopped — use stoppedAt, fallback to lastSeen
-      final stoppedMs = (d['stoppedAt'] ?? d['lastSeen']) as int?;
+      final stoppedMs = _ts(d['stoppedAt']) ?? _ts(d['lastSeen']);
       final stoppedMin = stoppedMs != null
           ? ((now - stoppedMs) / 60000).floor()
           : null;
@@ -631,8 +640,7 @@ class _LiveDriversListState extends State<_LiveDriversList> {
           const Divider(height: 1),
           // Driver rows
           ...entries.map((e) {
-            final uid = e.key;
-            final d   = e.value;
+            final d = e.value;
             final name      = d['name']      as String? ?? 'Unknown';
             final vehicleId = d['vehicleId'] as String? ?? '—';
             final info      = _classify(d);
