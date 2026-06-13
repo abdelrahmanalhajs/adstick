@@ -93,6 +93,32 @@ class FirestoreService {
       .map((snap) =>
           snap.docs.map((d) => AdvertiserRecord.fromDoc(d)).toList());
 
+  Stream<List<Campaign>> advertiserCampaignsStream(String uid) => _db
+      .collection('campaigns')
+      .where('advertiserId', isEqualTo: uid)
+      .orderBy('createdAt', descending: true)
+      .snapshots()
+      .map((snap) => snap.docs.map((d) => Campaign.fromDoc(d)).toList());
+
+  // ── ACTIVITY FEED ────────────────────────────────────────────
+
+  /// Most recent N campaigns (any status) for the activity feed.
+  Stream<List<Campaign>> recentCampaignsStream({int limit = 8}) => _db
+      .collection('campaigns')
+      .orderBy('createdAt', descending: true)
+      .limit(limit)
+      .snapshots()
+      .map((snap) => snap.docs.map((d) => Campaign.fromDoc(d)).toList());
+
+  /// Most recent N payout requests for the activity feed.
+  Stream<List<PayoutRequest>> recentPayoutsStream({int limit = 8}) => _db
+      .collection('payouts')
+      .orderBy('requestedAt', descending: true)
+      .limit(limit)
+      .snapshots()
+      .map((snap) =>
+          snap.docs.map((d) => PayoutRequest.fromDoc(d)).toList());
+
   // ── CAMPAIGNS ───────────────────────────────────────────────
 
   Stream<List<Campaign>> allCampaignsStream() => _db

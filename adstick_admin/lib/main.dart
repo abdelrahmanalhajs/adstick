@@ -11,6 +11,7 @@ import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/cars_screen.dart';
+import 'screens/advertisers_screen.dart';
 import 'screens/campaigns_screen.dart';
 import 'screens/drivers_screen.dart';
 import 'screens/reports_screen.dart';
@@ -134,6 +135,7 @@ class AdStickAdminApp extends StatelessWidget {
             GoRoute(path: '/live-map',    builder: (_, __) => const LiveMapScreen()),
             GoRoute(path: '/cars',        builder: (_, __) => const CarsScreen()),
             GoRoute(path: '/fleet',       builder: (_, __) => const FleetScreen()),
+            GoRoute(path: '/advertisers', builder: (_, __) => const AdvertisersScreen()),
             GoRoute(path: '/campaigns',   builder: (_, __) => const CampaignsScreen()),
             GoRoute(path: '/drivers',     builder: (_, __) => const DriversScreen()),
             GoRoute(path: '/reports',     builder: (_, __) => const ReportsScreen()),
@@ -246,6 +248,7 @@ class _AdminDrawer extends StatelessWidget {
               _t(context, Icons.people_rounded,           l.t('drivers'),     '/drivers'),
               _t(context, Icons.traffic_rounded,          l.t('traffic'),     '/traffic'),
               _sec(l.t('sec_revenue')),
+              _t(context, Icons.business_rounded,         'Advertisers',      '/advertisers'),
               _t(context, Icons.campaign_rounded,         l.t('campaigns'),   '/campaigns'),
               _t(context, Icons.trending_up_rounded,      l.t('roi'),         '/roi'),
               _t(context, Icons.storefront_rounded,       l.t('marketplace'), '/marketplace'),

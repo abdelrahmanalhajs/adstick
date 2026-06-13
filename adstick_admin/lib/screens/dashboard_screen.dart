@@ -124,6 +124,16 @@ class DashboardScreen extends StatelessWidget {
                           color: Colors.white)),
                   const SizedBox(height: 12),
                   const _RecentFraudAlerts(),
+                  const SizedBox(height: 24),
+
+                  // ── Live activity feed ────────────────────────────
+                  const Text('Live Activity',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white)),
+                  const SizedBox(height: 12),
+                  const _LiveActivityFeed(),
                   const SizedBox(height: 80),
                 ]),
               );
@@ -765,4 +775,147 @@ class _RecentFraudAlerts extends StatelessWidget {
           );
         },
       );
+}
+
+// ── Live Activity Feed ─────────────────────────────────────────────
+// Merges recent campaigns (advertiser side) + recent payouts (driver side)
+// into a single chronological activity timeline.
+class _LiveActivityFeed extends StatelessWidget {
+  const _LiveActivityFeed();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Campaign>>(
+      stream: fsService.recentCampaignsStream(limit: 6),
+      builder: (_, campSnap) {
+        return StreamBuilder<List<PayoutRequest>>(
+          stream: fsService.recentPayoutsStream(limit: 6),
+          builder: (_, paySnap) {
+            // Merge into a unified list of activity items
+            final items = <_ActivityItem>[];
+
+            for (final c in campSnap.data ?? []) {
+              items.add(_ActivityItem(
+                icon: Icons.campaign_rounded,
+                color: _campaignColor(c.status),
+                title: c.name,
+                subtitle:
+                    '${c.advertiserName} · ${c.status.toUpperCase()} · SAR ${c.totalBudget.toStringAsFixed(0)} budget',
+                time: c.createdAt,
+              ));
+            }
+
+            for (final p in paySnap.data ?? []) {
+              items.add(_ActivityItem(
+                icon: Icons.payments_rounded,
+                color: _payoutColor(p.status),
+                title: 'Payout · ${p.driverName}',
+                subtitle:
+                    'SAR ${p.amount.toStringAsFixed(0)} · ${p.status.toUpperCase()}',
+                time: p.requestedAt,
+              ));
+            }
+
+            // Sort by time descending, put null-time items last
+            items.sort((a, b) {
+              if (a.time == null && b.time == null) return 0;
+              if (a.time == null) return 1;
+              if (b.time == null) return -1;
+              return b.time!.compareTo(a.time!);
+            });
+
+            if (items.isEmpty) {
+              return Card(
+                child: const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Center(
+                    child: Text('No activity yet',
+                        style: TextStyle(
+                            color: AppTheme.textMuted, fontSize: 13)),
+                  ),
+                ),
+              );
+            }
+
+            return Card(
+              child: Column(
+                children: items.take(12).map((item) {
+                  final isLast = item == items.take(12).last;
+                  return Column(children: [
+                    ListTile(
+                      dense: true,
+                      leading: Container(
+                        width: 34, height: 34,
+                        decoration: BoxDecoration(
+                            color: item.color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Icon(item.icon, color: item.color, size: 17),
+                      ),
+                      title: Text(item.title,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis),
+                      subtitle: Text(item.subtitle,
+                          style: const TextStyle(
+                              color: AppTheme.textMuted, fontSize: 10),
+                          overflow: TextOverflow.ellipsis),
+                      trailing: item.time != null
+                          ? Text(_relTime(item.time!),
+                              style: const TextStyle(
+                                  color: AppTheme.textMuted, fontSize: 9))
+                          : null,
+                    ),
+                    if (!isLast) const Divider(height: 1, indent: 16),
+                  ]);
+                }).toList(),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Color _campaignColor(String status) {
+    switch (status) {
+      case 'active':    return AppTheme.green;
+      case 'pending':   return AppTheme.yellow;
+      case 'paused':    return AppTheme.blue;
+      default:          return AppTheme.textMuted;
+    }
+  }
+
+  Color _payoutColor(String status) {
+    switch (status) {
+      case 'completed': return AppTheme.green;
+      case 'pending':   return AppTheme.yellow;
+      case 'rejected':  return Colors.red;
+      default:          return AppTheme.brand;
+    }
+  }
+
+  static String _relTime(DateTime t) {
+    final diff = DateTime.now().difference(t);
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
+  }
+}
+
+class _ActivityItem {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final DateTime? time;
+  const _ActivityItem({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    this.time,
+  });
 }

@@ -74,6 +74,11 @@ class FirestoreService {
     required double kmDriven,
     required double earnings,
   }) async {
+    // Fetch driver profile first to get currentCampaignId
+    final userDoc = await _db.collection('users').doc(uid).get();
+    final campaignId =
+        (userDoc.data() ?? {})['currentCampaignId'] as String?;
+
     final batch = _db.batch();
 
     // Update user totals
@@ -115,6 +120,17 @@ class FirestoreService {
       },
       SetOptions(merge: true),
     );
+
+    // If the driver is running a campaign, credit its spend + impressions.
+    // Impressions formula: 14 per km driven (same as dashboard KPI).
+    if (campaignId != null && campaignId.isNotEmpty) {
+      final impressions = (kmDriven * 14).round();
+      batch.update(_db.collection('campaigns').doc(campaignId), {
+        'spentBudget':        FieldValue.increment(earnings),
+        'actualImpressions':  FieldValue.increment(impressions),
+        'lastActivityAt':     FieldValue.serverTimestamp(),
+      });
+    }
 
     await batch.commit();
   }
