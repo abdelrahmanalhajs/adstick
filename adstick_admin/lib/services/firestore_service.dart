@@ -17,16 +17,44 @@ class FirestoreService {
   );
 
   // ── RTDB LIVE DRIVERS ────────────────────────────────────────
-  /// Streams ALL driver nodes from RTDB — includes isActive, location,
-  /// todayStats (distanceKm, durationMinutes, avgSpeedKmh).
+  /// Streams driver nodes from RTDB — only entries with role=='driver'.
+  /// Handles Flutter Web JS-interop by deep-converting nested maps.
   Stream<Map<String, Map<String, dynamic>>> allDriversRtdbStream() =>
       _rtdb.ref('drivers').onValue.map((event) {
         if (event.snapshot.value == null) return {};
-        final raw = Map<String, dynamic>.from(
-            event.snapshot.value as Map<dynamic, dynamic>);
-        return raw.map((k, v) => MapEntry(
-            k, Map<String, dynamic>.from(v as Map<dynamic, dynamic>)));
+        try {
+          final top = event.snapshot.value as Map;
+          final result = <String, Map<String, dynamic>>{};
+          for (final entry in top.entries) {
+            try {
+              final key = entry.key?.toString();
+              if (key == null || entry.value == null) continue;
+              if (entry.value is! Map) continue;
+              final data = _deepConvert(entry.value as Map);
+              // Only include actual drivers — filter out admin / non-driver UIDs
+              if (data['role'] != 'driver') continue;
+              result[key] = data;
+            } catch (_) {
+              // Skip any individual entry that can't be converted
+            }
+          }
+          return result;
+        } catch (_) {
+          return {};
+        }
       });
+
+  /// Recursively converts Map<dynamic,dynamic> (including JS interop maps)
+  /// to Map<String,dynamic> so nested fields are always accessible.
+  static Map<String, dynamic> _deepConvert(Map m) {
+    final out = <String, dynamic>{};
+    for (final e in m.entries) {
+      final k = e.key?.toString();
+      if (k == null) continue;
+      out[k] = e.value is Map ? _deepConvert(e.value as Map) : e.value;
+    }
+    return out;
+  }
 
   // ── PLATFORM STATS ───────────────────────────────────────────
 

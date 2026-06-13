@@ -55,6 +55,7 @@ class GpsService {
     await _rtdb.ref('drivers/$uid').update({
       'name':               name,
       'vehicleId':          vehicleId,
+      'role':               'driver',       // ensures admin filter never includes this
       'isActive':           true,
       'trackingStartedAt':  ServerValue.timestamp,
       'lastSeen':           ServerValue.timestamp,

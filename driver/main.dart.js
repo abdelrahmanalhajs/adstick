@@ -33211,7 +33211,7 @@ $S:2}
 A.aQi.prototype={
 $1(a){var s=A.dV().b
 s=s==null?null:s.canvasKitBaseUrl
-return(s==null?"canvaskit/":s)+a},
+return(s==null?"https://www.gstatic.com/flutter-canvaskit/c416acfeb8126e097f758c664aaa3da929e27da0/":s)+a},
 $S:43}
 A.V8.prototype={
 gp(a){var s=this.a
@@ -51453,7 +51453,7 @@ break}p.f=new A.cr(Date.now(),0,!1)
 p.e=0
 B.b.a3(p.r)
 s=4
-return A.t(A.agw(p.a.gAo().yI("drivers/"+a)).c.bJ(A.af(["name",b,"vehicleId",c,"isActive",!0,"trackingStartedAt",B.kR,"lastSeen",B.kR],t.N,t.X)),$async$rs)
+return A.t(A.agw(p.a.gAo().yI("drivers/"+a)).c.bJ(A.af(["name",b,"vehicleId",c,"role","driver","isActive",!0,"trackingStartedAt",B.kR,"lastSeen",B.kR],t.N,t.X)),$async$rs)
 case 4:p.b=$.OU().Pr(B.Nw).es(new A.alM(p,a,b,c))
 q=!0
 s=1
