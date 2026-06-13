@@ -45,22 +45,27 @@ class FirestoreService {
           );
 
   // ── DRIVERS ─────────────────────────────────────────────────
+  // Note: orderBy on a different field from where() needs a composite index.
+  // Sort in Dart instead to avoid index requirements.
 
   Stream<List<DriverRecord>> allDriversStream() => _db
       .collection('users')
       .where('role', isEqualTo: 'driver')
-      .orderBy('totalKm', descending: true)
       .snapshots()
-      .map((snap) =>
-          snap.docs.map((d) => DriverRecord.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => DriverRecord.fromDoc(d)).toList();
+        list.sort((a, b) => b.totalKm.compareTo(a.totalKm));
+        return list;
+      });
 
   Stream<List<DriverRecord>> activeDriversStream() => _db
       .collection('users')
       .where('role', isEqualTo: 'driver')
-      .where('isActive', isEqualTo: true)
       .snapshots()
-      .map((snap) =>
-          snap.docs.map((d) => DriverRecord.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => DriverRecord.fromDoc(d)).toList();
+        return list.where((d) => d.isActive).toList();
+      });
 
   Future<DriverRecord?> getDriver(String uid) async {
     final doc = await _db.collection('users').doc(uid).get();
@@ -88,17 +93,23 @@ class FirestoreService {
   Stream<List<AdvertiserRecord>> allAdvertisersStream() => _db
       .collection('users')
       .where('role', isEqualTo: 'advertiser')
-      .orderBy('totalBudget', descending: true)
       .snapshots()
-      .map((snap) =>
-          snap.docs.map((d) => AdvertiserRecord.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => AdvertiserRecord.fromDoc(d)).toList();
+        list.sort((a, b) => b.totalBudget.compareTo(a.totalBudget));
+        return list;
+      });
 
   Stream<List<Campaign>> advertiserCampaignsStream(String uid) => _db
       .collection('campaigns')
       .where('advertiserId', isEqualTo: uid)
-      .orderBy('createdAt', descending: true)
       .snapshots()
-      .map((snap) => snap.docs.map((d) => Campaign.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => Campaign.fromDoc(d)).toList();
+        list.sort((a, b) => (b.createdAt ?? DateTime(0))
+            .compareTo(a.createdAt ?? DateTime(0)));
+        return list;
+      });
 
   // ── ACTIVITY FEED ────────────────────────────────────────────
 
@@ -130,9 +141,13 @@ class FirestoreService {
   Stream<List<Campaign>> pendingCampaignsStream() => _db
       .collection('campaigns')
       .where('status', isEqualTo: 'pending')
-      .orderBy('createdAt', descending: true)
       .snapshots()
-      .map((snap) => snap.docs.map((d) => Campaign.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => Campaign.fromDoc(d)).toList();
+        list.sort((a, b) => (b.createdAt ?? DateTime(0))
+            .compareTo(a.createdAt ?? DateTime(0)));
+        return list;
+      });
 
   Stream<List<Campaign>> activeCampaignsStream() => _db
       .collection('campaigns')
@@ -166,23 +181,29 @@ class FirestoreService {
   // ── FRAUD ALERTS ─────────────────────────────────────────────
 
   Stream<List<FraudAlert>> fraudAlertsStream({String? status}) {
-    Query<Map<String, dynamic>> q =
-        _db.collection('fraud_alerts').orderBy('createdAt', descending: true);
+    Query<Map<String, dynamic>> q = _db.collection('fraud_alerts');
     if (status != null) q = q.where('status', isEqualTo: status);
     return q
         .limit(100)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((d) => FraudAlert.fromDoc(d)).toList());
+        .map((snap) {
+          final list = snap.docs.map((d) => FraudAlert.fromDoc(d)).toList();
+          list.sort((a, b) => (b.createdAt ?? DateTime(0))
+              .compareTo(a.createdAt ?? DateTime(0)));
+          return list;
+        });
   }
 
   Stream<List<FraudAlert>> openFraudAlertsStream() => _db
       .collection('fraud_alerts')
       .where('status', isEqualTo: 'open')
-      .orderBy('createdAt', descending: true)
       .snapshots()
-      .map((snap) =>
-          snap.docs.map((d) => FraudAlert.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => FraudAlert.fromDoc(d)).toList();
+        list.sort((a, b) => (b.createdAt ?? DateTime(0))
+            .compareTo(a.createdAt ?? DateTime(0)));
+        return list;
+      });
 
   Future<void> createFraudAlert(FraudAlert alert) =>
       _db.collection('fraud_alerts').add(alert.toMap());
@@ -285,10 +306,13 @@ class FirestoreService {
   Stream<List<PayoutRequest>> pendingPayoutsStream() => _db
       .collection('payouts')
       .where('status', isEqualTo: 'pending')
-      .orderBy('requestedAt', descending: true)
       .snapshots()
-      .map((snap) =>
-          snap.docs.map((d) => PayoutRequest.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => PayoutRequest.fromDoc(d)).toList();
+        list.sort((a, b) => (b.requestedAt ?? DateTime(0))
+            .compareTo(a.requestedAt ?? DateTime(0)));
+        return list;
+      });
 
   Stream<List<PayoutRequest>> allPayoutsStream() => _db
       .collection('payouts')
@@ -369,9 +393,13 @@ class FirestoreService {
   Stream<List<Invoice>> pendingInvoicesStream() => _db
       .collection('invoices')
       .where('status', isEqualTo: 'sent')
-      .orderBy('dueDate')
       .snapshots()
-      .map((snap) => snap.docs.map((d) => Invoice.fromDoc(d)).toList());
+      .map((snap) {
+        final list = snap.docs.map((d) => Invoice.fromDoc(d)).toList();
+        list.sort((a, b) => (a.dueDate ?? DateTime(9999))
+            .compareTo(b.dueDate ?? DateTime(9999)));
+        return list;
+      });
 
   Future<String> generateInvoice(Invoice invoice) async {
     final ref = _db.collection('invoices').doc();
