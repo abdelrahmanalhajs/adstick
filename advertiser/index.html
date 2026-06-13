@@ -97,11 +97,9 @@
     var _cn = document.getElementById('_cn');
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./flutter_service_worker.js')
-        .then(function(reg) {
-          if (reg.active) { _cn.style.display = 'block'; }
-        })
-        .catch(function(err) { console.warn('[SW] registration failed:', err); });
+      navigator.serviceWorker.getRegistration().then(function(reg) {
+        if (reg && reg.active) { _cn.style.display = 'block'; }
+      });
     }
 
     function _setProgress(p, msg) {
