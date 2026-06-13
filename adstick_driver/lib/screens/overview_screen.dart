@@ -39,7 +39,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
           await fsService.updateStreak(profile.uid);
         }
       } else {
-        final ok = await gpsService.startTracking(profile.uid, profile.name);
+        final ok = await gpsService.startTracking(profile.uid, profile.name,
+            vehicleId: profile.vehicleId);
         if (!ok && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Location permission required to start tracking'),

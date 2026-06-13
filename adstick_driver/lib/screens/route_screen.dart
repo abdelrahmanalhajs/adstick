@@ -63,12 +63,14 @@ class _RouteScreenState extends State<RouteScreen> {
       await gpsService.stopTracking(user.uid);
       setState(() { _tracking = false; _startTime = '--'; });
     } else {
-      // Get driver name from Firestore
+      // Get driver name + vehicleId from Firestore
       final doc = await FirebaseFirestore.instance
           .collection('users').doc(user.uid).get();
-      final name = doc.data()?['name'] as String? ?? 'Driver';
+      final name      = doc.data()?['name']      as String? ?? 'Driver';
+      final vehicleId = doc.data()?['vehicleId'] as String? ?? '';
 
-      final ok = await gpsService.startTracking(user.uid, name);
+      final ok = await gpsService.startTracking(user.uid, name,
+          vehicleId: vehicleId);
       if (!mounted) return;
       if (!ok) {
         setState(() => _permissionDenied = true);

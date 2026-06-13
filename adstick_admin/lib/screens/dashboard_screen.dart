@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/firestore_service.dart';
@@ -67,6 +68,16 @@ class DashboardScreen extends StatelessWidget {
                     totalKmToday: totalKmToday,
                   ),
                   const SizedBox(height: 20),
+
+                  // ── Live drivers list ────────────────────────────
+                  const Text('Live Drivers',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white)),
+                  const SizedBox(height: 12),
+                  _LiveDriversList(drivers: rtdbDrivers),
+                  const SizedBox(height: 24),
 
                   // ── KPI grid ────────────────────────────────────
                   const Text('Platform KPIs',
@@ -481,6 +492,213 @@ class _ActionRow extends StatelessWidget {
                   color: AppTheme.green, size: 24),
         ),
       );
+}
+
+// ── Live drivers list ─────────────────────────────────────────
+class _LiveDriversList extends StatefulWidget {
+  final Map<String, Map<String, dynamic>> drivers;
+  const _LiveDriversList({required this.drivers});
+
+  @override
+  State<_LiveDriversList> createState() => _LiveDriversListState();
+}
+
+class _LiveDriversListState extends State<_LiveDriversList> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    // Refresh "X min ago" labels every 30 s without re-hitting Firebase
+    _tick = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  // Determine status and time label from RTDB fields
+  ({String status, Color color, String timeLbl}) _classify(
+      Map<String, dynamic> d) {
+    final isActive = d['isActive'] == true;
+    final speedRaw = (d['location'] as Map?)?['speed'];
+    final speed    = double.tryParse(speedRaw?.toString() ?? '0') ?? 0;
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    if (isActive && speed > 3) {
+      // Moving — use trackingStartedAt for total session duration
+      final startMs = d['trackingStartedAt'] as int?;
+      final diffMin = startMs != null
+          ? ((now - startMs) / 60000).floor()
+          : (d['todayStats'] as Map?)?['durationMinutes'] as int? ?? 0;
+      return (
+        status: 'Moving',
+        color: AppTheme.green,
+        timeLbl: diffMin < 1 ? 'just started' : 'for ${_fmtDur(diffMin)}',
+      );
+    } else if (isActive) {
+      // Idle — use lastSeen for how long they've been idle
+      final lastSeenMs = d['lastSeen'] as int?;
+      final idleMin = lastSeenMs != null
+          ? ((now - lastSeenMs) / 60000).floor()
+          : 0;
+      return (
+        status: 'Idle',
+        color: AppTheme.yellow,
+        timeLbl: idleMin < 1 ? 'just stopped moving' : 'idle ${_fmtDur(idleMin)}',
+      );
+    } else {
+      // Stopped — use stoppedAt, fallback to lastSeen
+      final stoppedMs = (d['stoppedAt'] ?? d['lastSeen']) as int?;
+      final stoppedMin = stoppedMs != null
+          ? ((now - stoppedMs) / 60000).floor()
+          : null;
+      return (
+        status: 'Stopped',
+        color: AppTheme.textMuted,
+        timeLbl: stoppedMin == null
+            ? 'offline'
+            : stoppedMin < 1
+                ? 'just stopped'
+                : '${_fmtDur(stoppedMin)} ago',
+      );
+    }
+  }
+
+  static String _fmtDur(int minutes) {
+    if (minutes >= 60) {
+      final h = minutes ~/ 60;
+      final m = minutes % 60;
+      return m == 0 ? '${h}h' : '${h}h ${m}m';
+    }
+    return '${minutes}m';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.drivers.isEmpty) {
+      return Card(
+        child: const Padding(
+          padding: EdgeInsets.all(20),
+          child: Center(
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.directions_car_rounded,
+                  color: AppTheme.textMuted, size: 20),
+              SizedBox(width: 8),
+              Text('No drivers in database yet',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 13)),
+            ]),
+          ),
+        ),
+      );
+    }
+
+    // Sort: Moving first, then Idle, then Stopped
+    const _order = {'Moving': 0, 'Idle': 1, 'Stopped': 2};
+    final entries = widget.drivers.entries.toList()
+      ..sort((a, b) {
+        final ca = _classify(a.value);
+        final cb = _classify(b.value);
+        return (_order[ca.status] ?? 2).compareTo(_order[cb.status] ?? 2);
+      });
+
+    return Card(
+      child: Column(
+        children: [
+          // Header row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Row(children: [
+              Expanded(flex: 3, child: Text('Driver',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 10,
+                      fontWeight: FontWeight.w700))),
+              Expanded(flex: 2, child: Text('Plate',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 10,
+                      fontWeight: FontWeight.w700))),
+              Expanded(flex: 2, child: Text('Status',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 10,
+                      fontWeight: FontWeight.w700))),
+              Expanded(flex: 3, child: Text('Duration',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 10,
+                      fontWeight: FontWeight.w700))),
+            ]),
+          ),
+          const Divider(height: 1),
+          // Driver rows
+          ...entries.map((e) {
+            final uid = e.key;
+            final d   = e.value;
+            final name      = d['name']      as String? ?? 'Unknown';
+            final vehicleId = d['vehicleId'] as String? ?? '—';
+            final info      = _classify(d);
+
+            return Column(children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(children: [
+                  // Status dot + name
+                  Expanded(flex: 3, child: Row(children: [
+                    Container(
+                      width: 8, height: 8,
+                      decoration: BoxDecoration(
+                          color: info.color, shape: BoxShape.circle),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(name,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ])),
+                  // Plate number
+                  Expanded(flex: 2, child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E2E),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Text(vehicleId,
+                        style: const TextStyle(
+                            color: AppTheme.brand,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'monospace'),
+                        overflow: TextOverflow.ellipsis),
+                  )),
+                  // Status badge
+                  Expanded(flex: 2, child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                        color: info.color.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Text(info.status,
+                        style: TextStyle(
+                            color: info.color,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800)),
+                  )),
+                  // Time label
+                  Expanded(flex: 3, child: Text(info.timeLbl,
+                      style: const TextStyle(
+                          color: AppTheme.textMuted, fontSize: 10),
+                      overflow: TextOverflow.ellipsis)),
+                ]),
+              ),
+              if (e.key != entries.last.key)
+                const Divider(height: 1, indent: 16),
+            ]);
+          }),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Recent fraud alerts ───────────────────────────────────────────

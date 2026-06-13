@@ -40,7 +40,8 @@ class GpsService {
   }
 
   // ── Start tracking ───────────────────────────────────────
-  Future<bool> startTracking(String uid, String name) async {
+  Future<bool> startTracking(String uid, String name,
+      {String vehicleId = ''}) async {
     if (_sub != null) return true; // already tracking
 
     final ok = await requestPermission();
@@ -49,6 +50,15 @@ class GpsService {
     _trackingStart = DateTime.now();
     _totalDistanceM = 0;
     routePoints.clear();
+
+    // Mark driver as just-started in RTDB immediately
+    await _rtdb.ref('drivers/$uid').update({
+      'name':               name,
+      'vehicleId':          vehicleId,
+      'isActive':           true,
+      'trackingStartedAt':  ServerValue.timestamp,
+      'lastSeen':           ServerValue.timestamp,
+    });
 
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,
@@ -77,9 +87,10 @@ class GpsService {
       final speedKmh = pos.speed < 0 ? 0.0 : pos.speed * 3.6;
 
       _rtdb.ref('drivers/$uid').update({
-        'name':     name,
-        'isActive': true,
-        'lastSeen': ServerValue.timestamp,
+        'name':      name,
+        'vehicleId': vehicleId,
+        'isActive':  true,
+        'lastSeen':  ServerValue.timestamp,
         'location': {
           'lat':       pos.latitude,
           'lng':       pos.longitude,
@@ -105,7 +116,10 @@ class GpsService {
   Future<void> stopTracking(String uid) async {
     await _sub?.cancel();
     _sub = null;
-    await _rtdb.ref('drivers/$uid').update({'isActive': false});
+    await _rtdb.ref('drivers/$uid').update({
+      'isActive':  false,
+      'stoppedAt': ServerValue.timestamp,
+    });
   }
 
   // ── Today's stats ────────────────────────────────────────
