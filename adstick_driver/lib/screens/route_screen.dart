@@ -60,7 +60,7 @@ class _RouteScreenState extends State<RouteScreen> {
     if (user == null) return;
 
     if (_tracking) {
-      await gpsService.stopTracking(user.uid);
+      await gpsService.stopTracking(user.uid); // FraudResult ignored here — overview handles commit
       setState(() { _tracking = false; _startTime = '--'; });
     } else {
       // Get driver name + vehicleId from Firestore

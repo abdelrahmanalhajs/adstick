@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:latlong2/latlong.dart';
+import 'fraud_service.dart';
 
 // ── Singleton ────────────────────────────────────────────────
 final gpsService = GpsService._();
@@ -11,7 +13,8 @@ class GpsService {
 
   final _rtdb = FirebaseDatabase.instanceFor(
     app: FirebaseDatabase.instance.app,
-    databaseURL: 'https://adstick-90329-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://adstick-90329-default-rtdb.europe-west1.firebasedatabase.app',
   );
 
   StreamSubscription<Position>? _sub;
@@ -36,7 +39,7 @@ class GpsService {
       perm = await Geolocator.requestPermission();
     }
     return perm == LocationPermission.always ||
-           perm == LocationPermission.whileInUse;
+        perm == LocationPermission.whileInUse;
   }
 
   // ── Start tracking ───────────────────────────────────────
@@ -51,14 +54,38 @@ class GpsService {
     _totalDistanceM = 0;
     routePoints.clear();
 
-    // Mark driver as just-started in RTDB immediately
+    // ── Fetch campaign city for geo-fence check ──────────
+    String? campaignCity;
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      final campaignId =
+          (userDoc.data() ?? {})['currentCampaignId'] as String?;
+      if (campaignId != null && campaignId.isNotEmpty) {
+        final campDoc = await FirebaseFirestore.instance
+            .collection('campaigns')
+            .doc(campaignId)
+            .get();
+        campaignCity = (campDoc.data() ?? {})['city'] as String?;
+      }
+    } catch (_) {}
+
+    // ── Initialise fraud session ──────────────────────────
+    fraudService.startSession(uid, name, campaignCity: campaignCity);
+
+    // Run device checks in background (non-blocking)
+    fraudService.runDeviceChecks(uid);
+
+    // Mark driver as active in RTDB immediately
     await _rtdb.ref('drivers/$uid').update({
-      'name':               name,
-      'vehicleId':          vehicleId,
-      'role':               'driver',       // ensures admin filter never includes this
-      'isActive':           true,
-      'trackingStartedAt':  ServerValue.timestamp,
-      'lastSeen':           ServerValue.timestamp,
+      'name':              name,
+      'vehicleId':         vehicleId,
+      'role':              'driver',
+      'isActive':          true,
+      'trackingStartedAt': ServerValue.timestamp,
+      'lastSeen':          ServerValue.timestamp,
     });
 
     const settings = LocationSettings(
@@ -68,7 +95,11 @@ class GpsService {
 
     _sub = Geolocator.getPositionStream(locationSettings: settings)
         .listen((Position pos) {
-      // Accumulate distance
+      // ── Fraud check — discard if fraudulent ────────────
+      final accepted = fraudService.checkFix(pos);
+      if (!accepted) return; // Fix rejected — don't accumulate distance
+
+      // Accumulate distance only from accepted fixes
       if (lastPosition != null) {
         _totalDistanceM += Geolocator.distanceBetween(
           lastPosition!.latitude, lastPosition!.longitude,
@@ -77,11 +108,11 @@ class GpsService {
       }
       lastPosition = pos;
       routePoints.add(LatLng(pos.latitude, pos.longitude));
-      if (routePoints.length > 500) routePoints.removeAt(0); // cap trail length
+      if (routePoints.length > 500) routePoints.removeAt(0);
 
       _positionController.add(pos);
 
-      // Push to Firebase RTDB
+      // Push accepted fix to RTDB
       final durationMin = _trackingStart != null
           ? DateTime.now().difference(_trackingStart!).inMinutes
           : 0;
@@ -90,6 +121,7 @@ class GpsService {
       _rtdb.ref('drivers/$uid').update({
         'name':      name,
         'vehicleId': vehicleId,
+        'role':      'driver',
         'isActive':  true,
         'lastSeen':  ServerValue.timestamp,
         'location': {
@@ -101,10 +133,11 @@ class GpsService {
           'timestamp': pos.timestamp.millisecondsSinceEpoch,
         },
         'todayStats': {
-          'distanceKm':       (_totalDistanceM / 1000).toStringAsFixed(2),
-          'durationMinutes':  durationMin,
-          'avgSpeedKmh':      durationMin > 0
-              ? ((_totalDistanceM / 1000) / (durationMin / 60)).toStringAsFixed(1)
+          'distanceKm':      (_totalDistanceM / 1000).toStringAsFixed(2),
+          'durationMinutes': durationMin,
+          'avgSpeedKmh':     durationMin > 0
+              ? ((_totalDistanceM / 1000) / (durationMin / 60))
+                  .toStringAsFixed(1)
               : '0',
         },
       });
@@ -114,21 +147,32 @@ class GpsService {
   }
 
   // ── Stop tracking ────────────────────────────────────────
-  Future<void> stopTracking(String uid) async {
+  /// Stops GPS, runs session-end fraud analysis, returns FraudResult.
+  Future<FraudResult> stopTracking(String uid) async {
     await _sub?.cancel();
     _sub = null;
+
+    // Run session-end fraud checks before committing anything
+    final result = await fraudService.endSession(
+      kmDriven:        distanceKm,
+      durationMinutes: durationMinutes.toDouble(),
+    );
+
     await _rtdb.ref('drivers/$uid').update({
       'isActive':  false,
       'stoppedAt': ServerValue.timestamp,
     });
+
+    return result;
   }
 
   // ── Today's stats ────────────────────────────────────────
   double get distanceKm => _totalDistanceM / 1000;
-  int get durationMinutes =>
-      _trackingStart != null
-          ? DateTime.now().difference(_trackingStart!).inMinutes
-          : 0;
+
+  int get durationMinutes => _trackingStart != null
+      ? DateTime.now().difference(_trackingStart!).inMinutes
+      : 0;
+
   double get avgSpeedKmh =>
       durationMinutes > 0 ? distanceKm / (durationMinutes / 60) : 0;
 

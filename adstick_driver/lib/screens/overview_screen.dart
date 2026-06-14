@@ -5,6 +5,7 @@ import '../widgets/section_header.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
 import '../services/gps_service.dart';
+import '../services/fraud_service.dart';
 import '../models/models.dart';
 
 class OverviewScreen extends StatefulWidget {
@@ -27,20 +28,28 @@ class _OverviewScreenState extends State<OverviewScreen> {
     setState(() => _starting = true);
     try {
       if (gpsService.isTracking) {
-        await gpsService.stopTracking(profile.uid);
-        // Commit session earnings to Firestore
-        final earned = gpsService.distanceKm * 1.0; // SAR 1/km base
-        if (gpsService.distanceKm > 0) {
-          await fsService.commitSession(
-            uid: profile.uid,
-            kmDriven: gpsService.distanceKm,
-            earnings: earned,
+        final km = gpsService.distanceKm;
+
+        // stopTracking now runs session-end fraud checks and returns result
+        final fraudResult = await gpsService.stopTracking(profile.uid);
+
+        if (km > 0) {
+          final result = await fsService.commitSession(
+            uid:         profile.uid,
+            kmDriven:    km,
+            earnings:    km * 1.0,
+            fraudResult: fraudResult,
           );
           await fsService.updateStreak(profile.uid);
+
+          if (!mounted) return;
+          _showSessionResult(result);
         }
       } else {
-        final ok = await gpsService.startTracking(profile.uid, profile.name,
-            vehicleId: profile.vehicleId);
+        final ok = await gpsService.startTracking(
+          profile.uid, profile.name,
+          vehicleId: profile.vehicleId,
+        );
         if (!ok && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Location permission required to start tracking'),
@@ -51,6 +60,28 @@ class _OverviewScreenState extends State<OverviewScreen> {
     } finally {
       if (mounted) setState(() => _starting = false);
     }
+  }
+
+  void _showSessionResult(SessionCommitResult result) {
+    Color bg;
+    String emoji;
+    if (result.wasBlocked) {
+      bg = Colors.red.shade800;
+      emoji = '🚫';
+    } else if (result.wasHeld) {
+      bg = Colors.orange.shade800;
+      emoji = '⏸️';
+    } else {
+      bg = AppTheme.driverGreen;
+      emoji = '✅';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('$emoji ${result.message}',
+          style: const TextStyle(color: Colors.white)),
+      backgroundColor: bg,
+      duration: const Duration(seconds: 5),
+    ));
   }
 
   @override
