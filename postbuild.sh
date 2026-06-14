@@ -107,7 +107,17 @@ SW_EOF
 
   # Sync to deploy directory
   rsync -a --delete "$BUILD/" "$DEPLOY/"
-  echo "  ✓ Deployed to $DEPLOY"
+
+  # Patch base href so relative asset paths resolve correctly under /adstick/<app>/
+  local SUBPATH
+  case "$APP_NAME" in
+    admin)      SUBPATH="/adstick/admin/" ;;
+    driver)     SUBPATH="/adstick/driver/" ;;
+    advertiser) SUBPATH="/adstick/advertiser/" ;;
+    *)          SUBPATH="/" ;;
+  esac
+  sed -i '' "s|<base href=\"[^\"]*\">|<base href=\"${SUBPATH}\">|" "$DEPLOY/index.html"
+  echo "  ✓ Patched base href to ${SUBPATH} in $DEPLOY/index.html"
 }
 
 BASE="/Users/abdelrahmanalhaj/Documents/Claude/Projects/Ads"
