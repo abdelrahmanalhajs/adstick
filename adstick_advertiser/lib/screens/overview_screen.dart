@@ -118,42 +118,39 @@ class OverviewScreen extends StatelessWidget {
               final totalSpent  = (d['totalSpent'] ?? 0.0) as double;
               final roi         = (d['roi'] ?? 0.0) as double;
 
-              return GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.5,
-                children: [
-                  _StatCard(
+              return Column(children: [
+                Row(children: [
+                  Expanded(child: _StatCard(
                     label: 'Impressions Today',
                     value: _fmtNum(impressions),
                     icon: Icons.visibility_rounded,
                     color: AppTheme.brand,
-                  ),
-                  _StatCard(
+                  )),
+                  const SizedBox(width: 12),
+                  Expanded(child: _StatCard(
                     label: 'Active Cars',
                     value: '$activeCars',
                     icon: Icons.directions_car_rounded,
                     color: AppTheme.green,
-                  ),
-                  _StatCard(
+                  )),
+                ]),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Expanded(child: _StatCard(
                     label: 'Total Spent',
                     value: 'SAR ${_fmtNum(totalSpent.toInt())}',
                     icon: Icons.account_balance_wallet_rounded,
                     color: AppTheme.blue,
-                  ),
-                  _StatCard(
+                  )),
+                  const SizedBox(width: 12),
+                  Expanded(child: _StatCard(
                     label: 'Campaign ROI',
-                    value: roi > 0
-                        ? '${roi.toStringAsFixed(1)}×'
-                        : '—',
+                    value: roi > 0 ? '${roi.toStringAsFixed(1)}×' : '—',
                     icon: Icons.trending_up_rounded,
                     color: AppTheme.yellow,
-                  ),
-                ],
-              );
+                  )),
+                ]),
+              ]);
             },
           ),
           const SizedBox(height: 20),
@@ -452,7 +449,7 @@ class _StatCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -462,6 +459,7 @@ class _StatCard extends StatelessWidget {
                           color: AppTheme.textMuted, fontSize: 10)),
                   Icon(icon, color: color, size: 18),
                 ]),
+                const SizedBox(height: 8),
                 Text(value,
                     style: TextStyle(
                         color: color,
