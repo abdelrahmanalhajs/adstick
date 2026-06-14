@@ -214,7 +214,7 @@ class _PayoutCard extends StatelessWidget {
       {required bool approve}) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.dark2,
         title: Text(
           approve ? 'Approve Payout?' : 'Reject Payout?',
@@ -226,7 +226,7 @@ class _PayoutCard extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel',
                   style: TextStyle(color: AppTheme.textMuted))),
           ElevatedButton(
@@ -241,7 +241,7 @@ class _PayoutCard extends StatelessWidget {
                 fsService.rejectPayout(
                     p.id, p.driverId, p.amount);
               }
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
             child: Text(approve ? 'Approve' : 'Reject'),
           ),

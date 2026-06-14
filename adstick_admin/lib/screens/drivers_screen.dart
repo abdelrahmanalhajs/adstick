@@ -352,7 +352,7 @@ class _DriverCard extends StatelessWidget {
   void _confirmSuspend(BuildContext context, DriverRecord d) {
     showDialog(
       context: context,
-      builder: (_) {
+      builder: (dialogContext) {
         final ctrl = TextEditingController();
         return AlertDialog(
           backgroundColor: AppTheme.dark2,
@@ -368,7 +368,7 @@ class _DriverCard extends StatelessWidget {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: const Text('Cancel',
                     style: TextStyle(color: AppTheme.textMuted))),
             ElevatedButton(
@@ -379,7 +379,7 @@ class _DriverCard extends StatelessWidget {
                     reason: ctrl.text.trim().isNotEmpty
                         ? ctrl.text.trim()
                         : null);
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
               child: const Text('Suspend'),
             ),

@@ -221,7 +221,7 @@ class _RuleCard extends StatelessWidget {
   void _confirmDelete(BuildContext context, DynamicPricingRule rule) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.dark2,
         title: const Text('Delete Rule?',
             style: TextStyle(color: Colors.white)),
@@ -231,7 +231,7 @@ class _RuleCard extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel',
                   style: TextStyle(color: AppTheme.textMuted))),
           ElevatedButton(
@@ -239,7 +239,7 @@ class _RuleCard extends StatelessWidget {
                 ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               fsService.deletePricingRule(rule.id);
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
             child: const Text('Delete'),
           ),
