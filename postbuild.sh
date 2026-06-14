@@ -33,20 +33,7 @@ const PRECACHE = [
   './index.html',
   './flutter.js',
   './flutter_bootstrap.js',
-  // dart2js path (Firefox, Safari, older browsers)
   './main.dart.js',
-  // dart2wasm path (Chrome / WasmGC browsers)
-  './main.dart.wasm',
-  './main.dart.mjs',
-  // CanvasKit + skwasm (served locally via --no-web-resources-cdn)
-  './canvaskit/canvaskit.js',
-  './canvaskit/canvaskit.wasm',
-  './canvaskit/skwasm.js',
-  './canvaskit/skwasm.wasm',
-  './canvaskit/skwasm_heavy.js',
-  './canvaskit/skwasm_heavy.wasm',
-  './canvaskit/wimp.js',
-  './canvaskit/wimp.wasm',
   './assets/FontManifest.json',
   './assets/AssetManifest.bin.json',
   './version.json',
