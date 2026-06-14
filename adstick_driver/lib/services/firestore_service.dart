@@ -200,10 +200,19 @@ class FirestoreService {
   Stream<Map<String, dynamic>> rtdbDriverStream(String uid) =>
       _rtdb.ref('drivers/$uid').onValue.map((event) {
         if (event.snapshot.value == null) return <String, dynamic>{};
-        final raw = Map<String, dynamic>.from(
-            event.snapshot.value as Map<dynamic, dynamic>);
-        return raw;
+        return _deepConvert(event.snapshot.value as Map);
       });
+
+  /// Recursively converts nested JS maps to Map<String, dynamic>.
+  static Map<String, dynamic> _deepConvert(Map m) {
+    final out = <String, dynamic>{};
+    for (final e in m.entries) {
+      final k = e.key?.toString();
+      if (k == null) continue;
+      out[k] = e.value is Map ? _deepConvert(e.value as Map) : e.value;
+    }
+    return out;
+  }
 
   // ── CAMPAIGNS ───────────────────────────────────────────────
 

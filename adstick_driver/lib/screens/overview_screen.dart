@@ -254,46 +254,51 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       ? 'Active'
                       : 'None';
 
-                  return GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.5,
-                    children: [
-                      StatCard(
-                        label: 'KM Today',
-                        value: kmToday.toStringAsFixed(1),
-                        unit: 'km',
-                        icon: Icons.route_rounded,
-                        color: AppTheme.driverGreen,
-                      ),
-                      StatCard(
-                        label: "Today's Earnings",
-                        value: 'SAR ${earningsToday.toStringAsFixed(0)}',
-                        unit: '.${((earningsToday % 1) * 100).toStringAsFixed(0).padLeft(2, '0')}',
-                        icon: Icons.account_balance_wallet_rounded,
-                        color: const Color(0xFF60A5FA),
-                      ),
-                      StatCard(
-                        label: 'Campaign',
-                        value: campaignName,
-                        unit: '',
-                        icon: Icons.label_rounded,
-                        color: const Color(0xFFF59E0B),
-                      ),
-                      StatCard(
-                        label: 'Quality Score',
-                        value: loading
-                            ? '...'
-                            : profile!.qualityScore.toStringAsFixed(0),
-                        unit: '/100',
-                        icon: Icons.star_rounded,
-                        color: const Color(0xFFF59E0B),
-                      ),
-                    ],
-                  );
+                  return Column(children: [
+                    IntrinsicHeight(child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: StatCard(
+                          label: 'KM Today',
+                          value: kmToday.toStringAsFixed(1),
+                          unit: 'km',
+                          icon: Icons.route_rounded,
+                          color: AppTheme.driverGreen,
+                        )),
+                        const SizedBox(width: 12),
+                        Expanded(child: StatCard(
+                          label: "Today's Earnings",
+                          value: 'SAR ${earningsToday.toStringAsFixed(0)}',
+                          unit: '.${((earningsToday % 1) * 100).toStringAsFixed(0).padLeft(2, '0')}',
+                          icon: Icons.account_balance_wallet_rounded,
+                          color: const Color(0xFF60A5FA),
+                        )),
+                      ],
+                    )),
+                    const SizedBox(height: 12),
+                    IntrinsicHeight(child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: StatCard(
+                          label: 'Campaign',
+                          value: campaignName,
+                          unit: '',
+                          icon: Icons.label_rounded,
+                          color: const Color(0xFFF59E0B),
+                        )),
+                        const SizedBox(width: 12),
+                        Expanded(child: StatCard(
+                          label: 'Quality Score',
+                          value: loading
+                              ? '...'
+                              : profile!.qualityScore.toStringAsFixed(0),
+                          unit: '/100',
+                          icon: Icons.star_rounded,
+                          color: const Color(0xFFF59E0B),
+                        )),
+                      ],
+                    )),
+                  ]);
                 },
               ),
 
