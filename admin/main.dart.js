@@ -50936,7 +50936,7 @@ s=b.b
 if(s==null)s=A.b([],t.UU)
 r=J.a7(s)
 if(r.gaf(s))return A.e9(A.aA(A.b([B.amv,B.aJ,B.amH,B.at,B.am3,B.ec,A.aWL(B.u5,B.amJ,new A.akG(this.a,this.b),A.xm(q,q,B.q,q,q,q,q,q,q,q,q,q,q,q,q,q,q,q,q,q))],t.p),B.j,B.e,B.a6),q,q)
-return A.hW(q,new A.akH(s),r.gG(s),B.T8)},
+return A.hW(q,new A.akH(s),r.gG(s),B.T9)},
 $S:695}
 A.akG.prototype={
 $0(){return this.a.Zh(this.b)},
@@ -51815,7 +51815,7 @@ h=J.de(h==null?50:h)
 g=s.h(0,"streakBonusPerDay")
 f=this.a
 e=t.p
-return A.tQ(A.b([new A.a9(B.hT,r,d),new A.LZ("Platform Commission Rate","Percentage taken from each campaign spend",B.UM,q,new A.aAB(),d),new A.qR("Base Rate per KM","SAR earned by driver per kilometre driven",B.dw,p,new A.aAC(),d),new A.LI("Peak Hour Multiplier","Rate multiplier during peak traffic hours",B.tW,o,new A.aAD(),d),B.at,new A.a9(B.hT,n,d),new A.qR("Minimum Payout Amount","Minimum wallet balance required to withdraw",B.jW,m,new A.aAE(),d),B.at,new A.a9(B.hT,l,d),new A.AY("Max Active Campaigns","Maximum concurrent campaigns per advertiser",B.eF,k,new A.aAF(),d),new A.AY("Impressions per KM","How many ad impressions count per kilometre driven",B.oc,j,new A.aAG(),d),B.at,new A.a9(B.hT,i,d),new A.qR("Referral Bonus","SAR reward for each successful driver referral",B.UO,h,new A.aAH(),d),new A.qR("Streak Bonus per Day","Extra SAR earned per active streak day",B.u0,J.de(g==null?2:g),new A.aAI(),d),B.ec,new A.a9(B.hT,A.O("Platform Info",d,d,d,d,B.bq,d,d),d),A.c6(new A.a9(B.b_,A.aA(A.b([f.B1(B.Ua,"Firebase Project","adstick-90329"),B.nm,f.B1(B.Un,"Region","europe-west1"),B.nm,f.B1(B.UF,"Database","Firestore + RTDB"),B.nm,f.B1(B.UL,"Renderer","Flutter CanvasKit")],e),B.j,B.e,B.h),d),d,d),B.Kz],e),B.T9,d,!1)},
+return A.tQ(A.b([new A.a9(B.hT,r,d),new A.LZ("Platform Commission Rate","Percentage taken from each campaign spend",B.UM,q,new A.aAB(),d),new A.qR("Base Rate per KM","SAR earned by driver per kilometre driven",B.dw,p,new A.aAC(),d),new A.LI("Peak Hour Multiplier","Rate multiplier during peak traffic hours",B.tW,o,new A.aAD(),d),B.at,new A.a9(B.hT,n,d),new A.qR("Minimum Payout Amount","Minimum wallet balance required to withdraw",B.jW,m,new A.aAE(),d),B.at,new A.a9(B.hT,l,d),new A.AY("Max Active Campaigns","Maximum concurrent campaigns per advertiser",B.eF,k,new A.aAF(),d),new A.AY("Impressions per KM","How many ad impressions count per kilometre driven",B.oc,j,new A.aAG(),d),B.at,new A.a9(B.hT,i,d),new A.qR("Referral Bonus","SAR reward for each successful driver referral",B.UO,h,new A.aAH(),d),new A.qR("Streak Bonus per Day","Extra SAR earned per active streak day",B.u0,J.de(g==null?2:g),new A.aAI(),d),B.ec,new A.a9(B.hT,A.O("Platform Info",d,d,d,d,B.bq,d,d),d),A.c6(new A.a9(B.b_,A.aA(A.b([f.B1(B.Ua,"Firebase Project","adstick-90329"),B.nm,f.B1(B.Un,"Region","europe-west1"),B.nm,f.B1(B.UF,"Database","Firestore + RTDB"),B.nm,f.B1(B.UL,"Renderer","Flutter CanvasKit")],e),B.j,B.e,B.h),d),d,d),B.Kz],e),B.T8,d,!1)},
 $S:546}
 A.aAB.prototype={
 $1(a){return $.bw().pm("commissionRate",a/100)},
@@ -116731,9 +116731,9 @@ B.T6=new A.a8(16,10,16,10)
 B.tk=new A.a8(16,12,16,12)
 B.T7=new A.a8(16,12,16,4)
 B.hW=new A.a8(16,14,16,4)
-B.T8=new A.a8(16,16,16,100)
+B.T8=new A.a8(16,16,110,16)
+B.T9=new A.a8(16,16,16,100)
 B.an=new A.a8(16,16,16,16)
-B.T9=new A.a8(16,16,80,16)
 B.Ta=new A.a8(16,18,16,18)
 B.Tb=new A.a8(16,4,16,4)
 B.Td=new A.a8(16,6,16,6)

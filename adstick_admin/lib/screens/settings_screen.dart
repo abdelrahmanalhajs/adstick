@@ -19,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
           final cfg = snap.data ?? {};
 
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(left: 16, top: 16, right: 110, bottom: 16),
             children: [
               // ── Earnings ────────────────────────────────────────
               _sectionHeader('Earnings & Rates'),
