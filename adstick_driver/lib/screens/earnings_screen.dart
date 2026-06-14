@@ -121,7 +121,7 @@ class _TodayTab extends StatelessWidget {
                 const SizedBox(height: 16),
                 Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                   _mini('${km.toStringAsFixed(1)} km', 'Distance'),
-                  _mini('SAR 1.00/km', 'Base Rate'),
+                  _mini('SAR 0.85/km', 'Base Rate'),
                   _mini('${durationMin.toInt()} min', 'Drive Time'),
                 ]),
               ]),
@@ -131,7 +131,7 @@ class _TodayTab extends StatelessWidget {
             const SectionHeader(title: 'Breakdown'),
             const SizedBox(height: 12),
 
-            _row('Base earnings  (km × SAR 1.00)',
+            _row('Base earnings  (km × SAR 0.85)',
                 'SAR ${baseEarnings.toStringAsFixed(2)}'),
             _row('Peak hour bonus  (+10%)',
                 '+ SAR ${peakBonus.toStringAsFixed(2)}',
@@ -253,7 +253,7 @@ class _HistoryTab extends StatelessWidget {
                         children: [
                           _mini('${totalKm.toStringAsFixed(1)} km',
                               'Distance'),
-                          _mini('SAR 1.00/km', 'Rate'),
+                          _mini('SAR 0.85/km', 'Base Rate'),
                           _mini('${entries.length} days',
                               'Active Days'),
                         ]),

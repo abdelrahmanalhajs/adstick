@@ -50962,7 +50962,7 @@ l=r.hS(s,0,new A.aL1())
 k=A.aE(16)
 j=this.a
 i=t.p
-k=A.b([A.aO(h,A.aS(A.b([A.R(j.e,h,h,h,h,B.L4,h,h),B.an,A.R("SAR "+B.c.O(l,2),h,h,h,h,B.pM,h,h),B.at,A.bh(A.b([A.aS(A.b([A.R(B.c.O(q,1)+" km",h,h,h,h,B.eL,h,h),A.R("Distance",h,h,h,h,B.dq,h,h)],i),B.p,B.l,B.m),A.aS(A.b([A.R("SAR 1.00/km",h,h,h,h,B.eL,h,h),A.R("Rate",h,h,h,h,B.dq,h,h)],i),B.p,B.l,B.m),A.aS(A.b([A.R(""+r.gC(s)+" days",h,h,h,h,B.eL,h,h),A.R("Active Days",h,h,h,h,B.dq,h,h)],i),B.p,B.l,B.m)],i),B.p,B.fz,B.m,0)],i),B.p,B.l,B.m),B.o,h,h,new A.aK(h,h,h,k,h,B.jR,B.t),h,h,h,B.nr,h,h,1/0),B.aQ,B.Jz,B.a8,j.Ko("Base earnings","SAR "+B.c.O(p,2)),j.tl("Peak hour bonus","+ SAR "+B.c.O(o,2),B.n),j.tl("Campaign bonus","+ SAR "+B.c.O(n,2),B.n)],i)
+k=A.b([A.aO(h,A.aS(A.b([A.R(j.e,h,h,h,h,B.L4,h,h),B.an,A.R("SAR "+B.c.O(l,2),h,h,h,h,B.pM,h,h),B.at,A.bh(A.b([A.aS(A.b([A.R(B.c.O(q,1)+" km",h,h,h,h,B.eL,h,h),A.R("Distance",h,h,h,h,B.dq,h,h)],i),B.p,B.l,B.m),A.aS(A.b([A.R("SAR 0.85/km",h,h,h,h,B.eL,h,h),A.R("Base Rate",h,h,h,h,B.dq,h,h)],i),B.p,B.l,B.m),A.aS(A.b([A.R(""+r.gC(s)+" days",h,h,h,h,B.eL,h,h),A.R("Active Days",h,h,h,h,B.dq,h,h)],i),B.p,B.l,B.m)],i),B.p,B.fz,B.m,0)],i),B.p,B.l,B.m),B.o,h,h,new A.aK(h,h,h,k,h,B.jR,B.t),h,h,h,B.nr,h,h,1/0),B.aQ,B.Jz,B.a8,j.Ko("Base earnings","SAR "+B.c.O(p,2)),j.tl("Peak hour bonus","+ SAR "+B.c.O(o,2),B.n),j.tl("Campaign bonus","+ SAR "+B.c.O(n,2),B.n)],i)
 if(m>0)k.push(j.tl("Streak bonus","+ SAR "+B.c.O(m,2),B.eh))
 k.push(B.rS)
 k.push(j.Kp("Total","SAR "+B.c.O(l,2),!0))

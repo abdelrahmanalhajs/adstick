@@ -266,8 +266,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                         const SizedBox(width: 12),
                         Expanded(child: StatCard(
                           label: "Today's Earnings",
-                          value: 'SAR ${earningsToday.toStringAsFixed(0)}',
-                          unit: '.${((earningsToday % 1) * 100).toStringAsFixed(0).padLeft(2, '0')}',
+                          value: 'SAR ${earningsToday.floor()}',
+                          unit: '.${((earningsToday % 1) * 100).floor().toString().padLeft(2, '0')}',
                           icon: Icons.account_balance_wallet_rounded,
                           color: const Color(0xFF60A5FA),
                         )),
