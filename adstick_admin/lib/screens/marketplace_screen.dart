@@ -378,7 +378,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
         ),
       );
 
-  void _save() async {
+  void _save() {
     final mult = double.tryParse(_mult.text.trim()) ?? 1.0;
     final e = widget.existing;
     final rule = DynamicPricingRule(
@@ -391,7 +391,7 @@ class _AddRuleSheetState extends State<_AddRuleSheet> {
       reason: _reason.text.trim(),
       daysOfWeek: e?.daysOfWeek ?? [],
     );
-    await fsService.savePricingRule(rule);
-    if (mounted) Navigator.pop(context);
+    fsService.savePricingRule(rule);
+    Navigator.pop(context);
   }
 }

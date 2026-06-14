@@ -215,8 +215,6 @@ class _AddEventSheetState extends State<_AddEventSheet> {
   final _location  = TextEditingController();
   final _dateLabel = TextEditingController();
   final _reach     = TextEditingController();
-  bool _saving = false;
-
   @override
   void dispose() {
     _name.dispose(); _location.dispose();
@@ -249,17 +247,12 @@ class _AddEventSheetState extends State<_AddEventSheet> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _saving ? null : _save,
+              onPressed: _save,
               style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.brand,
                   padding: const EdgeInsets.symmetric(vertical: 14)),
-              child: _saving
-                  ? const SizedBox(
-                      width: 20, height: 20,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
-                  : const Text('Create Event',
-                      style: TextStyle(color: Colors.white)),
+              child: const Text('Create Event',
+                  style: TextStyle(color: Colors.white)),
             ),
           ),
           const SizedBox(height: 20),
@@ -288,22 +281,17 @@ class _AddEventSheetState extends State<_AddEventSheet> {
         ),
       );
 
-  Future<void> _save() async {
+  void _save() {
     if (_name.text.trim().isEmpty) return;
-    setState(() => _saving = true);
-    try {
-      final event = PlatformEvent(
-        id: '',
-        name: _name.text.trim(),
-        location: _location.text.trim(),
-        dateLabel: _dateLabel.text.trim(),
-        expectedReach: _reach.text.trim(),
-        status: 'planning',
-      );
-      await fsService.createEvent(event);
-      if (mounted) Navigator.pop(context);
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
+    final event = PlatformEvent(
+      id: '',
+      name: _name.text.trim(),
+      location: _location.text.trim(),
+      dateLabel: _dateLabel.text.trim(),
+      expectedReach: _reach.text.trim(),
+      status: 'planning',
+    );
+    fsService.createEvent(event);
+    Navigator.pop(context);
   }
 }
