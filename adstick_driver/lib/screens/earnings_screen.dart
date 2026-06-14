@@ -73,7 +73,7 @@ class _TodayTab extends StatelessWidget {
         final peakBonus       = km * 0.10;
         final campaignBonus   = km * 0.05;
         final total           = baseEarnings + peakBonus + campaignBonus;
-        final durationMin     = (stats['durationMinutes'] ?? 0) as num;
+        final durationMin     = double.tryParse(stats['durationMinutes']?.toString() ?? '0') ?? 0;
         final isActive        = rtdb['isActive'] == true;
 
         return SingleChildScrollView(
