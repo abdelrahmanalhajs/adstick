@@ -75,6 +75,7 @@ class MarketplaceScreen extends StatelessWidget {
         label: const Text('Add Rule'),
         backgroundColor: AppTheme.brand,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
