@@ -17,6 +17,7 @@ class EventsScreen extends StatelessWidget {
         label: const Text('Add Event',
             style: TextStyle(color: Colors.white)),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: StreamBuilder<List<PlatformEvent>>(
         stream: fsService.eventsStream(),
         builder: (_, snap) {

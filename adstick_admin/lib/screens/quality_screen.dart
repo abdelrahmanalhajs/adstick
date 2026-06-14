@@ -70,6 +70,7 @@ class QualityScreen extends StatelessWidget {
         label: const Text('Recompute All'),
         backgroundColor: AppTheme.brand,
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
