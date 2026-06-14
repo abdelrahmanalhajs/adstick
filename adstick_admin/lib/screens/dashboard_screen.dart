@@ -217,13 +217,11 @@ class _KpiGrid extends StatelessWidget {
   final _MergedStats stats;
   const _KpiGrid({required this.stats});
 
-  Widget _row(Widget a, Widget b) => IntrinsicHeight(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Expanded(child: a),
-          const SizedBox(width: 12),
-          Expanded(child: b),
-        ]),
-      );
+  Widget _row(Widget a, Widget b) => Row(children: [
+        Expanded(child: a),
+        const SizedBox(width: 12),
+        Expanded(child: b),
+      ]);
 
   @override
   Widget build(BuildContext context) {

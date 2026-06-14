@@ -255,9 +255,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       : 'None';
 
                   return Column(children: [
-                    IntrinsicHeight(child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                    Row(children: [
                         Expanded(child: StatCard(
                           label: 'KM Today',
                           value: kmToday.toStringAsFixed(1),
@@ -273,12 +271,9 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           icon: Icons.account_balance_wallet_rounded,
                           color: const Color(0xFF60A5FA),
                         )),
-                      ],
-                    )),
+                      ]),
                     const SizedBox(height: 12),
-                    IntrinsicHeight(child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                    Row(children: [
                         Expanded(child: StatCard(
                           label: 'Campaign',
                           value: campaignName,
@@ -296,8 +291,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           icon: Icons.star_rounded,
                           color: const Color(0xFFF59E0B),
                         )),
-                      ],
-                    )),
+                      ]),
                   ]);
                 },
               ),
