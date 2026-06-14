@@ -132,7 +132,10 @@ class FirestoreService {
 
     // ── Fetch campaign for impression tracking ─────────────────────
     final userDoc    = await _db.collection('users').doc(uid).get();
-    final campaignId = (userDoc.data() ?? {})['currentCampaignId'] as String?;
+    final userData   = userDoc.data() ?? {};
+    final campaignId = userData['currentCampaignId'] as String?;
+    final driverName = userData['name'] as String? ?? '';
+    final driverTier = userData['tier'] as String? ?? 'bronze';
 
     final batch = _db.batch();
 
@@ -153,6 +156,8 @@ class FirestoreService {
         'kmThisMonth':       FieldValue.increment(kmDriven),
         'earningsThisMonth': FieldValue.increment(earnings),
         'lastUpdated':       FieldValue.serverTimestamp(),
+        'name':              driverName,
+        'tier':              driverTier,
       },
       SetOptions(merge: true),
     );

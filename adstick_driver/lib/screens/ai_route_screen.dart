@@ -208,7 +208,7 @@ class _TimeSlotCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(slot.hours,
             style: const TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-        const Spacer(),
+        const SizedBox(height: 8),
         Text('${slot.multiplier}×',
             style: TextStyle(
                 color: color, fontSize: 26, fontWeight: FontWeight.w900)),
