@@ -217,20 +217,18 @@ class _KpiGrid extends StatelessWidget {
   final _MergedStats stats;
   const _KpiGrid({required this.stats});
 
+  Widget _row(Widget a, Widget b) => IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Expanded(child: a),
+          const SizedBox(width: 12),
+          Expanded(child: b),
+        ]),
+      );
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      // Keep each card ~120px tall regardless of screen width
-      final cardWidth = (constraints.maxWidth - 12) / 2;
-      final ratio = cardWidth / 120;
-      return GridView.count(
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: ratio,
-        children: [
+    return Column(children: [
+      _row(
         _KpiCard(
           label: 'Total Drivers',
           value: '${stats.totalDrivers}',
@@ -245,6 +243,9 @@ class _KpiGrid extends StatelessWidget {
           icon: Icons.campaign_rounded,
           color: AppTheme.blue,
         ),
+      ),
+      const SizedBox(height: 12),
+      _row(
         _KpiCard(
           label: 'Revenue MTD',
           value: 'SAR ${_fmtD(stats.revenueThisMonth)}',
@@ -259,6 +260,9 @@ class _KpiGrid extends StatelessWidget {
           icon: Icons.pending_actions_rounded,
           color: AppTheme.yellow,
         ),
+      ),
+      const SizedBox(height: 12),
+      _row(
         _KpiCard(
           label: 'Impressions Today',
           value: _fmtN(stats.totalImpressionsToday),
@@ -275,9 +279,8 @@ class _KpiGrid extends StatelessWidget {
           icon: Icons.route_rounded,
           color: const Color(0xFF60A5FA),
         ),
-      ],
-      );
-    });
+      ),
+    ]);
   }
 
   static String _fmtD(double v) {
@@ -310,7 +313,7 @@ class _KpiCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
               children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
