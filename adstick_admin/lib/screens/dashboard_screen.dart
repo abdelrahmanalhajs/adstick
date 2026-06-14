@@ -219,14 +219,18 @@ class _KpiGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1.4,
-      children: [
+    return LayoutBuilder(builder: (context, constraints) {
+      // Keep each card ~120px tall regardless of screen width
+      final cardWidth = (constraints.maxWidth - 12) / 2;
+      final ratio = cardWidth / 120;
+      return GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: ratio,
+        children: [
         _KpiCard(
           label: 'Total Drivers',
           value: '${stats.totalDrivers}',
@@ -272,7 +276,8 @@ class _KpiGrid extends StatelessWidget {
           color: const Color(0xFF60A5FA),
         ),
       ],
-    );
+      );
+    });
   }
 
   static String _fmtD(double v) {

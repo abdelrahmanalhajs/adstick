@@ -1,7 +1,7 @@
 'use strict';
 
 // Cache version — tied to Flutter build. Change triggers cache clear + re-download.
-const CACHE = 'adstick-admin-672035501';
+const CACHE = 'adstick-admin-2825017308';
 
 // Critical files to pre-cache on install
 const PRECACHE = [
