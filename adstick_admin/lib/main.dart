@@ -157,7 +157,8 @@ class AdStickAdminApp extends StatelessWidget {
         final loc  = state.matchedLocation;
         final pub  = loc == '/splash' || loc == '/login';
         if (user == null && !pub) return '/login';
-        if (user != null && role != null && role != 'admin') return '/login';
+        // 'denied' = Firestore confirmed not-admin (user was signed out by _checkRole)
+        if (role == 'denied') return '/login';
         return null;
       },
       routes: [

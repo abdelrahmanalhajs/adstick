@@ -49851,9 +49851,8 @@ s=A.xB(new A.dT(n)).goy()
 r=$.Cr().a
 q=b.c
 p=q==="/splash"||q==="/login"
-o=s==null
-if(o&&!p)return"/login"
-if(!o&&r!=null&&r!=="admin")return"/login"
+if(s==null&&!p)return"/login"
+if(r==="denied")return"/login"
 return null},
 $S:341}
 A.aey.prototype={
