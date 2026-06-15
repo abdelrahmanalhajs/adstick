@@ -32,34 +32,39 @@ import 'widgets/float_cluster.dart';
 
 bool _appStarted = false;
 
-// Caches the Firestore-verified role for the current Firebase user.
-// null  = not yet checked (or no user)
-// 'admin' = verified admin
-// 'denied' = authenticated but NOT an admin
-final _verifiedRole = ValueNotifier<String?>('unchecked');
-
-/// Fetches the role from Firestore and updates [_verifiedRole].
-/// Signs the user out immediately if their role is not 'admin'.
-Future<void> _checkRole() async {
+/// Signs out any authenticated user whose Firestore role is not 'admin'.
+Future<void> _enforceAdminRole() async {
   final user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    _verifiedRole.value = null;
-    return;
-  }
+  if (user == null) return;
   try {
     final doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
         .get();
-    final role = doc.data()?['role'];
-    if (role == 'admin') {
-      _verifiedRole.value = 'admin';
-    } else {
+    if (doc.data()?['role'] != 'admin') {
       await FirebaseAuth.instance.signOut();
-      _verifiedRole.value = 'denied';
     }
   } catch (_) {
-    _verifiedRole.value = null;
+    // Network error — leave the session; login screen re-validates on submit
+  }
+}
+
+/// ChangeNotifier that fires whenever Firebase auth state changes.
+/// Used as GoRouter's refreshListenable so the redirect re-runs on
+/// sign-in and sign-out (including forced sign-out by [_enforceAdminRole]).
+class _AuthChangeNotifier extends ChangeNotifier {
+  late final StreamSubscription<User?> _sub;
+
+  _AuthChangeNotifier() {
+    _sub = FirebaseAuth.instance.authStateChanges().listen((_) {
+      _enforceAdminRole().then((_) => notifyListeners());
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
   }
 }
 
@@ -75,7 +80,6 @@ void main() {
     try {
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
-      FirebaseAuth.instance.authStateChanges().listen((_) => _checkRole());
       _appStarted = true;
       runApp(const AdStickAdminApp());
     } catch (e, s) {
@@ -151,22 +155,21 @@ class AdStickAdminApp extends StatefulWidget {
 }
 
 class _AdStickAdminAppState extends State<AdStickAdminApp> {
+  late final _AuthChangeNotifier _authNotifier;
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
+    _authNotifier = _AuthChangeNotifier();
     _router = GoRouter(
       initialLocation: '/splash',
-      refreshListenable: _verifiedRole,
+      refreshListenable: _authNotifier,
       redirect: (ctx, state) {
         final user = FirebaseAuth.instance.currentUser;
-        final role = _verifiedRole.value;
         final loc  = state.matchedLocation;
         final pub  = loc == '/splash' || loc == '/login';
         if (user == null && !pub) return '/login';
-        // 'denied' = Firestore confirmed not-admin (user was signed out by _checkRole)
-        if (role == 'denied') return '/login';
         return null;
       },
       routes: [
@@ -202,6 +205,7 @@ class _AdStickAdminAppState extends State<AdStickAdminApp> {
 
   @override
   void dispose() {
+    _authNotifier.dispose();
     _router.dispose();
     super.dispose();
   }
