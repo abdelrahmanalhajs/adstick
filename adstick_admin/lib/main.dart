@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'l10n/app_l10n.dart';
 import 'theme/app_theme.dart';
@@ -31,6 +32,37 @@ import 'widgets/float_cluster.dart';
 
 bool _appStarted = false;
 
+// Caches the Firestore-verified role for the current Firebase user.
+// null  = not yet checked (or no user)
+// 'admin' = verified admin
+// 'denied' = authenticated but NOT an admin
+final _verifiedRole = ValueNotifier<String?>('unchecked');
+
+/// Fetches the role from Firestore and updates [_verifiedRole].
+/// Signs the user out immediately if their role is not 'admin'.
+Future<void> _checkRole() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    _verifiedRole.value = null;
+    return;
+  }
+  try {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    final role = doc.data()?['role'];
+    if (role == 'admin') {
+      _verifiedRole.value = 'admin';
+    } else {
+      await FirebaseAuth.instance.signOut();
+      _verifiedRole.value = 'denied';
+    }
+  } catch (_) {
+    _verifiedRole.value = null;
+  }
+}
+
 void _launchError(Object e, StackTrace s) {
   if (_appStarted) return;
   _appStarted = true;
@@ -43,6 +75,7 @@ void main() {
     try {
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
+      FirebaseAuth.instance.authStateChanges().listen((_) => _checkRole());
       _appStarted = true;
       runApp(const AdStickAdminApp());
     } catch (e, s) {
@@ -117,11 +150,14 @@ class AdStickAdminApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = GoRouter(
       initialLocation: '/splash',
+      refreshListenable: _verifiedRole,
       redirect: (ctx, state) {
         final user = FirebaseAuth.instance.currentUser;
+        final role = _verifiedRole.value;
         final loc  = state.matchedLocation;
         final pub  = loc == '/splash' || loc == '/login';
         if (user == null && !pub) return '/login';
+        if (user != null && role != null && role != 'admin') return '/login';
         return null;
       },
       routes: [

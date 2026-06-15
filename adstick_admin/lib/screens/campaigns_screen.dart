@@ -295,7 +295,7 @@ class _CampaignCard extends StatelessWidget {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.dark2,
         title: const Text('Reject Campaign',
             style: TextStyle(color: Colors.white)),
@@ -309,7 +309,7 @@ class _CampaignCard extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel',
                   style: TextStyle(color: AppTheme.textMuted))),
           ElevatedButton(
@@ -318,7 +318,7 @@ class _CampaignCard extends StatelessWidget {
             onPressed: () {
               fsService.rejectCampaign(
                   c.id, ctrl.text.trim());
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
             child: const Text('Reject'),
           ),
@@ -332,7 +332,7 @@ class _CampaignCard extends StatelessWidget {
         text: c.ratePerKm.toStringAsFixed(2));
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.dark2,
         title: const Text('Edit Rate (SAR/km)',
             style: TextStyle(color: Colors.white)),
@@ -347,7 +347,7 @@ class _CampaignCard extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel',
                   style: TextStyle(color: AppTheme.textMuted))),
           ElevatedButton(
@@ -356,7 +356,7 @@ class _CampaignCard extends StatelessWidget {
               if (rate != null && rate > 0) {
                 fsService.updateCampaignRate(c.id, rate);
               }
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
             },
             child: const Text('Save'),
           ),

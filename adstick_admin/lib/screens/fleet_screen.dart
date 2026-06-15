@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../theme/app_theme.dart';
 import '../services/firestore_service.dart';
 import '../models/models.dart';
@@ -21,7 +22,7 @@ class FleetScreen extends StatelessWidget {
 
           final total   = drivers.length;
           final active  = drivers.where((d) => d.isActive).length;
-          final idle    = drivers.where((d) => d.status == 'inactive').length;
+          final idle    = drivers.where((d) => !d.isActive && d.status != 'suspended').length;
           final susp    = drivers.where((d) => d.status == 'suspended').length;
 
           return Column(children: [
@@ -257,7 +258,7 @@ class _FleetCard extends StatelessWidget {
           Row(children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () => context.go('/live-map'),
                 style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     side: BorderSide(
@@ -270,7 +271,7 @@ class _FleetCard extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () => context.go('/drivers'),
                 style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     side: BorderSide(

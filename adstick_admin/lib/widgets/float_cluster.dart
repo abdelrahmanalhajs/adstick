@@ -263,7 +263,7 @@ class _ChatSheetState extends State<_ChatSheet> {
   bool _typing = false;
 
   static const _kb = <String, String>{
-    'price':    'AdStick offers three plans: Starter (SAR 499/mo), Growth (SAR 999/mo), and Enterprise (custom pricing). Each plan includes GPS tracking, real-time impressions, and dashboard access.',
+    'pric':     'AdStick offers three plans: Starter (SAR 499/mo), Growth (SAR 999/mo), and Enterprise (custom pricing). Each plan includes GPS tracking, real-time impressions, and dashboard access.',
     'earn':     'Drivers earn SAR 800–2,400/month based on distance driven and campaign performance. Top Gold-tier drivers receive bonus payouts and exclusive partner perks.',
     'driver':   'Drivers earn SAR 800–2,400/month based on distance driven and campaign performance. Top Gold-tier drivers receive bonus payouts and exclusive partner perks.',
     'campaign': 'Campaigns start from SAR 4,000/month and can target specific zones, peak hours, and demographics. You get live impression data, heatmaps, and ROI reports.',
