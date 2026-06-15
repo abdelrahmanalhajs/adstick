@@ -4,7 +4,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'l10n/app_l10n.dart';
 import 'theme/app_theme.dart';
@@ -31,42 +30,6 @@ import 'screens/settings_screen.dart';
 import 'widgets/float_cluster.dart';
 
 bool _appStarted = false;
-
-/// Signs out any authenticated user whose Firestore role is not 'admin'.
-Future<void> _enforceAdminRole() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
-  try {
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
-    if (doc.data()?['role'] != 'admin') {
-      await FirebaseAuth.instance.signOut();
-    }
-  } catch (_) {
-    // Network error — leave the session; login screen re-validates on submit
-  }
-}
-
-/// ChangeNotifier that fires whenever Firebase auth state changes.
-/// Used as GoRouter's refreshListenable so the redirect re-runs on
-/// sign-in and sign-out (including forced sign-out by [_enforceAdminRole]).
-class _AuthChangeNotifier extends ChangeNotifier {
-  late final StreamSubscription<User?> _sub;
-
-  _AuthChangeNotifier() {
-    _sub = FirebaseAuth.instance.authStateChanges().listen((_) {
-      _enforceAdminRole().then((_) => notifyListeners());
-    });
-  }
-
-  @override
-  void dispose() {
-    _sub.cancel();
-    super.dispose();
-  }
-}
 
 void _launchError(Object e, StackTrace s) {
   if (_appStarted) return;
@@ -147,24 +110,13 @@ class _ErrorApp extends StatelessWidget {
   }
 }
 
-class AdStickAdminApp extends StatefulWidget {
+class AdStickAdminApp extends StatelessWidget {
   const AdStickAdminApp({super.key});
 
   @override
-  State<AdStickAdminApp> createState() => _AdStickAdminAppState();
-}
-
-class _AdStickAdminAppState extends State<AdStickAdminApp> {
-  late final _AuthChangeNotifier _authNotifier;
-  late final GoRouter _router;
-
-  @override
-  void initState() {
-    super.initState();
-    _authNotifier = _AuthChangeNotifier();
-    _router = GoRouter(
+  Widget build(BuildContext context) {
+    final router = GoRouter(
       initialLocation: '/splash',
-      refreshListenable: _authNotifier,
       redirect: (ctx, state) {
         final user = FirebaseAuth.instance.currentUser;
         final loc  = state.matchedLocation;
@@ -201,17 +153,7 @@ class _AdStickAdminAppState extends State<AdStickAdminApp> {
         ),
       ],
     );
-  }
 
-  @override
-  void dispose() {
-    _authNotifier.dispose();
-    _router.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: localeNotifier,
       builder: (_, locale, __) => AppL10n(
@@ -219,7 +161,7 @@ class _AdStickAdminAppState extends State<AdStickAdminApp> {
         child: MaterialApp.router(
           title: 'AdStick Admin',
           theme: AppTheme.adminTheme(),
-          routerConfig: _router,
+          routerConfig: router,
           debugShowCheckedModeBanner: false,
           locale: Locale(locale),
           supportedLocales: const [Locale('en'), Locale('ar')],

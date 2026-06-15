@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../theme/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,11 +16,30 @@ class _State extends State<SplashScreen> with SingleTickerProviderStateMixin {
     _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
     _f = CurvedAnimation(parent: _c, curve: Curves.easeOut);
     _c.forward();
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      if (!mounted) return;
-      final user = FirebaseAuth.instance.currentUser;
-      context.go(user != null ? '/dashboard' : '/login');
-    });
+    Future.delayed(const Duration(milliseconds: 1500), _navigate);
+  }
+
+  Future<void> _navigate() async {
+    if (!mounted) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      context.go('/login');
+      return;
+    }
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (doc.data()?['role'] != 'admin') {
+        await FirebaseAuth.instance.signOut();
+        if (mounted) context.go('/login');
+        return;
+      }
+    } catch (_) {
+      // Network error — proceed; login screen re-validates on submit
+    }
+    if (mounted) context.go('/dashboard');
   }
   @override void dispose() { _c.dispose(); super.dispose(); }
   @override
