@@ -143,12 +143,20 @@ class _ErrorApp extends StatelessWidget {
   }
 }
 
-class AdStickAdminApp extends StatelessWidget {
+class AdStickAdminApp extends StatefulWidget {
   const AdStickAdminApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final router = GoRouter(
+  State<AdStickAdminApp> createState() => _AdStickAdminAppState();
+}
+
+class _AdStickAdminAppState extends State<AdStickAdminApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = GoRouter(
       initialLocation: '/splash',
       refreshListenable: _verifiedRole,
       redirect: (ctx, state) {
@@ -190,7 +198,16 @@ class AdStickAdminApp extends StatelessWidget {
         ),
       ],
     );
+  }
 
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: localeNotifier,
       builder: (_, locale, __) => AppL10n(
@@ -198,7 +215,7 @@ class AdStickAdminApp extends StatelessWidget {
         child: MaterialApp.router(
           title: 'AdStick Admin',
           theme: AppTheme.adminTheme(),
-          routerConfig: router,
+          routerConfig: _router,
           debugShowCheckedModeBanner: false,
           locale: Locale(locale),
           supportedLocales: const [Locale('en'), Locale('ar')],
